@@ -6,12 +6,12 @@ A modern, containerized web application for buying and managing fresh vegetables
 
 ## 📦 Tech Stack
 
-| Layer        | Technology                         |
-|--------------|------------------------------------|
-| Frontend     | Next.js 15 (React 19, TypeScript)  |
-| Backend      | Spring Boot 3.3.0 (Java 17)        |
-| Database     | PostgreSQL 15                      |
-| DevOps       | Docker, Docker Compose             |
+| Layer    | Technology                        |
+| -------- | --------------------------------- |
+| Frontend | Next.js 15 (React 19, TypeScript) |
+| Backend  | Spring Boot 3.3.0 (Java 17)       |
+| Database | PostgreSQL 15                     |
+| DevOps   | Docker, Docker Compose            |
 
 ---
 
@@ -98,6 +98,20 @@ Full documentation with architecture, ERD, API, and deployment guide:
   - Docker ports
 
 ---
+
+## 📘 API Reference
+
+| Entity      | Endpoint           | Methods                               |
+| ----------- | ------------------ | ------------------------------------- |
+| Auth        | `/api/auth/login`  | POST                                  |
+| Users       | `/api/users`       | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Products    | `/api/products`    | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Categories  | `/api/categories`  | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Offers      | `/api/offers`      | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Orders      | `/api/orders`      | GET, POST, PUT/PATCH (status), DELETE |
+| Order Items | `/api/order-items` | GET (Admin), POST (via order), DELETE |
+
+📎 See Swagger UI for full request/response structure.
 
 ## ✅ Optional: Unified Dockerfile?
 
