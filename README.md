@@ -82,6 +82,30 @@ Password: admin123
 
 ---
 
+## 📘 API Reference
+
+| Entity      | Endpoint           | Methods                               |
+| ----------- | ------------------ | ------------------------------------- |
+| Auth        | `/api/auth/login`  | POST                                  |
+| Users       | `/api/users`       | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Products    | `/api/products`    | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Categories  | `/api/categories`  | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Offers      | `/api/offers`      | GET, POST (Admin), PUT/PATCH, DELETE  |
+| Orders      | `/api/orders`      | GET, POST, PUT/PATCH (status), DELETE |
+| Order Items | `/api/order-items` | GET (Admin), POST (via order), DELETE |
+
+📎 See Swagger UI for full request/response structure.
+
+## 🔐 Security Design
+
+- **Authentication**: JWT-based via `/api/auth/login`
+- **Authorization**: Role-based (ADMIN, USER) using Spring Security
+- **Password Storage**: BCrypt (salted & hashed)
+- **Token Handling**: JWT passed in `Authorization: Bearer <token>` header
+- **CORS**: Restricted to frontend origin(s)
+- **Validation**: Backend (Bean validation), Frontend (Next.js forms)
+- **HTTPS**: Strongly recommended for production
+
 ## 📚 Documentation
 
 Full documentation with architecture, ERD, API, and deployment guide:
@@ -98,20 +122,6 @@ Full documentation with architecture, ERD, API, and deployment guide:
   - Docker ports
 
 ---
-
-## 📘 API Reference
-
-| Entity      | Endpoint           | Methods                               |
-| ----------- | ------------------ | ------------------------------------- |
-| Auth        | `/api/auth/login`  | POST                                  |
-| Users       | `/api/users`       | GET, POST (Admin), PUT/PATCH, DELETE  |
-| Products    | `/api/products`    | GET, POST (Admin), PUT/PATCH, DELETE  |
-| Categories  | `/api/categories`  | GET, POST (Admin), PUT/PATCH, DELETE  |
-| Offers      | `/api/offers`      | GET, POST (Admin), PUT/PATCH, DELETE  |
-| Orders      | `/api/orders`      | GET, POST, PUT/PATCH (status), DELETE |
-| Order Items | `/api/order-items` | GET (Admin), POST (via order), DELETE |
-
-📎 See Swagger UI for full request/response structure.
 
 ## ✅ Optional: Unified Dockerfile?
 
