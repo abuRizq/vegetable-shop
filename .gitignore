@@ -1,0 +1,15 @@
+# Node / Frontend
+node_modules/
+.env.local
+.next/
+out/
+
+# Java / Backend
+target/
+*.log
+*.class
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
