@@ -16,6 +16,7 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-jwt:
-  secret: ${JWT_SECRET:MySuperSecretKey}
-  expiration: ${JWT_EXPIRATION:86400000}
+app:
+  jwt:
+    secret: ${JWT_SECRET:MySuperSecretKeyThatIsAtLeast32CharactersLong!}
+    expiration-ms: ${JWT_EXPIRATION:86400000}
