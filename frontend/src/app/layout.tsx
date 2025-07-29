@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { Providers } from "./provider/ThemProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-geist antialiased">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
