@@ -23,21 +23,34 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDto.AuthResponse login(AuthDto.AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-        String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
 
-        AuthDto.AuthResponse response = new AuthDto.AuthResponse();
-        response.setToken(token);
-        response.setUser(new UserDto.UserResponse() {{
-            setId(user.getId());
-            setName(user.getName());
-            setEmail(user.getEmail());
-            setRole(user.getRole());
-        }});
-        return response;
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+
+            Object principal = authentication.getPrincipal();
+            if (!(principal instanceof UserDetails)) {
+                throw new RuntimeException("Principal is not UserDetails! It is: " + principal.getClass());
+            }
+
+            String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
+
+            AuthDto.AuthResponse response = new AuthDto.AuthResponse();
+            response.setToken(token);
+            response.setUser(new UserDto.UserResponse() {{
+                setId(user.getId());
+                setName(user.getName());
+                setEmail(user.getEmail());
+                setRole(user.getRole());
+            }});
+            return response;
+        } catch (Exception ex) {
+            ex.printStackTrace(System.out);
+            throw ex;
+        }
     }
 }
