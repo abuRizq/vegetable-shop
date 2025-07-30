@@ -2,17 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: Custom styles to handle MUI + Tailwind conflicts */
-@layer base {
-  /* Reset some conflicting styles if needed */
-  html {
-    @apply antialiased;
-  }
+/* Custom styles to help Tailwind and MUI work together */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-@layer components {
-  /* You can add custom component styles here */
-  .mui-button-custom {
-    @apply transition-all duration-200 ease-in-out;
-  }
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure proper dark mode transitions */
+html {
+  transition: background-color 0.3s ease;
+}
+
+/* Fix any potential conflicts between Tailwind and MUI */
+.MuiButton-root {
+  text-transform: none !important;
 }

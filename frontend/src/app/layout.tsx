@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { Providers } from "./provider/ThemProvider";
+import { Providers } from "./provider/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,11 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="font-geist antialiased">
-        <Providers>
-          {children}
-        </Providers>
+    <html lang="en" suppressHydrationWarning>
+      
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
