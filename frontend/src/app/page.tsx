@@ -12,195 +12,79 @@ import {
   Heart,
   Play,
 } from "lucide-react";
-import ThemeToggle from "./_Components/ThemeToggle";
+import Sidbar from "./_Components/Sidbar";
 
 // --- Types
-type NavItemProps = {
-  icon: React.ReactNode;
-  text: string;
-  active?: boolean;
-};
+
 type FriendsSidebarProps = {
   avatars: string[];
 };
 
-// ----------- Sidebar Item -----------
-function NavItem({ icon, text, active = false }: NavItemProps) {
-  return (
-    <div
-      className={`flex items-center gap-3 px-3 py-[7px] rounded-md cursor-pointer transition-all
-        ${active
-          ? "bg-[#fbeff1] dark:bg-red-900/20 text-[#e50914] dark:text-red-400 font-bold"
-          : "hover:bg-[#f8f8f8] dark:hover:bg-gray-700 text-[#232323] dark:text-gray-300 font-normal"
-        }
-      `}
-      style={{
-        fontSize: 15,
-        fontWeight: active ? 700 : 500,
-        letterSpacing: "0.02em",
-        marginBottom: 2,
-        fontFamily: "Geist, Roboto, Arial, sans-serif",
-      }}
-    >
-      <span className="text-[20px] flex items-center justify-center">{icon}</span>
-      {text}
-    </div>
-  );
-}
+
 
 // ----------- Right Sidebar -----------
-function FriendsSidebar({ avatars }: FriendsSidebarProps) {
-  return (
-    <aside
-      className="fixed right-0 top-0 h-screen w-20 flex flex-col items-center bg-white dark:bg-gray-900"
-      style={{
-        borderRadius: 0,
-        boxShadow: "none",
-        borderLeft: "1px solid #e6e6e6",
-        zIndex: 40,
-      }}
-    >
-      {/* زر + */}
-      <span
-        className="flex items-center justify-center bg-red-500 dark:bg-red-600 text-white rounded-full hover:bg-red-600 dark:hover:bg-red-700 transition-colors"
-        style={{
-          width: 40,
-          height: 40,
-          marginTop: 60,
-          marginBottom: 30,
-          fontSize: 28,
-          cursor: "pointer",
-        }}
-      >
-        <Plus size={28} />
-      </span>
-      {avatars.slice(1).map((src: string, i: number) => (
-        <Image
-          key={i}
-          src={src}
-          alt={`Friend ${i + 1}`}
-          width={38}
-          height={38}
-          className="rounded-full object-cover"
-          style={{
-            marginBottom: 25,
-            border: "1.5px solid #ececf2",
-            background: "#f7f7fc",
-            width: 38,
-            height: 38,
-          }}
-        />
-      ))}
-    </aside>
-  );
-}
+// function FriendsSidebar({ avatars }: FriendsSidebarProps) {
+//   return (
+//     <aside
+//       className="fixed right-0 top-0 h-screen w-20 flex flex-col items-center bg-white dark:bg-gray-900"
+//       style={{
+//         borderRadius: 0,
+//         boxShadow: "none",
+//         borderLeft: "1px solid #e6e6e6",
+//         zIndex: 40,
+//       }}
+//     >
+//       {/* زر + */}
+//       <span
+//         className="flex items-center justify-center bg-red-500 dark:bg-red-600 text-white rounded-full hover:bg-red-600 dark:hover:bg-red-700 transition-colors"
+//         style={{
+//           width: 40,
+//           height: 40,
+//           marginTop: 60,
+//           marginBottom: 30,
+//           fontSize: 28,
+//           cursor: "pointer",
+//         }}
+//       >
+//         <Plus size={28} />
+//       </span>
+//       {avatars.slice(1).map((src: string, i: number) => (
+//         <Image
+//           key={i}
+//           src={src}
+//           alt={`Friend ${i + 1}`}
+//           width={38}
+//           height={38}
+//           className="rounded-full object-cover"
+//           style={{
+//             marginBottom: 25,
+//             border: "1.5px solid #ececf2",
+//             background: "#f7f7fc",
+//             width: 38,
+//             height: 38,
+//           }}
+//         />
+//       ))}
+//     </aside>
+//   );
+// }
 
 // ----------- Main Page -----------
 export default function HomePage() {
-  const avatars: string[] = [
-    "/avatars/user1.jpg",
-    "/avatars/user2.jpg",
-    "/avatars/user3.jpg",
-    "/avatars/user4.jpg",
-    "/avatars/user5.jpg",
-    "/avatars/user6.jpg",
-    "/avatars/user7.jpg",
-  ];
+
 
   return (
     <div
-      className="bg-[#fafbfc] dark:bg-gray-900 min-h-screen flex text-[#232323] dark:text-white relative transition-colors"
-      style={{ fontFamily: "Geist, Roboto, Arial, sans-serif" }}
+      className="flex min-h-screen bg-gray-50 dark:bg-gray-900" style={{ fontFamily: "Geist, Roboto, Arial, sans-serif" }}
     >
-      {/* ---- Left Sidebar ---- */}
-      <aside
-        className="min-h-screen z-30 flex flex-col px-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
-        style={{
-          width: 220,
-          paddingTop: 18,
-          paddingLeft: 20,
-          paddingRight: 0,
-        }}
-      >
-        {/* Logo */}
-        <div
-          className="flex items-center font-black mb-7 text-[#232323] dark:text-white"
-          style={{
-            fontSize: 22,
-            letterSpacing: "-1px",
-            fontFamily: "Geist, Roboto, Arial, sans-serif",
-          }}
-        >
-          <div className="mr-3">
-            <ThemeToggle />
-          </div>
-          Netflix
-          <span className="text-[#e50914] text-[26px] ml-1 font-black">.</span>
-        </div>
-
-        {/* MENU */}
-        <div
-          className="text-gray-500 dark:text-gray-400"
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            marginBottom: 30,
-            marginTop: 0,
-            letterSpacing: "0.02em",
-          }}
-        >
-          Menu
-        </div>
-        <nav className="mb-1 flex flex-col gap-1">
-          <NavItem icon={<Home size={20} />} text="Browse" active />
-          <NavItem icon={<Heart size={20} strokeWidth={1.7} />} text="Watchlist" />
-          <NavItem icon={<Play size={20} strokeWidth={1.7} />} text="Coming soon" />
-        </nav>
-
-        {/* Social */}
-        <div
-          className="text-gray-500 dark:text-gray-400"
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            marginTop: 12,
-            marginBottom: 30,
-            letterSpacing: "0.02em",
-          }}
-        >
-          Social
-        </div>
-        <nav className="mb-1 flex flex-col gap-1">
-          <NavItem icon={<Users size={20} />} text="Friends" />
-          <NavItem icon={<PartyPopper size={20} />} text="Parties" />
-        </nav>
-
-        {/* General */}
-        <div
-          className="text-gray-500 dark:text-gray-400"
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            marginTop: 12,
-            marginBottom: 30,
-            letterSpacing: "0.02em",
-          }}
-        >
-          General
-        </div>
-        <nav className="mb-1 flex flex-col gap-1">
-          <NavItem icon={<Settings size={20} />} text="Setting" />
-          <NavItem icon={<LogOut size={20} />} text="Log out" />
-        </nav>
-      </aside>
 
       {/* ---- Right Sidebar ---- */}
-      <FriendsSidebar avatars={avatars} />
+      {/* <FriendsSidebar avatars={avatars} /> */}
 
       {/* ---- Main Content ---- */}
       <main className="flex-1 px-0 py-0 relative ml-0 mr-20">
         {/* ---- Top Bar ---- */}
-        <header
+        {/* <header
           className="flex justify-between items-center mb-8"
           style={{
             padding: "12px 30px 10px 30px",
@@ -234,10 +118,10 @@ export default function HomePage() {
               <div className="text-xs text-gray-400 dark:text-gray-500">Level 12</div>
             </div>
           </div>
-        </header>
+        </header> */}
 
         {/* ---- Banner ---- */}
-        <section
+        {/* <section
           className="relative rounded-2xl mb-10 overflow-hidden"
           style={{
             minHeight: 170,
@@ -297,10 +181,10 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* ---- Parties ---- */}
-        <section className="mb-10" style={{ marginLeft: 30 }}>
+        {/* <section className="mb-10" style={{ marginLeft: 30 }}>
           <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Parties</h3>
           <div className="flex gap-7">
             {["Jack", "Jones", "Jimy", "Jack"].map((name: string, i: number) => (
@@ -338,10 +222,12 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
-
+        </section> */}
+        <div className="bg-blue-500 text-white text-2xl p-6 rounded-xl">
+          ✅ Tailwind is now working!
+        </div>
         {/* ---- Continue Watching ---- */}
-        <section style={{ marginLeft: 30 }}>
+        {/* <section style={{ marginLeft: 30 }}>
           <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Continue watching</h3>
           <div className="flex gap-7">
             {[
@@ -369,7 +255,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
       </main>
     </div>
   );

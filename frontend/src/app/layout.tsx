@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import './globals.css'
 import { Providers } from "./provider/ThemeProvider";
+import Sidbar from "./_Components/Sidbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,9 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      
+
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Sidbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

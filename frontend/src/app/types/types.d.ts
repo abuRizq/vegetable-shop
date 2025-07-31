@@ -5,7 +5,6 @@ export interface User {
     password: string
     role: string;
 }
-
 declare namespace Orders {
     export interface Order {
         id: number;
