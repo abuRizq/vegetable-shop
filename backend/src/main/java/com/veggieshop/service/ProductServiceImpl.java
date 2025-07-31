@@ -5,6 +5,7 @@ import com.veggieshop.entity.Category;
 import com.veggieshop.entity.Product;
 import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.CategoryRepository;
+import com.veggieshop.repository.OrderItemRepository;
 import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
     public ProductDto.ProductResponse create(ProductDto.ProductCreateRequest request) {
@@ -33,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
                 .featured(request.isFeatured())
                 .imageUrl(request.getImageUrl())
                 .soldCount(0L)
+                .active(true)
                 .category(category)
                 .build();
         Product saved = productRepository.save(product);
@@ -58,11 +61,79 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found");
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        if (orderItemRepository.existsByProductId(id)) {
+            // Soft delete: deactivate the product if it has order items
+            if (!product.isActive()) {
+                // Already deactivated
+                return;
+            }
+            product.setActive(false);
+            productRepository.save(product);
+        } else {
+            // Hard delete: remove the product if no order items exist
+            productRepository.deleteById(id);
         }
-        productRepository.deleteById(id);
     }
+
+    // ========== Public APIs: Active products only ==========
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findAll() {
+        return productRepository.findByActiveTrue()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findByCategory(Long categoryId) {
+        return productRepository.findByCategoryIdAndActiveTrue(categoryId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findFeatured() {
+        return productRepository.findByFeaturedTrueAndActiveTrue()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ========== Admin APIs: All products, active and inactive ==========
+
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findAllIncludingInactive() {
+        return productRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findByCategoryIncludingInactive(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDto.ProductResponse> findAllFeaturedIncludingInactive() {
+        return productRepository.findByFeaturedTrue()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ========== Single product ==========
 
     @Override
     @Transactional(readOnly = true)
@@ -72,32 +143,7 @@ public class ProductServiceImpl implements ProductService {
         return mapToResponse(product);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductDto.ProductResponse> findAll() {
-        return productRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductDto.ProductResponse> findByCategory(Long categoryId) {
-        return productRepository.findByCategoryId(categoryId)
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductDto.ProductResponse> findFeatured() {
-        return productRepository.findByFeaturedTrue()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+    // ========== Mapper ==========
 
     private ProductDto.ProductResponse mapToResponse(Product product) {
         ProductDto.ProductResponse dto = new ProductDto.ProductResponse();

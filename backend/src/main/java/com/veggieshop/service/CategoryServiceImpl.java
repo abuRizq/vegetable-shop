@@ -2,9 +2,11 @@ package com.veggieshop.service;
 
 import com.veggieshop.dto.CategoryDto;
 import com.veggieshop.entity.Category;
+import com.veggieshop.exception.BadRequestException;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.CategoryRepository;
+import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public CategoryDto.CategoryResponse create(CategoryDto.CategoryCreateRequest request) {
@@ -47,8 +50,13 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found");
         }
+        // Prevent deleting a category if any products (active or inactive) exist in this category
+        if (!productRepository.findByCategoryId(id).isEmpty()) {
+            throw new BadRequestException("Cannot delete a category with associated products.");
+        }
         categoryRepository.deleteById(id);
     }
+
 
     @Override
     @Transactional(readOnly = true)

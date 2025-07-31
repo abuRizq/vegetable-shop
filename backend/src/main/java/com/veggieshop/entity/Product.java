@@ -38,6 +38,9 @@ public class Product {
     @Column(nullable = false)
     private String imageUrl;
 
+    @Column(nullable = false)
+    private boolean active = true; // Soft delete flag
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -54,6 +57,7 @@ public class Product {
         this.updatedAt = LocalDateTime.now();
         if (this.soldCount == null) this.soldCount = 0L;
         if (this.discount == null) this.discount = BigDecimal.ZERO;
+        if (this.active == false) this.active = true;
     }
 
     @PreUpdate
