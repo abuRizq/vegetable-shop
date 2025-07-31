@@ -5,6 +5,7 @@ import com.veggieshop.entity.Category;
 import com.veggieshop.exception.BadRequestException;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
+import com.veggieshop.mapper.CategoryMapper; // مهم
 import com.veggieshop.repository.CategoryRepository;
 import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final CategoryMapper categoryMapper; // مهم
 
     @Override
     public CategoryDto.CategoryResponse create(CategoryDto.CategoryCreateRequest request) {
@@ -32,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .description(request.getDescription())
                 .build();
         Category saved = categoryRepository.save(category);
-        return mapToResponse(saved);
+        return categoryMapper.toCategoryResponse(saved); // MapStruct
     }
 
     @Override
@@ -42,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         Category updated = categoryRepository.save(category);
-        return mapToResponse(updated);
+        return categoryMapper.toCategoryResponse(updated); // MapStruct
     }
 
     @Override
@@ -50,20 +51,18 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found");
         }
-        // Prevent deleting a category if any products (active or inactive) exist in this category
         if (!productRepository.findByCategoryId(id).isEmpty()) {
             throw new BadRequestException("Cannot delete a category with associated products.");
         }
         categoryRepository.deleteById(id);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public CategoryDto.CategoryResponse findById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        return mapToResponse(category);
+        return categoryMapper.toCategoryResponse(category); // MapStruct
     }
 
     @Override
@@ -71,15 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto.CategoryResponse> findAll() {
         return categoryRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    private CategoryDto.CategoryResponse mapToResponse(Category category) {
-        CategoryDto.CategoryResponse dto = new CategoryDto.CategoryResponse();
-        dto.setId(category.getId());
-        dto.setName(category.getName());
-        dto.setDescription(category.getDescription());
-        return dto;
+                .map(categoryMapper::toCategoryResponse) // MapStruct
+                .toList();
     }
 }

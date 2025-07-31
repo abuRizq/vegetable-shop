@@ -4,6 +4,7 @@ import com.veggieshop.dto.OfferDto;
 import com.veggieshop.entity.Offer;
 import com.veggieshop.entity.Product;
 import com.veggieshop.exception.ResourceNotFoundException;
+import com.veggieshop.mapper.OfferMapper; // جديد
 import com.veggieshop.repository.OfferRepository;
 import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +20,7 @@ public class OfferServiceImpl implements OfferService {
 
     private final OfferRepository offerRepository;
     private final ProductRepository productRepository;
+    private final OfferMapper offerMapper; // جديد
 
     @Override
     public OfferDto.OfferResponse create(OfferDto.OfferCreateRequest request) {
@@ -32,7 +33,7 @@ public class OfferServiceImpl implements OfferService {
                 .endDate(request.getEndDate())
                 .build();
         Offer saved = offerRepository.save(offer);
-        return mapToResponse(saved);
+        return offerMapper.toOfferResponse(saved);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class OfferServiceImpl implements OfferService {
     public OfferDto.OfferResponse findById(Long id) {
         Offer offer = offerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Offer not found"));
-        return mapToResponse(offer);
+        return offerMapper.toOfferResponse(offer);
     }
 
     @Override
@@ -56,8 +57,8 @@ public class OfferServiceImpl implements OfferService {
     public List<OfferDto.OfferResponse> findAll() {
         return offerRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .map(offerMapper::toOfferResponse)
+                .toList();
     }
 
     @Override
@@ -65,18 +66,7 @@ public class OfferServiceImpl implements OfferService {
     public List<OfferDto.OfferResponse> findByProduct(Long productId) {
         return offerRepository.findByProductId(productId)
                 .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    private OfferDto.OfferResponse mapToResponse(Offer offer) {
-        OfferDto.OfferResponse dto = new OfferDto.OfferResponse();
-        dto.setId(offer.getId());
-        dto.setProductId(offer.getProduct().getId());
-        dto.setProductName(offer.getProduct().getName());
-        dto.setDiscount(offer.getDiscount());
-        dto.setStartDate(offer.getStartDate());
-        dto.setEndDate(offer.getEndDate());
-        return dto;
+                .map(offerMapper::toOfferResponse)
+                .toList();
     }
 }

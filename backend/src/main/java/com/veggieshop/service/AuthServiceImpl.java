@@ -12,15 +12,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.veggieshop.exception.BadRequestException;
+import com.veggieshop.mapper.UserMapper;
 
-
-@Service
 @RequiredArgsConstructor
+@Service
 public class AuthServiceImpl implements AuthService {
-
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;   // Inject UserMapper
 
     @Override
     public AuthDto.AuthResponse login(AuthDto.AuthRequest request) {
@@ -32,7 +32,6 @@ public class AuthServiceImpl implements AuthService {
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
-
             Object principal = authentication.getPrincipal();
             if (!(principal instanceof UserDetails)) {
                 throw new BadRequestException("Invalid authentication details, please try again.");
@@ -42,12 +41,10 @@ public class AuthServiceImpl implements AuthService {
 
             AuthDto.AuthResponse response = new AuthDto.AuthResponse();
             response.setToken(token);
-            response.setUser(new UserDto.UserResponse() {{
-                setId(user.getId());
-                setName(user.getName());
-                setEmail(user.getEmail());
-                setRole(user.getRole());
-            }});
+
+            // Use MapStruct for mapping
+            response.setUser(userMapper.toUserResponse(user));
+
             return response;
         } catch (BadRequestException ex) {
             throw ex;

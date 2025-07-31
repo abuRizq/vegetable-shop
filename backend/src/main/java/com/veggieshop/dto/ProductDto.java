@@ -20,6 +20,7 @@ public class ProductDto {
         private String imageUrl;
         private Long categoryId;
         private String categoryName;
+        private boolean active;
     }
 
     @Data

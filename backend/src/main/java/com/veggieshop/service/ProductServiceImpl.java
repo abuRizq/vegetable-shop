@@ -5,6 +5,7 @@ import com.veggieshop.entity.Category;
 import com.veggieshop.entity.Product;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
+import com.veggieshop.mapper.ProductMapper;
 import com.veggieshop.repository.CategoryRepository;
 import com.veggieshop.repository.OrderItemRepository;
 import com.veggieshop.repository.ProductRepository;
@@ -23,14 +24,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final OrderItemRepository orderItemRepository;
+    private final ProductMapper productMapper; // Injected mapper
 
     @Override
     public ProductDto.ProductResponse create(ProductDto.ProductCreateRequest request) {
-        // Prevent duplicate product name
         if (productRepository.existsByName(request.getName())) {
             throw new DuplicateException("Product name already exists");
         }
-
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Product product = Product.builder()
@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(category)
                 .build();
         Product saved = productRepository.save(product);
-        return mapToResponse(saved);
+        return productMapper.toProductResponse(saved);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         product.setImageUrl(request.getImageUrl());
         Product updated = productRepository.save(product);
-        return mapToResponse(updated);
+        return productMapper.toProductResponse(updated);
     }
 
     @Override
@@ -73,7 +73,6 @@ public class ProductServiceImpl implements ProductService {
         if (orderItemRepository.existsByProductId(id)) {
             // Soft delete: deactivate the product if it has order items
             if (!product.isActive()) {
-                // Already deactivated
                 return;
             }
             product.setActive(false);
@@ -91,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findAll() {
         return productRepository.findByActiveTrue()
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -100,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findByCategory(Long categoryId) {
         return productRepository.findByCategoryIdAndActiveTrue(categoryId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -109,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findFeatured() {
         return productRepository.findByFeaturedTrueAndActiveTrue()
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -119,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findAllIncludingInactive() {
         return productRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findByCategoryIncludingInactive(Long categoryId) {
         return productRepository.findByCategoryId(categoryId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -135,7 +134,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto.ProductResponse> findAllFeaturedIncludingInactive() {
         return productRepository.findByFeaturedTrue()
                 .stream()
-                .map(this::mapToResponse)
+                .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
     }
 
@@ -146,23 +145,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto.ProductResponse findById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        return mapToResponse(product);
-    }
-
-    // ========== Mapper ==========
-
-    private ProductDto.ProductResponse mapToResponse(Product product) {
-        ProductDto.ProductResponse dto = new ProductDto.ProductResponse();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
-        dto.setDiscount(product.getDiscount());
-        dto.setFeatured(product.isFeatured());
-        dto.setSoldCount(product.getSoldCount());
-        dto.setImageUrl(product.getImageUrl());
-        dto.setCategoryId(product.getCategory().getId());
-        dto.setCategoryName(product.getCategory().getName());
-        return dto;
+        return productMapper.toProductResponse(product);
     }
 }

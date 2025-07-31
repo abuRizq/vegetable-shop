@@ -4,6 +4,7 @@ import com.veggieshop.dto.UserDto;
 import com.veggieshop.entity.User;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
+import com.veggieshop.mapper.UserMapper;
 import com.veggieshop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // For hashing passwords
+    private final UserMapper userMapper; // MapStruct mapper
 
     @Override
     public UserDto.UserResponse register(UserDto.UserCreateRequest request) {
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
                 .role(request.getRole() != null ? request.getRole() : User.Role.USER)
                 .build();
         User saved = userRepository.save(user);
-        return mapToResponse(saved);
+        return userMapper.toUserResponse(saved);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         User updated = userRepository.save(user);
-        return mapToResponse(updated);
+        return userMapper.toUserResponse(updated);
     }
 
     @Override
@@ -59,16 +60,13 @@ public class UserServiceImpl implements UserService {
     public UserDto.UserResponse findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return mapToResponse(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserDto.UserResponse> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return userMapper.toUserResponseList(userRepository.findAll());
     }
 
     @Override
@@ -76,16 +74,6 @@ public class UserServiceImpl implements UserService {
     public UserDto.UserResponse findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return mapToResponse(user);
-    }
-
-    // --- Mapping Method ---
-    private UserDto.UserResponse mapToResponse(User user) {
-        UserDto.UserResponse dto = new UserDto.UserResponse();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setRole(user.getRole());
-        return dto;
+        return userMapper.toUserResponse(user);
     }
 }
