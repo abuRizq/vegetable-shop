@@ -3,6 +3,7 @@ package com.veggieshop.service;
 import com.veggieshop.dto.ProductDto;
 import com.veggieshop.entity.Category;
 import com.veggieshop.entity.Product;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.CategoryRepository;
 import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto.ProductResponse create(ProductDto.ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -41,9 +42,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto.ProductResponse update(Long id, ProductDto.ProductUpdateRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
@@ -58,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found");
+            throw new ResourceNotFoundException("Product not found");
         }
         productRepository.deleteById(id);
     }
@@ -67,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductDto.ProductResponse findById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return mapToResponse(product);
     }
 

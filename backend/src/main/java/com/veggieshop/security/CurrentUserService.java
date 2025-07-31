@@ -14,10 +14,7 @@ public class CurrentUserService {
     private final UserRepository userRepository;
 
     public Long getCurrentUserId() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
-                .map(User::getId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return getCurrentUser().getId();
     }
 
     public User getCurrentUser() {

@@ -62,4 +62,10 @@ public class GlobalExceptionHandler {
         body.put("message", message);
         return new ResponseEntity<>(body, status);
     }
+
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<Object> handleDuplicate(DuplicateException ex) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage());
+    }
 }

@@ -3,6 +3,7 @@ package com.veggieshop.service;
 import com.veggieshop.dto.OrderDto;
 import com.veggieshop.dto.OrderItemDto;
 import com.veggieshop.entity.*;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto.OrderResponse create(Long userId, OrderDto.OrderCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Order order = Order.builder()
                 .user(user)
@@ -34,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> items = request.getItems().stream().map(itemReq -> {
             Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
             OrderItem item = OrderItem.builder()
                     .order(order)
                     .product(product)
@@ -67,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderDto.OrderResponse findById(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         return mapToResponse(order);
     }
 
@@ -92,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void updateStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         order.setStatus(Order.Status.valueOf(status.toUpperCase()));
         orderRepository.save(order);
     }

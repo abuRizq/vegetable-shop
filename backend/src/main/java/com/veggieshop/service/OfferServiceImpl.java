@@ -3,6 +3,7 @@ package com.veggieshop.service;
 import com.veggieshop.dto.OfferDto;
 import com.veggieshop.entity.Offer;
 import com.veggieshop.entity.Product;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.OfferRepository;
 import com.veggieshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public OfferDto.OfferResponse create(OfferDto.OfferCreateRequest request) {
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         Offer offer = Offer.builder()
                 .product(product)
                 .discount(request.getDiscount())
@@ -37,7 +38,7 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public void delete(Long id) {
         if (!offerRepository.existsById(id)) {
-            throw new RuntimeException("Offer not found");
+            throw new ResourceNotFoundException("Offer not found");
         }
         offerRepository.deleteById(id);
     }
@@ -46,7 +47,7 @@ public class OfferServiceImpl implements OfferService {
     @Transactional(readOnly = true)
     public OfferDto.OfferResponse findById(Long id) {
         Offer offer = offerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Offer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Offer not found"));
         return mapToResponse(offer);
     }
 

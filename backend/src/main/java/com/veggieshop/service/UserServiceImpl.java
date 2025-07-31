@@ -2,6 +2,8 @@ package com.veggieshop.service;
 
 import com.veggieshop.dto.UserDto;
 import com.veggieshop.entity.User;
+import com.veggieshop.exception.DuplicateException;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto.UserResponse register(UserDto.UserCreateRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists"); // Replace with custom exception later
+            throw new DuplicateException("Email already exists");
         }
         User user = User.builder()
                 .name(request.getName())
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto.UserResponse update(Long id, UserDto.UserUpdateRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         User updated = userRepository.save(user);
@@ -47,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
         userRepository.deleteById(id);
     }
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto.UserResponse findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return mapToResponse(user);
     }
 
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto.UserResponse findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return mapToResponse(user);
     }
 

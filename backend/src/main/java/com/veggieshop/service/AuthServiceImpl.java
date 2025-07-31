@@ -10,8 +10,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.veggieshop.exception.BadRequestException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +30,12 @@ public class AuthServiceImpl implements AuthService {
             );
 
             User user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                    .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
 
             Object principal = authentication.getPrincipal();
             if (!(principal instanceof UserDetails)) {
-                throw new RuntimeException("Principal is not UserDetails! It is: " + principal.getClass());
+                throw new BadRequestException("Invalid authentication details, please try again.");
             }
 
             String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
@@ -48,9 +49,11 @@ public class AuthServiceImpl implements AuthService {
                 setRole(user.getRole());
             }});
             return response;
-        } catch (Exception ex) {
-            ex.printStackTrace(System.out);
+        } catch (BadRequestException ex) {
             throw ex;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new BadRequestException("Invalid credentials");
         }
     }
 }

@@ -2,6 +2,8 @@ package com.veggieshop.service;
 
 import com.veggieshop.dto.CategoryDto;
 import com.veggieshop.entity.Category;
+import com.veggieshop.exception.DuplicateException;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto.CategoryResponse create(CategoryDto.CategoryCreateRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Category name already exists");
+            throw new DuplicateException("Category name already exists");
         }
         Category category = Category.builder()
                 .name(request.getName())
@@ -33,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto.CategoryResponse update(Long id, CategoryDto.CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         Category updated = categoryRepository.save(category);
@@ -43,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
         if (!categoryRepository.existsById(id)) {
-            throw new RuntimeException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
         categoryRepository.deleteById(id);
     }
@@ -52,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryDto.CategoryResponse findById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         return mapToResponse(category);
     }
 
