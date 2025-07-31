@@ -13,6 +13,8 @@ import {
   Play,
 } from "lucide-react";
 import Sidbar from "./_Components/Sidbar";
+import Searchbar from "./_Components/header/Searchbar";
+import Header from "./_Components/header/header";
 
 // --- Types
 
@@ -74,15 +76,15 @@ export default function HomePage() {
 
 
   return (
-    <div
-      className="flex min-h-screen bg-gray-50 dark:bg-gray-900" style={{ fontFamily: "Geist, Roboto, Arial, sans-serif" }}
-    >
+    <div className="w-full  min-h-screen ">
 
       {/* ---- Right Sidebar ---- */}
       {/* <FriendsSidebar avatars={avatars} /> */}
 
       {/* ---- Main Content ---- */}
-      <main className="flex-1 px-0 py-0 relative ml-0 mr-20">
+      <main className=" ">
+        <Header />
+
         {/* ---- Top Bar ---- */}
         {/* <header
           className="flex justify-between items-center mb-8"
@@ -220,12 +222,10 @@ export default function HomePage() {
                   ))}
                 </div>
               </div>
-            ))}
+            ))} 
           </div>
         </section> */}
-        <div className="bg-blue-500 text-white text-2xl p-6 rounded-xl">
-          ✅ Tailwind is now working!
-        </div>
+
         {/* ---- Continue Watching ---- */}
         {/* <section style={{ marginLeft: 30 }}>
           <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-white">Continue watching</h3>

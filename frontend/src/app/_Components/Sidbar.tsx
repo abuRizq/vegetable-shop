@@ -8,15 +8,13 @@ import ThemeToggle from "./ThemeToggle"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
-
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed)
     }
-
     return (
         <aside
             className={`
-            min-h-screen flex flex-col 
+            h-screen flex flex-col 
             bg-gradient-to-b from-white via-gray-50/50 to-white 
             dark:from-gray-900 dark:via-gray-900/80 dark:to-gray-900
             border-r border-gray-200/60 dark:border-gray-700/60
