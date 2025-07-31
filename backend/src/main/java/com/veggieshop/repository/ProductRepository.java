@@ -22,4 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // All featured products, active or inactive (admin)
     List<Product> findByFeaturedTrue();
+
+    // Prevent duplicate product names
+    boolean existsByName(String name);
 }

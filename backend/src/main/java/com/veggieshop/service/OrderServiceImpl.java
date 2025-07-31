@@ -5,6 +5,7 @@ import com.veggieshop.dto.OrderItemDto;
 import com.veggieshop.entity.*;
 import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.*;
+import com.veggieshop.util.PriceCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final OfferRepository offerRepository;
 
     @Override
     public OrderDto.OrderResponse create(Long userId, OrderDto.OrderCreateRequest request) {
@@ -36,13 +38,19 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = request.getItems().stream().map(itemReq -> {
             Product product = productRepository.findById(itemReq.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-            OrderItem item = OrderItem.builder()
+
+            // Get all offers for this product
+            List<Offer> offers = offerRepository.findByProductId(product.getId());
+
+            // Calculate the final price with product discount and active offer(s)
+            BigDecimal finalPrice = PriceCalculator.calculateFinalPrice(product, offers, java.time.LocalDate.now());
+
+            return OrderItem.builder()
                     .order(order)
                     .product(product)
                     .quantity(itemReq.getQuantity())
-                    .price(product.getPrice())
+                    .price(finalPrice)
                     .build();
-            return item;
         }).collect(Collectors.toList());
 
         // Calculate total price
@@ -63,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
         return mapToResponse(savedOrder);
     }
+
 
     @Override
     @Transactional(readOnly = true)

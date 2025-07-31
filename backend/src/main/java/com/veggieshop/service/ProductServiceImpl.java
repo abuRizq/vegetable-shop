@@ -3,6 +3,7 @@ package com.veggieshop.service;
 import com.veggieshop.dto.ProductDto;
 import com.veggieshop.entity.Category;
 import com.veggieshop.entity.Product;
+import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.repository.CategoryRepository;
 import com.veggieshop.repository.OrderItemRepository;
@@ -25,6 +26,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto.ProductResponse create(ProductDto.ProductCreateRequest request) {
+        // Prevent duplicate product name
+        if (productRepository.existsByName(request.getName())) {
+            throw new DuplicateException("Product name already exists");
+        }
+
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Product product = Product.builder()
