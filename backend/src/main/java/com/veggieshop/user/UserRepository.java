@@ -1,6 +1,6 @@
 package com.veggieshop.repository;
 
-import com.veggieshop.entity.User;
+import com.veggieshop.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

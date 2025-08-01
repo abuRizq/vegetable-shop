@@ -1,7 +1,6 @@
 package com.veggieshop.service;
 
-import com.veggieshop.dto.AuthDto;
-import com.veggieshop.dto.UserDto;
+import com.veggieshop.auth.AuthDto;
 import com.veggieshop.entity.User;
 import com.veggieshop.repository.UserRepository;
 import com.veggieshop.security.JwtUtil;

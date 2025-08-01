@@ -1,6 +1,6 @@
 package com.veggieshop.repository;
 
-import com.veggieshop.entity.OrderItem;
+import com.veggieshop.order.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
