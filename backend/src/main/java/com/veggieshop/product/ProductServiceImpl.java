@@ -1,14 +1,10 @@
-package com.veggieshop.service;
+package com.veggieshop.product;
 
-import com.veggieshop.dto.ProductDto;
-import com.veggieshop.entity.Category;
-import com.veggieshop.entity.Product;
+import com.veggieshop.category.Category;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
-import com.veggieshop.mapper.ProductMapper;
-import com.veggieshop.repository.CategoryRepository;
-import com.veggieshop.repository.OrderItemRepository;
-import com.veggieshop.repository.ProductRepository;
+import com.veggieshop.category.CategoryRepository;
+import com.veggieshop.order.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

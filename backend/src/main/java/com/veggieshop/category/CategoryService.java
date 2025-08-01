@@ -1,6 +1,4 @@
-package com.veggieshop.service;
-
-import com.veggieshop.dto.CategoryDto;
+package com.veggieshop.category;
 
 import java.util.List;
 

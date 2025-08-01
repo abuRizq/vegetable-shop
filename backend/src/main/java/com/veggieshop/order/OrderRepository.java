@@ -1,6 +1,5 @@
-package com.veggieshop.repository;
+package com.veggieshop.order;
 
-import com.veggieshop.order.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

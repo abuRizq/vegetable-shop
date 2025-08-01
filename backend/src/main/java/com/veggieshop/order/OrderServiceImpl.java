@@ -1,10 +1,12 @@
-package com.veggieshop.service;
+package com.veggieshop.order;
 
-import com.veggieshop.dto.OrderDto;
-import com.veggieshop.entity.*;
+import com.veggieshop.offer.Offer;
 import com.veggieshop.exception.ResourceNotFoundException;
-import com.veggieshop.mapper.OrderMapper; // جديد
-import com.veggieshop.repository.*;
+import com.veggieshop.offer.OfferRepository;
+import com.veggieshop.product.Product;
+import com.veggieshop.product.ProductRepository;
+import com.veggieshop.user.User;
+import com.veggieshop.user.UserRepository;
 import com.veggieshop.util.PriceCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

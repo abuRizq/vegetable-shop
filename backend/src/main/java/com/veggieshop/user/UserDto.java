@@ -1,6 +1,5 @@
-package com.veggieshop.dto;
+package com.veggieshop.user;
 
-import com.veggieshop.entity.User;
 import lombok.Data;
 
 import jakarta.validation.constraints.Email;

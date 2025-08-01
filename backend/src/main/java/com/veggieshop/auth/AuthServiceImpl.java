@@ -1,8 +1,7 @@
-package com.veggieshop.service;
+package com.veggieshop.auth;
 
-import com.veggieshop.auth.AuthDto;
-import com.veggieshop.entity.User;
-import com.veggieshop.repository.UserRepository;
+import com.veggieshop.user.User;
+import com.veggieshop.user.UserRepository;
 import com.veggieshop.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.veggieshop.exception.BadRequestException;
-import com.veggieshop.mapper.UserMapper;
+import com.veggieshop.user.UserMapper;
 
 @RequiredArgsConstructor
 @Service

@@ -1,11 +1,7 @@
-package com.veggieshop.service;
+package com.veggieshop.user;
 
-import com.veggieshop.dto.UserDto;
-import com.veggieshop.entity.User;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
-import com.veggieshop.mapper.UserMapper;
-import com.veggieshop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

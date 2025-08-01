@@ -1,12 +1,8 @@
-package com.veggieshop.service;
+package com.veggieshop.offer;
 
-import com.veggieshop.dto.OfferDto;
-import com.veggieshop.entity.Offer;
-import com.veggieshop.entity.Product;
+import com.veggieshop.product.Product;
 import com.veggieshop.exception.ResourceNotFoundException;
-import com.veggieshop.mapper.OfferMapper; // جديد
-import com.veggieshop.repository.OfferRepository;
-import com.veggieshop.repository.ProductRepository;
+import com.veggieshop.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

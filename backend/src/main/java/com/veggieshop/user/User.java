@@ -1,4 +1,4 @@
-package com.veggieshop.entity;
+package com.veggieshop.user;
 
 import jakarta.persistence.*;
 import lombok.*;

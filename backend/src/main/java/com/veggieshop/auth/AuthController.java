@@ -1,7 +1,5 @@
-package com.veggieshop.controller;
+package com.veggieshop.auth;
 
-import com.veggieshop.dto.AuthDto;
-import com.veggieshop.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

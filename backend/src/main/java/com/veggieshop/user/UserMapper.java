@@ -1,7 +1,5 @@
-package com.veggieshop.mapper;
+package com.veggieshop.user;
 
-import com.veggieshop.dto.UserDto;
-import com.veggieshop.entity.User;
 import org.mapstruct.Mapper;
 
 import java.util.List;

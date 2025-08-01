@@ -1,5 +1,6 @@
-package com.veggieshop.entity;
+package com.veggieshop.product;
 
+import com.veggieshop.category.Category;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;

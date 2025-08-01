@@ -1,6 +1,4 @@
-package com.veggieshop.service;
-
-import com.veggieshop.dto.ProductDto;
+package com.veggieshop.product;
 
 import java.util.List;
 

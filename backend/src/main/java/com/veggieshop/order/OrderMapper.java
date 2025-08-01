@@ -1,11 +1,7 @@
-package com.veggieshop.mapper;
+package com.veggieshop.order;
 
-import com.veggieshop.dto.OrderDto;
-import com.veggieshop.entity.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring", uses = {OrderItemMapper.class})
 public interface OrderMapper {

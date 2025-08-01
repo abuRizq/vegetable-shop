@@ -1,4 +1,4 @@
-package com.veggieshop.dto;
+package com.veggieshop.product;
 
 import lombok.Data;
 

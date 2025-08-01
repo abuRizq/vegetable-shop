@@ -1,5 +1,6 @@
-package com.veggieshop.dto;
+package com.veggieshop.auth;
 
+import com.veggieshop.user.UserDto;
 import lombok.Data;
 
 import jakarta.validation.constraints.Email;

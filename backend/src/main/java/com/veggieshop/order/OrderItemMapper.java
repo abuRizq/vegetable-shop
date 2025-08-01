@@ -1,7 +1,5 @@
-package com.veggieshop.mapper;
+package com.veggieshop.order;
 
-import com.veggieshop.dto.OrderItemDto;
-import com.veggieshop.entity.OrderItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

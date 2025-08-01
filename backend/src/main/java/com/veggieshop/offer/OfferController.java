@@ -1,7 +1,5 @@
-package com.veggieshop.controller;
+package com.veggieshop.offer;
 
-import com.veggieshop.dto.OfferDto;
-import com.veggieshop.service.OfferService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

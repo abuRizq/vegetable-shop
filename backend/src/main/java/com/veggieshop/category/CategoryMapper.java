@@ -1,7 +1,5 @@
-package com.veggieshop.mapper;
+package com.veggieshop.category;
 
-import com.veggieshop.dto.CategoryDto;
-import com.veggieshop.entity.Category;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
