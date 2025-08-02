@@ -1,7 +1,6 @@
 package com.veggieshop.category;
 
 import lombok.Data;
-
 import jakarta.validation.constraints.NotBlank;
 
 public class CategoryDto {

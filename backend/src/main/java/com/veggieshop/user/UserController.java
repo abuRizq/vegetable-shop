@@ -2,15 +2,16 @@ package com.veggieshop.user;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
-// === OpenAPI Annotations ===
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,13 +40,41 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Get all users",
-            description = "Retrieves all users (ADMIN only)."
+            summary = "Get all users (paginated)",
+            description = "Retrieves all users (ADMIN only, paginated and sortable)."
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserDto.UserResponse>> getAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<Page<UserDto.UserResponse>> getAll(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.findAll(pageable));
+    }
+
+    @Operation(
+            summary = "Get users by role (paginated)",
+            description = "Retrieve users by role (ADMIN only, paginated and sortable)."
+    )
+    @GetMapping("/role/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<UserDto.UserResponse>> getByRole(
+            @PathVariable("role") User.Role role,
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.findByRole(role, pageable));
+    }
+
+    @Operation(
+            summary = "Search users by name or email (paginated)",
+            description = "Search users by name or email substring (ADMIN only, paginated)."
+    )
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<UserDto.UserResponse>> search(
+            @RequestParam("q") String query,
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.search(query, pageable));
     }
 
     @Operation(

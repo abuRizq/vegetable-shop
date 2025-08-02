@@ -2,15 +2,18 @@ package com.veggieshop.product;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
-// === OpenAPI Annotations ===
+import java.math.BigDecimal;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,12 +28,15 @@ public class ProductController {
     private final ProductService productService;
 
     @Operation(
-            summary = "Get all products",
-            description = "Retrieves a list of all products."
+            summary = "Get all products (paginated)",
+            description = "Retrieves a paged list of all active products."
     )
     @GetMapping
-    public ResponseEntity<List<ProductDto.ProductResponse>> getAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<Page<ProductDto.ProductResponse>> getAll(
+            @PageableDefault(size = 20, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findAll(pageable));
     }
 
     @Operation(
@@ -45,23 +51,52 @@ public class ProductController {
     }
 
     @Operation(
-            summary = "Get featured products",
-            description = "Retrieves a list of featured products."
+            summary = "Get featured products (paginated)",
+            description = "Retrieves a paged list of featured active products."
     )
     @GetMapping("/featured")
-    public ResponseEntity<List<ProductDto.ProductResponse>> getFeatured() {
-        return ResponseEntity.ok(productService.findFeatured());
+    public ResponseEntity<Page<ProductDto.ProductResponse>> getFeatured(
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findFeatured(pageable));
     }
 
     @Operation(
-            summary = "Get products by category",
-            description = "Retrieves products belonging to a specific category."
+            summary = "Get products by category (paginated)",
+            description = "Retrieves paged products belonging to a specific category."
     )
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductDto.ProductResponse>> getByCategory(
+    public ResponseEntity<Page<ProductDto.ProductResponse>> getByCategory(
             @Parameter(description = "ID of the category", required = true, example = "2")
-            @PathVariable("categoryId") Long categoryId) {
-        return ResponseEntity.ok(productService.findByCategory(categoryId));
+            @PathVariable("categoryId") Long categoryId,
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findByCategory(categoryId, pageable));
+    }
+
+    @Operation(
+            summary = "Search products by name (paginated)",
+            description = "Find active products by name substring (case-insensitive, paginated)."
+    )
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductDto.ProductResponse>> searchByName(
+            @RequestParam("name") String name,
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.searchByName(name, pageable));
+    }
+
+    @Operation(
+            summary = "Filter products by price (paginated)",
+            description = "Find active products within a price range (inclusive, paginated)."
+    )
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ProductDto.ProductResponse>> filterByPrice(
+            @RequestParam("min") BigDecimal min,
+            @RequestParam("max") BigDecimal max,
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.filterByPrice(min, max, pageable));
     }
 
     @Operation(

@@ -2,15 +2,16 @@ package com.veggieshop.offer;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
-// === OpenAPI Annotations ===
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,12 +26,15 @@ public class OfferController {
     private final OfferService offerService;
 
     @Operation(
-            summary = "Get all offers",
-            description = "Retrieves a list of all offers."
+            summary = "Get all offers (paged)",
+            description = "Retrieves a paged list of offers. Supports sorting and filtering."
     )
     @GetMapping
-    public ResponseEntity<List<OfferDto.OfferResponse>> getAll() {
-        return ResponseEntity.ok(offerService.findAll());
+    public ResponseEntity<Page<OfferDto.OfferResponse>> getAllPaged(
+            @PageableDefault(size = 20, sort = "id", direction = org.springframework.data.domain.Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(offerService.findAll(pageable));
     }
 
     @Operation(
@@ -45,14 +49,27 @@ public class OfferController {
     }
 
     @Operation(
-            summary = "Get offers by product",
-            description = "Retrieves offers related to a specific product."
+            summary = "Get offers by product (paged)",
+            description = "Retrieves offers related to a specific product with pagination and sorting."
     )
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<OfferDto.OfferResponse>> getByProduct(
+    public ResponseEntity<Page<OfferDto.OfferResponse>> getByProductPaged(
             @Parameter(description = "ID of the product", required = true, example = "1")
-            @PathVariable("productId") Long productId) {
-        return ResponseEntity.ok(offerService.findByProduct(productId));
+            @PathVariable("productId") Long productId,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return ResponseEntity.ok(offerService.findByProduct(productId, pageable));
+    }
+
+    @Operation(
+            summary = "Get active offers (paged)",
+            description = "Retrieves only currently active offers."
+    )
+    @GetMapping("/active")
+    public ResponseEntity<Page<OfferDto.OfferResponse>> getActiveOffers(
+            @PageableDefault(size = 10, sort = "startDate") Pageable pageable
+    ) {
+        return ResponseEntity.ok(offerService.findActiveOffers(pageable));
     }
 
     @Operation(

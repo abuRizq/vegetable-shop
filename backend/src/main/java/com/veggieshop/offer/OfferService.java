@@ -1,11 +1,19 @@
 package com.veggieshop.offer;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface OfferService {
     OfferDto.OfferResponse create(OfferDto.OfferCreateRequest request);
     void delete(Long id);
     OfferDto.OfferResponse findById(Long id);
-    List<OfferDto.OfferResponse> findAll();
-    List<OfferDto.OfferResponse> findByProduct(Long productId);
+
+    // Pagination & Sorting
+    Page<OfferDto.OfferResponse> findAll(Pageable pageable);
+
+    // By Product with Paging
+    Page<OfferDto.OfferResponse> findByProduct(Long productId, Pageable pageable);
+
+    // Example: Active offers (current date within offer period)
+    Page<OfferDto.OfferResponse> findActiveOffers(Pageable pageable);
 }

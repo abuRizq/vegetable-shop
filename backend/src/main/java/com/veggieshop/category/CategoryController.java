@@ -2,15 +2,15 @@ package com.veggieshop.category;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-import java.util.List;
 
-// === OpenAPI Annotations ===
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,12 +25,28 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @Operation(
-            summary = "Get all categories",
-            description = "Retrieves a list of all categories."
+            summary = "Get all categories (paged)",
+            description = "Retrieves a paged list of categories. Supports sorting and filtering."
     )
     @GetMapping
-    public ResponseEntity<List<CategoryDto.CategoryResponse>> getAll() {
-        return ResponseEntity.ok(categoryService.findAll());
+    public ResponseEntity<Page<CategoryDto.CategoryResponse>> getAllPaged(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(categoryService.findAll(pageable));
+    }
+
+    @Operation(
+            summary = "Search categories by name (paged)",
+            description = "Searches categories by partial name match. Supports pagination and sorting."
+    )
+    @GetMapping("/search")
+    public ResponseEntity<Page<CategoryDto.CategoryResponse>> searchByName(
+            @Parameter(description = "Partial name to search for", name = "name")
+            @RequestParam(name = "name") String name,
+            @PageableDefault(size = 20, sort = "name") Pageable pageable
+    ) {
+        Page<CategoryDto.CategoryResponse> categories = categoryService.searchByName(name, pageable);
+        return ResponseEntity.ok(categories);
     }
 
     @Operation(

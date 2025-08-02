@@ -4,10 +4,12 @@ import com.veggieshop.product.Product;
 import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class OfferServiceImpl implements OfferService {
 
     private final OfferRepository offerRepository;
     private final ProductRepository productRepository;
-    private final OfferMapper offerMapper; // جديد
+    private final OfferMapper offerMapper;
 
     @Override
     public OfferDto.OfferResponse create(OfferDto.OfferCreateRequest request) {
@@ -50,19 +52,24 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OfferDto.OfferResponse> findAll() {
-        return offerRepository.findAll()
-                .stream()
-                .map(offerMapper::toOfferResponse)
-                .toList();
+    public Page<OfferDto.OfferResponse> findAll(Pageable pageable) {
+        return offerRepository.findAll(pageable)
+                .map(offerMapper::toOfferResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OfferDto.OfferResponse> findByProduct(Long productId) {
-        return offerRepository.findByProductId(productId)
-                .stream()
-                .map(offerMapper::toOfferResponse)
-                .toList();
+    public Page<OfferDto.OfferResponse> findByProduct(Long productId, Pageable pageable) {
+        return offerRepository.findByProductId(productId, pageable)
+                .map(offerMapper::toOfferResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OfferDto.OfferResponse> findActiveOffers(Pageable pageable) {
+        LocalDate today = LocalDate.now();
+        return offerRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                today, today, pageable
+        ).map(offerMapper::toOfferResponse);
     }
 }

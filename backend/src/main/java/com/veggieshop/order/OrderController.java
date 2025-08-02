@@ -3,6 +3,9 @@ package com.veggieshop.order;
 import com.veggieshop.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,9 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
-// === OpenAPI Annotations ===
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,25 +45,59 @@ public class OrderController {
     }
 
     @Operation(
-            summary = "Get all orders (ADMIN only)",
-            description = "Retrieves all orders in the system. Requires ADMIN role."
+            summary = "Get all orders (paged, ADMIN only)",
+            description = "Retrieves all orders in the system with pagination. Requires ADMIN role."
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<OrderDto.OrderResponse>> getAll() {
-        return ResponseEntity.ok(orderService.findAll());
+    public ResponseEntity<Page<OrderDto.OrderResponse>> getAll(
+            @PageableDefault(size = 20, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(orderService.findAll(pageable));
     }
 
     @Operation(
-            summary = "Get all orders for a specific user",
-            description = "Retrieves all orders for a specific user. ADMIN can access any user, USER can access only his own orders."
+            summary = "Get all orders for a specific user (paged)",
+            description = "Retrieves all orders for a specific user, paged. ADMIN can access any user, USER can access only his own orders."
     )
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.user.id")
-    public ResponseEntity<List<OrderDto.OrderResponse>> getByUser(
+    public ResponseEntity<Page<OrderDto.OrderResponse>> getByUser(
             @Parameter(description = "ID of the user", required = true, example = "1")
-            @PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(orderService.findByUser(userId));
+            @PathVariable("userId") Long userId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(orderService.findByUser(userId, pageable));
+    }
+
+    @Operation(
+            summary = "Get orders by status (paged, ADMIN only)",
+            description = "Retrieves orders filtered by status (e.g., PAID, PENDING), paged."
+    )
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<OrderDto.OrderResponse>> getByStatus(
+            @Parameter(description = "Status of the orders", required = true, example = "PAID")
+            @PathVariable("status") String status,
+            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(orderService.findByStatus(status, pageable));
+    }
+
+    @Operation(
+            summary = "Get orders by user and status (paged)",
+            description = "Retrieves orders for a user filtered by status, paged."
+    )
+    @GetMapping("/user/{userId}/status/{status}")
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.user.id")
+    public ResponseEntity<Page<OrderDto.OrderResponse>> getByUserAndStatus(
+            @PathVariable("userId") Long userId,
+            @PathVariable("status") String status,
+            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
+    ) {
+        return ResponseEntity.ok(orderService.findByUserAndStatus(userId, status, pageable));
     }
 
     @Operation(

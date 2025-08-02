@@ -1,27 +1,37 @@
 package com.veggieshop.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // All products (admin)
-    List<Product> findAll();
+
+    // All products, paginated and sorted (admin)
+    Page<Product> findAll(Pageable pageable);
 
     // Only active products (public, users)
-    List<Product> findByActiveTrue();
+    Page<Product> findByActiveTrue(Pageable pageable);
 
     // Only active products in a specific category (public, users)
-    List<Product> findByCategoryIdAndActiveTrue(Long categoryId);
+    Page<Product> findByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
 
     // All products in a specific category (admin)
-    List<Product> findByCategoryId(Long categoryId);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
 
     // Only active featured products (public, users)
-    List<Product> findByFeaturedTrueAndActiveTrue();
+    Page<Product> findByFeaturedTrueAndActiveTrue(Pageable pageable);
 
     // All featured products, active or inactive (admin)
-    List<Product> findByFeaturedTrue();
+    Page<Product> findByFeaturedTrue(Pageable pageable);
+
+    // Search by name containing (case-insensitive)
+    Page<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name, Pageable pageable);
+
+    // Filter by price range (active products)
+    Page<Product> findByPriceBetweenAndActiveTrue(java.math.BigDecimal min, java.math.BigDecimal max, Pageable pageable);
 
     // Prevent duplicate product names
     boolean existsByName(String name);
+
+    boolean existsByCategoryId(Long categoryId);
 }

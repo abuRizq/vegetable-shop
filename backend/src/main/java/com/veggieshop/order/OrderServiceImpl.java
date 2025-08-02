@@ -9,6 +9,8 @@ import com.veggieshop.user.User;
 import com.veggieshop.user.UserRepository;
 import com.veggieshop.util.PriceCalculator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final OfferRepository offerRepository;
-    private final OrderMapper orderMapper; // جديد
+    private final OrderMapper orderMapper;
 
     @Override
     public OrderDto.OrderResponse create(Long userId, OrderDto.OrderCreateRequest request) {
@@ -41,7 +43,8 @@ public class OrderServiceImpl implements OrderService {
             Product product = productRepository.findById(itemReq.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-            List<Offer> offers = offerRepository.findByProductId(product.getId());
+            // NOTE: Pass Pageable.unpaged() to get all offers
+            List<Offer> offers = offerRepository.findByProductId(product.getId(), Pageable.unpaged()).getContent();
             BigDecimal finalPrice = PriceCalculator.calculateFinalPrice(product, offers, java.time.LocalDate.now());
 
             return OrderItem.builder()
@@ -81,20 +84,32 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDto.OrderResponse> findByUser(Long userId) {
-        return orderRepository.findByUserId(userId)
-                .stream()
-                .map(orderMapper::toOrderResponse)
-                .toList();
+    public Page<OrderDto.OrderResponse> findByUser(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable)
+                .map(orderMapper::toOrderResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDto.OrderResponse> findAll() {
-        return orderRepository.findAll()
-                .stream()
-                .map(orderMapper::toOrderResponse)
-                .toList();
+    public Page<OrderDto.OrderResponse> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toOrderResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderDto.OrderResponse> findByStatus(String status, Pageable pageable) {
+        Order.Status orderStatus = Order.Status.valueOf(status.toUpperCase());
+        return orderRepository.findByStatus(orderStatus, pageable)
+                .map(orderMapper::toOrderResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderDto.OrderResponse> findByUserAndStatus(Long userId, String status, Pageable pageable) {
+        Order.Status orderStatus = Order.Status.valueOf(status.toUpperCase());
+        return orderRepository.findByUserIdAndStatus(userId, orderStatus, pageable)
+                .map(orderMapper::toOrderResponse);
     }
 
     @Override
