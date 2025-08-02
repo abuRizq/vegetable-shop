@@ -1,46 +1,111 @@
-@import "tailwindcss";
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Default (light mode) */
+/* Light theme variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --font-sans: 'Geist', sans-serif;
-  --font-mono: monospace;
+  /* Primary colors */
+  --primary: 196 100% 47%; /* Cyan */
+  --primary-light: 196 100% 67%;
+  --primary-dark: 196 91% 37%;
+  
+  /* Secondary colors */
+  --secondary: 0 84% 60%; /* Red */
+  --secondary-light: 0 77% 70%;
+  --secondary-dark: 0 84% 50%;
+  
+  /* Background colors */
+  --background: 0 0% 100%; /* White */
+  --paper: 0 0% 98%; /* Very light gray */
+  --elevated: 0 0% 96%; /* Light gray */
+  
+  /* Text colors */
+  --text-primary: 0 0% 13%; /* Very dark gray */
+  --text-secondary: 0 0% 38%; /* Medium gray */
+  --text-disabled: 0 0% 62%; /* Light gray */
+  
+  /* UI elements */
+  --divider: 0 0% 87%; /* Light border color */
+  --action-hover: 0 0% 96%; /* Hover background */
+  --action-selected: 196 100% 95%; /* Selected background */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark theme variables */
+.dark {
+  /* Primary colors */
+  --primary: 196 91% 67%; /* Lighter cyan for dark mode */
+  --primary-light: 196 91% 77%;
+  --primary-dark: 196 91% 57%;
+  
+  /* Secondary colors */
+  --secondary: 0 77% 70%; /* Lighter red for dark mode */
+  --secondary-light: 0 77% 80%;
+  --secondary-dark: 0 77% 60%;
+  
+  /* Background colors */
+  --background: 0 0% 7%; /* Very dark gray */
+  --paper: 0 0% 11%; /* Dark gray */
+  --elevated: 0 0% 15%; /* Slightly lighter dark gray */
+  
+  /* Text colors */
+  --text-primary: 0 0% 98%; /* Nearly white */
+  --text-secondary: 0 0% 78%; /* Light gray */
+  --text-disabled: 0 0% 58%; /* Medium gray */
+  
+  /* UI elements */
+  --divider: 0 0% 22%; /* Dark border color */
+  --action-hover: 0 0% 15%; /* Dark hover background */
+  --action-selected: 196 91% 15%; /* Dark selected background */
+  
+  /* Shadows for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
 }
 
-/* Font faces */
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/geist/Geist-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/geist/Geist-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/geist/Geist-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+/* Base styles */
+* {
+  border-color: hsl(var(--divider));
 }
 
-/* Apply styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--text-primary));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--divider));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--text-disabled));
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background-color: hsl(var(--action-selected));
+  color: hsl(var(--text-primary));
 }

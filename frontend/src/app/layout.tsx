@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import './globals.css'
+import { Providers } from "./provider/ThemeProvider";
+import Sidbar from "./_Components/Sidbar";
+import Searchbar from "./_Components/header/Searchbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,9 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="font-geist antialiased">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+
+      <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
+        <Providers>
+          <Sidbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
