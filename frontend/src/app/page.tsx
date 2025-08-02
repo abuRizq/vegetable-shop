@@ -77,51 +77,10 @@ export default function HomePage() {
 
   return (
     <div className="w-full  min-h-screen ">
-
-      {/* ---- Right Sidebar ---- */}
-      {/* <FriendsSidebar avatars={avatars} /> */}
-
-      {/* ---- Main Content ---- */}
       <main className=" ">
         <Header />
 
         {/* ---- Top Bar ---- */}
-        {/* <header
-          className="flex justify-between items-center mb-8"
-          style={{
-            padding: "12px 30px 10px 30px",
-          }}
-        >
-          <button className="text-2xl px-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
-            <ChevronLeft size={24} />
-          </button>
-          <div className="flex-1 max-w-md mx-6">
-            <input
-              type="text"
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-600 px-4 py-2 bg-[#f5f5f5] dark:bg-gray-700 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-              placeholder="Search..."
-              style={{
-                fontFamily: "Geist, Roboto, Arial, sans-serif",
-                fontSize: 15,
-              }}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <Bell size={22} className="text-gray-600 dark:text-gray-400" />
-            <Image
-              src={avatars[0]}
-              alt="User"
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full border-2 border-gray-300 dark:border-gray-600"
-            />
-            <div>
-              <div className="font-bold text-gray-900 dark:text-white">John</div>
-              <div className="text-xs text-gray-400 dark:text-gray-500">Level 12</div>
-            </div>
-          </div>
-        </header> */}
-
         {/* ---- Banner ---- */}
         {/* <section
           className="relative rounded-2xl mb-10 overflow-hidden"

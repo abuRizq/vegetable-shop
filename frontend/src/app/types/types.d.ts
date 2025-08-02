@@ -26,7 +26,6 @@ declare namespace Orders {
         product: Product;
     };
 }
-
 declare namespace Poudects {
     export interface Category {
         id: number;
@@ -65,15 +64,12 @@ export type OrderItem = Orders.OrderItem;
 export type Product = Products.Product;
 export type Category = Products.Category;
 export type Offer = Products.Offer;
-
-
 // API Response types (useful for frontend)
 export interface ApiResponse<T> {
     data: T;
     message: string;
     success: boolean;
 }
-
 export interface PaginatedResponse<T> {
     data: T[];
     total: number;
