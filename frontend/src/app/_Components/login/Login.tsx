@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/hooks/useAuth"
-import { Eye, EyeOff, Mail, Loader2, AlertCircle, User, Shield, Zap } from "lucide-react"
+import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart } from "lucide-react"
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("")
@@ -40,7 +40,6 @@ export const LoginForm = () => {
     setIsSubmitting(true)
     try {
       await login({ email, password })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Login failed:", error.message)
     } finally {
@@ -51,39 +50,102 @@ export const LoginForm = () => {
   // Show loading while checking existing auth
   if (isLoading && !isSubmitting) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ backgroundColor: "hsl(var(--background))" }}
+      >
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-300 text-lg">Checking authentication...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: "hsl(var(--primary))" }} />
+          <p className="text-lg" style={{ color: "hsl(var(--text-secondary))" }}>
+            Checking authentication...
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-gray-50 dark:bg-gray-900">
-      {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800">
-        <div className="w-full max-w-md">
+    <div
+      className="min-h-screen w-full flex items-center justify-center relative overflow-hidden"
+      style={{ backgroundColor: "hsl(var(--background))" }}
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=60 height=60 viewBox=0 0 60 60 xmlns=http://www.w3.org/2000/svg%3E%3Cg fill=none fillRule=evenodd%3E%3Cg fill=%23000000 fillOpacity=0.1%3E%3Ccircle cx=7 cy=7 r=1/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+      </div>
+
+      {/* Floating Vegetable Icons */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Top Left */}
+        <div className="absolute top-20 left-20 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center animate-bounce">
+          <span className="text-2xl">🥬</span>
+        </div>
+
+        {/* Top Right */}
+        <div className="absolute top-32 right-24 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center animate-pulse">
+          <span className="text-xl">🥕</span>
+        </div>
+
+        {/* Bottom Left */}
+        <div className="absolute bottom-32 left-16 w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center animate-bounce delay-300">
+          <span className="text-xl">🥒</span>
+        </div>
+
+        {/* Bottom Right */}
+        <div className="absolute bottom-20 right-20 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center animate-pulse delay-500">
+          <span className="text-xl">🍅</span>
+        </div>
+
+        {/* Center decorations */}
+        <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-secondary/5 rounded-full animate-ping"></div>
+        <div className="absolute top-3/4 right-1/4 w-6 h-6 bg-accent/5 rounded-full animate-pulse delay-700"></div>
+        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-primary/10 rounded-full animate-bounce delay-1000"></div>
+        <div className="absolute top-1/3 right-1/6 w-10 h-10 bg-secondary/5 rounded-full animate-pulse delay-200"></div>
+      </div>
+
+      {/* Login Form Container */}
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div
+          className="card-elevated p-8 rounded-2xl shadow-2xl backdrop-blur-xl border"
+          style={{
+            backgroundColor: "hsl(var(--paper) / 0.95)",
+            borderColor: "hsl(var(--divider))",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
           {/* Logo and Branding */}
-          <div className="mb-8">
-            <div className="flex items-center mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                <div className="w-4 h-4 bg-white rounded-sm"></div>
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-green mr-4">
+                <Leaf className="w-8 h-8 text-white animate-leaf-sway" />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</span>
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: "hsl(var(--text-primary))" }}>
+                  FreshVeggies
+                </h1>
+                <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+                  Farm Fresh Delivery
+                </p>
+              </div>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h1>
-            <p className="text-gray-600 dark:text-gray-400">Please enter your details</p>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: "hsl(var(--text-primary))" }}>
+              Welcome back
+            </h2>
+            <p style={{ color: "hsl(var(--text-secondary))" }}>Sign in to access your fresh produce</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Message */}
             {error && (
               <div
-                className="flex items-center space-x-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg text-red-700 dark:text-red-300"
+                className="flex items-center space-x-3 p-4 rounded-lg border"
+                style={{
+                  backgroundColor: "hsl(var(--error) / 0.1)",
+                  borderColor: "hsl(var(--error) / 0.3)",
+                  color: "hsl(var(--error))",
+                }}
                 role="alert"
               >
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -93,10 +155,18 @@ export const LoginForm = () => {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium"
+                style={{ color: "hsl(var(--text-primary))" }}
+              >
                 Email address
               </label>
               <div className="relative">
+                <Mail
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                  style={{ color: "hsl(var(--text-disabled))" }}
+                />
                 <input
                   id="email"
                   type="email"
@@ -106,14 +176,18 @@ export const LoginForm = () => {
                   disabled={isSubmitting}
                   autoComplete="email"
                   placeholder="Enter your email"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium"
+                style={{ color: "hsl(var(--text-primary))" }}
+              >
                 Password
               </label>
               <div className="relative">
@@ -126,13 +200,14 @@ export const LoginForm = () => {
                   disabled={isSubmitting}
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isSubmitting}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 disabled:opacity-50"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 disabled:opacity-50"
+                  style={{ color: "hsl(var(--text-disabled))" }}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -146,15 +221,22 @@ export const LoginForm = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-600 border-gray-300 dark:border-gray-500 rounded focus:ring-blue-500 focus:ring-2"
+                  className="w-4 h-4 rounded border-2 focus:ring-2 focus:ring-offset-0"
+                  style={{
+                    accentColor: "hsl(var(--primary))",
+                    borderColor: "hsl(var(--divider))",
+                  }}
                 />
-                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember for 30 days</span>
+                <span className="ml-2 text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+                  Remember me
+                </span>
               </label>
               <button
                 type="button"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                className="text-sm font-medium transition-colors duration-200 hover:underline"
+                style={{ color: "hsl(var(--primary))" }}
               >
-                Forgot password
+                Forgot password?
               </button>
             </div>
 
@@ -162,7 +244,7 @@ export const LoginForm = () => {
             <button
               type="submit"
               disabled={isSubmitting || !email || !password}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-blue-500/25"
+              className="btn-primary w-full py-3 px-4 rounded-lg font-semibold transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
             >
               {isSubmitting ? (
                 <>
@@ -170,14 +252,17 @@ export const LoginForm = () => {
                   <span>Signing in...</span>
                 </>
               ) : (
-                <span>Sign in</span>
+                <>
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Sign in to Shop</span>
+                </>
               )}
             </button>
 
             {/* Google Sign In */}
             <button
               type="button"
-              className="w-full flex items-center justify-center space-x-3 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 text-gray-700 dark:text-gray-300 font-medium"
+              className="w-full flex items-center justify-center space-x-3 py-3 px-4 rounded-lg font-medium transition-all duration-200 card hover:shadow-md"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -197,102 +282,31 @@ export const LoginForm = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span>Sign in with Google</span>
+              <span style={{ color: "hsl(var(--text-primary))" }}>Continue with Google</span>
             </button>
           </form>
 
           {/* Sign Up Link */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don&apos;t have an account?{" "}
+            <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+              New to FreshVeggies?{" "}
               <button
                 type="button"
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                className="font-medium transition-colors duration-200 hover:underline"
+                style={{ color: "hsl(var(--primary))" }}
               >
-                Sign up
+                Create account
               </button>
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Right Side - Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=60 height=60 viewBox=0 0 60 60 xmlns=http://www.w3.org/2000/svg%3E%3Cg fill=none fillRule=evenodd%3E%3Cg fill=%23000000 fillOpacity=0.1%3E%3Ccircle cx=7 cy=7 r=1/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
-        </div>
-
-        {/* Floating Icons */}
-        <div className="absolute inset-0">
-          {/* User Icon */}
-          <div className="absolute top-20 left-16 w-12 h-12 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-bounce backdrop-blur-sm">
-            <User className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </div>
-
-          {/* Shield Icon */}
-          <div className="absolute top-32 right-20 w-10 h-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-pulse backdrop-blur-sm">
-            <Shield className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          </div>
-
-          <div className="absolute bottom-32 left-20 w-8 h-8 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-bounce delay-300 backdrop-blur-sm">
-            <Zap className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-          </div>
-
-          {/* Mail Icon */}
-          <div className="absolute bottom-40 right-16 w-10 h-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-pulse delay-500 backdrop-blur-sm">
-            <Mail className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          </div>
-
-          {/* Decorative Circles */}
-          <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-blue-500/30 rounded-full animate-ping"></div>
-          <div className="absolute top-1/2 right-1/3 w-6 h-6 bg-indigo-500/20 rounded-full animate-pulse delay-700"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-blue-600/40 rounded-full animate-bounce delay-1000"></div>
-        </div>
-
-        {/* Main Illustration */}
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-gray-800 dark:text-gray-200 text-center">
-          <div className="mb-8">
-            {/* Central Icon */}
-            <div className="w-48 h-48 mx-auto mb-8 relative">
-              <div className="w-full h-full bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 dark:border-black/30">
-                <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl">
-                  <User className="w-16 h-16 text-white" />
-                </div>
-              </div>
-
-              {/* Floating Elements around central icon */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-white/30 dark:bg-black/30 rounded-full flex items-center justify-center animate-bounce backdrop-blur-sm">
-                <Shield className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-              </div>
-              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-white/30 dark:bg-black/30 rounded-full animate-pulse backdrop-blur-sm"></div>
-            </div>
-          </div>
-
-          <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Secure & Modern</h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-md leading-relaxed">
-            Experience a powerful dashboard with advanced security and intuitive design
-          </p>
-
-          {/* Feature Points */}
-          <div className="mt-8 space-y-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-700 dark:text-gray-300">Advanced Security</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-gray-700 dark:text-gray-300">Modern Interface</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-              <span className="text-gray-700 dark:text-gray-300">Lightning Fast</span>
-            </div>
+          {/* Bottom tagline */}
+          <div className="mt-6 text-center">
+            <p className="text-xs" style={{ color: "hsl(var(--text-disabled))" }}>
+              🌱 Farm Fresh • 🚚 Same Day Delivery • 🥬 100% Organic
+            </p>
           </div>
         </div>
-
-        {/* Bottom Decorative Elements */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/10 dark:from-black/20 to-transparent"></div>
       </div>
     </div>
   )

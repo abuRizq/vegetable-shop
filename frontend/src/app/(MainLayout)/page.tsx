@@ -76,7 +76,7 @@ export default function HomePage() {
 
 
   return (
-    <div className="w-full  min-h-screen ">
+      <div className="min-h-screen w-full content-transition" style={{ backgroundColor: "hsl(var(--background))" }}>
 
       {/* ---- Right Sidebar ---- */}
       {/* <FriendsSidebar avatars={avatars} /> */}
