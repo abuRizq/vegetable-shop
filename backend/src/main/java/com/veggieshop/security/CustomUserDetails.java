@@ -1,6 +1,6 @@
 package com.veggieshop.security;
 
-import com.veggieshop.entity.User;
+import com.veggieshop.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
