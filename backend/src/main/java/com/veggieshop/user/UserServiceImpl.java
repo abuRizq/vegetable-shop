@@ -1,5 +1,6 @@
 package com.veggieshop.user;
 
+import com.veggieshop.exception.BadRequestException;
 import com.veggieshop.exception.DuplicateException;
 import com.veggieshop.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -86,5 +87,25 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public void changePassword(Long userId, UserDto.PasswordChangeRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BadRequestException("Old password is incorrect");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserDto.UserResponse changeRole(Long userId, User.Role newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setRole(newRole);
+        User updated = userRepository.save(user);
+        return userMapper.toUserResponse(updated);
     }
 }
