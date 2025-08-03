@@ -1,7 +1,17 @@
 package com.veggieshop.config;
 
-import com.veggieshop.entity.*;
-import com.veggieshop.repository.*;
+import com.veggieshop.category.Category;
+import com.veggieshop.category.CategoryRepository;
+import com.veggieshop.offer.Offer;
+import com.veggieshop.offer.OfferRepository;
+import com.veggieshop.order.Order;
+import com.veggieshop.order.OrderItem;
+import com.veggieshop.order.OrderItemRepository;
+import com.veggieshop.order.OrderRepository;
+import com.veggieshop.product.Product;
+import com.veggieshop.product.ProductRepository;
+import com.veggieshop.user.User;
+import com.veggieshop.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
