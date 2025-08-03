@@ -12,9 +12,9 @@ import {
   Heart,
   Play,
 } from "lucide-react";
-import Sidbar from "./_Components/Sidbar";
-import Searchbar from "./_Components/header/Searchbar";
-import Header from "./_Components/header/header";
+import Sidbar from "../_Components/Sidbar";
+import Searchbar from "../_Components/header/Searchbar";
+import Header from "../_Components/header/header";
 
 // --- Types
 
