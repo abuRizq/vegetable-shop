@@ -1,9 +1,11 @@
-import LoginForm from '@/app/_Components/login/Login'
+"use client"
+
+import { LoginForm } from '@/app/_Components/login/Login'
 import React from 'react'
 
 function page() {
     return (
-        <div>
+        <div className="h-screen w-full">
             <LoginForm />
         </div>
     )

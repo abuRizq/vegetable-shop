@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import './globals.css'
+import { QueryProviders } from "./provider/QueryClientProvider";
 
 
 export const metadata: Metadata = {
@@ -16,9 +17,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
 
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
- 
+        <QueryProviders>
           {children}
-     
+        </QueryProviders>
       </body>
     </html>
   );

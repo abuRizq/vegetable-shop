@@ -42,6 +42,34 @@ class AuthService {
             throw error;
         }
     }
+    async validateTokenAndGetUser(): Promise<User | null> {
+        const token = this.getTokenFromLocalStorage();
+        if (!token) {
+            return null;
+        }
+        try {
+            const response = await fetch(`${this.baseURL}/api/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    this.removeTokenFromLocalStorage()
+                    throw new Error('Authentication expired');
+                } else {
+                    throw new Error('Invalid token or user not found');
+                }
+            }
+            const user: User = await response.json();
+            return user;
+        }
+        catch (error) {
+            this.removeTokenFromLocalStorage()
+            throw error;
+        }
+    }
     async virfyToken(): Promise<User | null> {
         const token = this.getTokenFromLocalStorage();
 
@@ -73,28 +101,22 @@ class AuthService {
         try {
             const token = this.getTokenFromLocalStorage();
             if (!token) return;
-            await fetch(`${this.baseURL}/auth/logout`, {
+            await fetch(`${this.baseURL
+                } / auth / logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${token} `,
                 },
             });
             this.removeTokenFromLocalStorage();
         } catch (error) {
             console.error('Error during logout:', error);
         }
+    } 
+    getAuthHeader(): Record<string, string> {
+        const token = this.getTokenFromLocalStorage();
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
-    // async register(credentials: RegisterCredentials): Promise<RegisterResponse> {
-    //     try {
-    //         const response = await fetch(`${this.baseURL}/auth/register`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(credentials),
-    //         });
-    //     }
-    // }    
 }
 export const authService = new AuthService();
