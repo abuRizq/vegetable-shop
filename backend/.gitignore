@@ -1,0 +1,9 @@
+# Spring Boot application config
+backend/src/main/resources/application*.properties
+
+# Ignore all application*.yml files
+backend/src/main/resources/application*.yml
+git add -f backend/src/main/resources/application.yml.example
+
+# But keep the example file
+!backend/src/main/resources/application.yml.example
