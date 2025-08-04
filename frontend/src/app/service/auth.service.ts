@@ -1,4 +1,4 @@
-import { LoginCredentials, LoginResponse, User } from "../types/auth";
+import { LoginCredentials, LoginResponse, RegisterCredentials, User } from "../types/auth";
 
 class AuthService {
     private baseURL = process.env.NEXT_PUBLIC_API_URL;
@@ -42,6 +42,30 @@ class AuthService {
             throw error;
         }
     }
+    async Register(credentials: RegisterCredentials): Promise<LoginResponse> {
+        try {
+            const response = await fetch(`${this.baseURL}/users/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(credentials),
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || `HTTP ${response.status}: Registration failed`);
+            }
+            const data: LoginResponse = await response.json();
+            if (!data.token || !data.user) {
+                throw new Error('Invalid response format from server');
+            }
+            this.setTokenToLoacalStorage(data.token);
+            return data;
+        } catch (error) {
+            this.removeTokenFromLocalStorage();
+            throw error;
+        }
+    }
     async validateTokenAndGetUser(): Promise<User | null> {
         const token = this.getTokenFromLocalStorage();
         if (!token) {
@@ -70,13 +94,11 @@ class AuthService {
             throw error;
         }
     }
-    async virfyToken(): Promise<User | null> {
+    async virfyToken(): Promise<LoginResponse | null> {
         const token = this.getTokenFromLocalStorage();
-
         if (!token) {
             return null;
         }
-
         try {
             const response = await fetch(`${this.baseURL}/auth/me`, {
                 method: 'GET',
@@ -89,7 +111,7 @@ class AuthService {
                 this.removeTokenFromLocalStorage();
                 return null;
             }
-            const user: User = await response.json();
+            const user: LoginResponse = await response.json();
             return user;
         } catch (error) {
             console.error('Error during token verification:', error);
@@ -97,7 +119,7 @@ class AuthService {
             return null;
         }
     }
-    async logout(): Promise<void> {
+    async logout(credentials: RegisterCredentials): Promise<void> {
         try {
             const token = this.getTokenFromLocalStorage();
             if (!token) return;
@@ -113,10 +135,10 @@ class AuthService {
         } catch (error) {
             console.error('Error during logout:', error);
         }
-    } 
+    }
     getAuthHeader(): Record<string, string> {
         const token = this.getTokenFromLocalStorage();
-        return token ? { 'Authorization': `Bearer ${token}` } : {};
+        return token ? { 'Authorization': `Bearer ${token} ` } : {};
     }
 }
 export const authService = new AuthService();

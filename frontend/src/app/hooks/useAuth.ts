@@ -17,18 +17,14 @@ export const useAuth = () => {
         queryKey: Authkey.user(),
         queryFn: authService.validateTokenAndGetUser,
         enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth_token'),
-
-        // FIX: Handle undefined error
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         retry: (failureCount, error: any) => {
-            // Add null check for error
             if (error?.message?.includes('Authentication expired') ||
                 error?.message?.includes('No authentication token')) {
                 return false;
             }
             return failureCount < 2;
         },
-
         staleTime: 5 * 60 * 1000,
         refetchInterval: 15 * 60 * 1000,
         refetchOnWindowFocus: true,
@@ -53,6 +49,15 @@ export const useAuth = () => {
             quryClinet.removeQueries({ queryKey: Authkey.user() });
         }
     })
+    const RegisterMution = useMutation({
+        mutationFn: authService.Register,
+        onSuccess: (data) => {
+            quryClinet.setQueryData(Authkey.user(), data.user)
+        },
+        onError: (error) => {
+            quryClinet.removeQueries({ queryKey: Authkey.user() })
+        }
+    })
     const isAuthenticated = !!(user && !isError);
     const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
 
@@ -61,14 +66,13 @@ export const useAuth = () => {
         isAuthenticated,
         isLoading,
         error: error?.massage || LoginMution.error?.message,
-
         login: LoginMution.mutate,
         logout: LogoutMution.mutate,
-
+        register: RegisterMution.mutate,
         refetchUser: () =>
             quryClinet.invalidateQueries({ queryKey: Authkey.user() }),
         clearError: () => {
             quryClinet.resetQueries({ queryKey: Authkey.user() });
-        }
+        },
     };
 }
