@@ -9,7 +9,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/vegetable_shop}
     username: ${DB_USER:postgres}
-    password: ${DB_PASS:secret}
+    password: ${DB_PASS:admin}
   jpa:
     hibernate:
       ddl-auto: update
