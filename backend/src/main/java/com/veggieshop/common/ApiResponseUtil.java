@@ -55,6 +55,14 @@ public class ApiResponseUtil {
     }
 
     public static <T> ResponseEntity<ApiResponse<T>> noContent() {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(ApiResponse.<T>builder()
+                        .success(true)
+                        .data(null)
+                        .meta(null)
+                        .error(null)
+                        .build());
     }
+
 }

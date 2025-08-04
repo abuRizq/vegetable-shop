@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -86,5 +87,18 @@ public class GlobalExceptionHandler {
                 .timestamp(Instant.now())
                 .build();
         return ResponseEntity.status(status).body(ApiResponse.error(apiError));
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingCookie(MissingRequestCookieException ex, HttpServletRequest request) {
+        ApiError error = new ApiError(
+                400,
+                "Missing cookie: " + ex.getCookieName(),
+                "Required authentication cookie is missing.",
+                request.getRequestURI(),
+                Instant.now(),
+                null
+        );
+        return ResponseEntity.badRequest().body(ApiResponse.error(error));
     }
 }
