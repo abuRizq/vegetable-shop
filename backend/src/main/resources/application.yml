@@ -1,3 +1,24 @@
+# ===============================================
+#  Veggie Shop Spring Boot - Example application.yml
+#  -----------------------------------------------
+#  ⚠️ DO NOT PUT REAL PASSWORDS OR SECRETS HERE!
+#  Change values by setting environment variables (recommended),
+#  or directly edit defaults below for local testing only.
+#
+#  Required env vars for production (examples):
+#    - ADMIN_USER=your_admin_username
+#    - ADMIN_PASS=your_admin_password
+#    - DB_URL=jdbc:postgresql://localhost:5432/vegetable_shop
+#    - DB_USER=your_db_username
+#    - DB_PASS=your_db_password
+#    - MAIL_HOST=smtp.yourprovider.com
+#    - MAIL_PORT=587
+#    - MAIL_USER=your@email.com
+#    - MAIL_PASS=your_app_password
+#    - JWT_SECRET=your-long-secret-string
+#    - JWT_EXPIRATION=900000
+# ===============================================
+
 server:
   port: 8080
 
@@ -15,8 +36,27 @@ spring:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: ${MAIL_HOST:smtp.yourprovider.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:your@email.com}
+    password: ${MAIL_PASS:your_app_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   jwt:
-    secret: ${JWT_SECRET:5WTQ5zL14Ue0v5U6Hphqr5Zp6byKePG0A2hYXnN2OMpQyY4tdgWJ8xuvq1UHKADyB5m8fWlb6T6B6SGk9OKlOKg==}
-    expiration-ms: ${JWT_EXPIRATION:86400000}
+    secret: ${JWT_SECRET:changeme-super-secret-key}
+    expiration-ms: ${JWT_EXPIRATION:900000}
+
+# ===============================================
+# README for application.yml:
+# - NEVER commit real secrets/passwords to Github.
+# - Use environment variables to set sensitive values in production.
+# - For local testing, you can use defaults above (NOT RECOMMENDED for prod).
+# - For SSL/HTTPS setup, see Spring Boot documentation.
+# ===============================================
