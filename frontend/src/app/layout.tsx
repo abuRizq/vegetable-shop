@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import './globals.css'
-import { Providers } from "./provider/ThemeProvider";
-import Sidbar from "./_Components/Sidbar";
-import Searchbar from "./_Components/header/Searchbar";
+import { QueryProviders } from "./provider/QueryClientProvider";
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,10 +17,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
 
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-        <Providers>
-          <Sidbar />
+        <QueryProviders>
           {children}
-        </Providers>
+        </QueryProviders>
       </body>
     </html>
   );
