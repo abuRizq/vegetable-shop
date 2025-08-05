@@ -14,23 +14,24 @@ function NavItem({ icon, text, active = false, className = "", collapsed = false
             <a
                 href="#"
                 className={`
-                    flex items-center rounded-xl
-                    transition-all duration-300 ease-out
-                    hover:bg-gray-100/80 dark:hover:bg-gray-800/60
-                    focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-opacity-50
+             flex items-center rounded-xl
+                    nav-item-transition
+                    focus:outline-none focus:ring-2 focus:ring-opacity-50
                     backdrop-blur-sm
                     ${collapsed ? "px-3 py-3 justify-center mx-1" : "px-4 py-3 mx-2"}
-                    ${active
-                        ? "bg-gradient-to-r from-blue-50/90 to-indigo-50/90 dark:from-blue-900/40 dark:to-indigo-900/40 text-blue-700 dark:text-blue-400 shadow-lg shadow-blue-500/10 border border-blue-200/50 dark:border-blue-800/50 scale-[1.02]"
-                        : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:shadow-md hover:shadow-gray-200/20 dark:hover:shadow-black/10 hover:scale-[1.01]"
-                    }
+                    ${active ? "shadow-lg border scale-[1.02]" : "hover:shadow-md hover:scale-[1.01]"}
                     ${className}
                 `}
+                style={{
+                    backgroundColor: active ? "hsl(var(--action-selected))" : "transparent",
+                    color: active ? "hsl(var(--primary))" : "hsl(var(--text-primary))",
+                    borderColor: active ? "hsl(var(--primary) / 0.3)" : "transparent",
+                }}
             >
                 <span
                     className={`
                     flex-shrink-0 transition-all duration-300
-                    ${active ? "scale-110 text-blue-600 dark:text-blue-400 drop-shadow-sm" : "group-hover:scale-105"}
+                    ${active ? "scale-110 drop-shadow-sm" : "group-hover:scale-105"}
                     ${collapsed ? "" : "mr-3"}
                 `}
                 >
@@ -41,7 +42,7 @@ function NavItem({ icon, text, active = false, className = "", collapsed = false
                 )}
                 {active && !collapsed && (
                     <div className="ml-auto flex items-center">
-                        <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-pulse shadow-sm"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-sm"></div>
                     </div>
                 )}
             </a>

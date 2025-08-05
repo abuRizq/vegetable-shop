@@ -40,6 +40,17 @@
   --error: 0 84% 60%;
   --info: 200 98% 39%;
 
+  /* Auth Button Colors */
+  --auth-login-text: 200 98% 39%;
+  --auth-login-bg: 200 98% 95%;
+  --auth-login-border: 200 98% 85%;
+  --auth-login-hover: 200 98% 90%;
+  
+  --auth-logout-text: 0 84% 60%;
+  --auth-logout-bg: 0 84% 95%;
+  --auth-logout-border: 0 84% 85%;
+  --auth-logout-hover: 0 84% 90%;
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -77,6 +88,17 @@
   --warning: 45 83% 57%;
   --error: 0 77% 70%;
   --info: 200 88% 49%;
+
+  /* Auth Button Colors - Dark Theme */
+  --auth-login-text: 200 88% 49%;
+  --auth-login-bg: 200 88% 10%;
+  --auth-login-border: 200 88% 20%;
+  --auth-login-hover: 200 88% 15%;
+  
+  --auth-logout-text: 0 77% 70%;
+  --auth-logout-bg: 0 77% 10%;
+  --auth-logout-border: 0 77% 20%;
+  --auth-logout-hover: 0 77% 15%;
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -129,6 +151,25 @@ body {
 
 .shadow-green {
   box-shadow: var(--shadow-green);
+}
+
+/* Auth Button Utility Classes */
+.auth-login {
+  color: hsl(var(--auth-login-text));
+  background-color: hsl(var(--auth-login-bg));
+  border-color: hsl(var(--auth-login-border));
+}
+.auth-login:hover {
+  background-color: hsl(var(--auth-login-hover));
+}
+
+.auth-logout {
+  color: hsl(var(--auth-logout-text));
+  background-color: hsl(var(--auth-logout-bg));
+  border-color: hsl(var(--auth-logout-border));
+}
+.auth-logout:hover {
+  background-color: hsl(var(--auth-logout-hover));
 }
 
 /* Cards */

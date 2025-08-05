@@ -7,6 +7,7 @@ import NavItem from "./NavItem"
 import ThemeToggle from "./ThemeToggle"
 import { useQuery } from "@tanstack/react-query"
 import { authService } from "../service/auth.service"
+import Link from "next/link"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
@@ -18,6 +19,8 @@ function Sidebar() {
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed)
     }
+    const isLoggedIn = user != null;
+
     return (
         <aside
             className={`
@@ -208,16 +211,22 @@ function Sidebar() {
                     backgroundColor: "hsl(var(--action-hover))",
                 }}
             >
-                <NavItem
-                    icon={<LogOut size={20} />}
-                    text={typeof user !== null ? "Log In" : "Sign Out"}
-                    className="hover:shadow-md"
-                    // style={{
-                    //     color: "hsl(var(--error))",
-                    //     backgroundColor: "hsl(var(--error) / 0.1)",
-                    // }}
-                    collapsed={isCollapsed}
-                />
+                <Link
+                    href={isLoggedIn ? "/" : "/login"}
+                    className={`
+            flex items-center rounded-xl
+                    nav-item-transition
+                    focus:outline-none focus:ring-2 focus:ring-opacity-50
+                    backdrop-blur-sm
+                    ${isCollapsed ? "px-3 py-3 justify-center mx-1" : "px-4 py-3 mx-2"}                            
+                `}
+
+                >
+                    <LogOut size={20}
+                        className={` ${isCollapsed ? "px-2" : "px-4"}`}
+                    />
+                    <span>{isLoggedIn ? "Sign Out" : "Log In"}</span>
+                </Link>
             </div>
         </aside>
     );
