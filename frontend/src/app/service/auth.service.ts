@@ -25,7 +25,6 @@ class AuthService {
                 },
                 body: JSON.stringify(credentials),
             });
-
             if (!response.ok) {
                 const errorData = await (await response).json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
@@ -119,7 +118,7 @@ class AuthService {
             return null;
         }
     }
-    async logout(credentials: RegisterCredentials): Promise<void> {
+    async logout(): Promise<void> {
         try {
             const token = this.getTokenFromLocalStorage();
             if (!token) return;
