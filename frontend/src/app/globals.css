@@ -2,43 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light theme variables */
+/* Light theme (default) */
 :root {
-  /* Primary colors - Fresh Green */
-  --primary: 142 76% 36%; /* Forest Green */
+  /* Primary */
+  --primary: 142 76% 36%;
   --primary-light: 142 69% 58%;
   --primary-dark: 142 84% 27%;
 
-  /* Secondary colors - Vibrant Orange */
-  --secondary: 25 95% 53%; /* Carrot Orange */
+  /* Secondary */
+  --secondary: 25 95% 53%;
   --secondary-light: 25 95% 63%;
   --secondary-dark: 25 95% 43%;
 
-  /* Accent colors - Fresh Lime */
-  --accent: 84 81% 44%; /* Lime Green */
+  /* Accent */
+  --accent: 84 81% 44%;
   --accent-light: 84 81% 54%;
   --accent-dark: 84 81% 34%;
 
-  /* Background colors */
-  --background: 0 0% 100%; /* Pure White */
-  --paper: 120 20% 98%; /* Very light mint */
-  --elevated: 120 15% 96%; /* Light mint gray */
+  /* Backgrounds */
+  --background: 0 0% 100%;
+  --paper: 120 20% 98%;
+  --elevated: 120 15% 96%;
 
-  /* Text colors */
-  --text-primary: 0 0% 13%; /* Very dark gray */
-  --text-secondary: 0 0% 38%; /* Medium gray */
-  --text-disabled: 0 0% 62%; /* Light gray */
+  /* Text */
+  --text-primary: 0 0% 13%;
+  --text-secondary: 0 0% 38%;
+  --text-disabled: 0 0% 62%;
 
-  /* UI elements */
-  --divider: 120 10% 87%; /* Light mint border */
-  --action-hover: 120 25% 96%; /* Mint hover background */
-  --action-selected: 142 76% 95%; /* Green selected background */
+  /* UI */
+  --divider: 120 10% 87%;
+  --action-hover: 120 25% 96%;
+  --action-selected: 142 76% 95%;
 
-  /* Success/Error states */
-  --success: 142 76% 36%; /* Same as primary green */
-  --warning: 45 93% 47%; /* Golden yellow */
-  --error: 0 84% 60%; /* Red for errors */
-  --info: 200 98% 39%; /* Blue for info */
+  /* States */
+  --success: 142 76% 36%;
+  --warning: 45 93% 47%;
+  --error: 0 84% 60%;
+  --info: 200 98% 39%;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -47,76 +47,68 @@
   --shadow-green: 0 4px 14px 0 rgb(34 197 94 / 0.15);
 }
 
-/* Dark theme variables */
+/* Dark theme */
 .dark {
-  /* Primary colors - Softer Green for dark mode */
-  --primary: 142 69% 58%; /* Lighter forest green */
+  --primary: 142 69% 58%;
   --primary-light: 142 69% 68%;
   --primary-dark: 142 69% 48%;
 
-  /* Secondary colors - Softer Orange */
-  --secondary: 25 85% 63%; /* Softer carrot orange */
+  --secondary: 25 85% 63%;
   --secondary-light: 25 85% 73%;
   --secondary-dark: 25 85% 53%;
 
-  /* Accent colors - Softer Lime */
-  --accent: 84 71% 54%; /* Softer lime green */
+  --accent: 84 71% 54%;
   --accent-light: 84 71% 64%;
   --accent-dark: 84 71% 44%;
 
-  /* Background colors */
-  --background: 0 0% 7%; /* Very dark gray */
-  --paper: 120 8% 11%; /* Dark mint gray */
-  --elevated: 120 6% 15%; /* Slightly lighter dark mint */
+  --background: 0 0% 7%;
+  --paper: 120 8% 11%;
+  --elevated: 120 6% 15%;
 
-  /* Text colors */
-  --text-primary: 0 0% 98%; /* Nearly white */
-  --text-secondary: 0 0% 78%; /* Light gray */
-  --text-disabled: 0 0% 58%; /* Medium gray */
+  --text-primary: 0 0% 98%;
+  --text-secondary: 0 0% 78%;
+  --text-disabled: 0 0% 58%;
 
-  /* UI elements */
-  --divider: 120 5% 22%; /* Dark mint border */
-  --action-hover: 120 8% 15%; /* Dark mint hover */
-  --action-selected: 142 69% 15%; /* Dark green selected */
+  --divider: 120 5% 22%;
+  --action-hover: 120 8% 15%;
+  --action-selected: 142 69% 15%;
 
-  /* Success/Error states for dark mode */
-  --success: 142 69% 58%; /* Lighter green for dark mode */
-  --warning: 45 83% 57%; /* Softer yellow */
-  --error: 0 77% 70%; /* Softer red */
-  --info: 200 88% 49%; /* Softer blue */
+  --success: 142 69% 58%;
+  --warning: 45 83% 57%;
+  --error: 0 77% 70%;
+  --info: 200 88% 49%;
 
-  /* Shadows for dark mode */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
   --shadow-green: 0 4px 14px 0 rgb(34 197 94 / 0.25);
 }
 
-/* Base styles */
-* {
-  border-color: hsl(var(--divider));
+/* Apply transitions only on relevant elements */
+body,
+button,
+input,
+.card,
+.nav,
+footer {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--text-primary));
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom utility classes for vegetable shop theme */
+/* Utility classes */
 .bg-primary {
   background-color: hsl(var(--primary));
 }
-
 .bg-primary-light {
   background-color: hsl(var(--primary-light));
 }
-
 .bg-secondary {
   background-color: hsl(var(--secondary));
 }
-
 .bg-accent {
   background-color: hsl(var(--accent));
 }
@@ -124,11 +116,9 @@ body {
 .text-primary-color {
   color: hsl(var(--primary));
 }
-
 .text-secondary-color {
   color: hsl(var(--secondary));
 }
-
 .text-accent {
   color: hsl(var(--accent));
 }
@@ -141,47 +131,29 @@ body {
   box-shadow: var(--shadow-green);
 }
 
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
+/* Cards */
+.card {
+  background-color: hsl(var(--paper));
+  border: 1px solid hsl(var(--divider));
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+.card-elevated {
+  background-color: hsl(var(--elevated));
+  box-shadow: var(--shadow-md);
 }
 
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
-}
-
-/* Focus styles */
-:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-
-/* Selection styles */
-::selection {
-  background-color: hsl(var(--action-selected));
-  color: hsl(var(--text-primary));
-}
-
-/* Button variants */
+/* Buttons */
 .btn-primary {
   background-color: hsl(var(--primary));
   color: white;
   border: 1px solid hsl(var(--primary));
-  transition: all 0.2s ease;
 }
-
 .btn-primary:hover {
   background-color: hsl(var(--primary-dark));
-  border-color: hsl(var(--primary-dark));
   box-shadow: var(--shadow-green);
 }
 
@@ -189,62 +161,36 @@ body {
   background-color: hsl(var(--secondary));
   color: white;
   border: 1px solid hsl(var(--secondary));
-  transition: all 0.2s ease;
 }
-
 .btn-secondary:hover {
   background-color: hsl(var(--secondary-dark));
-  border-color: hsl(var(--secondary-dark));
 }
 
 .btn-outline {
   background-color: transparent;
   color: hsl(var(--primary));
   border: 1px solid hsl(var(--primary));
-  transition: all 0.2s ease;
 }
-
 .btn-outline:hover {
   background-color: hsl(var(--primary));
   color: white;
 }
 
-/* Card styles */
-.card {
-  background-color: hsl(var(--paper));
-  border: 1px solid hsl(var(--divider));
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.card-elevated {
-  background-color: hsl(var(--elevated));
-  box-shadow: var(--shadow-md);
-}
-
-/* Input styles */
+/* Inputs */
 .input {
   background-color: hsl(var(--paper));
   border: 1px solid hsl(var(--divider));
   color: hsl(var(--text-primary));
-  transition: all 0.2s ease;
 }
-
 .input:focus {
   border-color: hsl(var(--primary));
   box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
 }
-
 .input::placeholder {
   color: hsl(var(--text-disabled));
 }
 
-/* Vegetable-specific animations */
+/* Animations */
 @keyframes grow {
   0% {
     transform: scale(1);
@@ -256,7 +202,6 @@ body {
     transform: scale(1);
   }
 }
-
 @keyframes leaf-sway {
   0%,
   100% {
@@ -266,25 +211,47 @@ body {
     transform: rotate(2deg);
   }
 }
-
 .animate-grow {
   animation: grow 2s ease-in-out infinite;
 }
-
 .animate-leaf-sway {
   animation: leaf-sway 3s ease-in-out infinite;
 }
 
-/* Reduced motion support */
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
+/* Focus & selection */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+::selection {
+  background-color: hsl(var(--action-selected));
+  color: hsl(var(--text-primary));
+}
+
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Print styles */
+/* Print */
 @media print {
   * {
     background: white !important;

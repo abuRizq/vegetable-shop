@@ -5,9 +5,16 @@ import { useState } from "react"
 import { Home, Heart, Clock, ShoppingCart, Tag, Settings, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
 import NavItem from "./NavItem"
 import ThemeToggle from "./ThemeToggle"
+import { useQuery } from "@tanstack/react-query"
+import { authService } from "../service/auth.service"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const { data: user } = useQuery({
+        queryKey: ['user', 'user'],
+        queryFn: authService.validateTokenAndGetUser,
+        enabled: typeof window != undefined || !!localStorage.getItem('auth-token')
+    })
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed)
     }
@@ -47,7 +54,11 @@ function Sidebar() {
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
                 <div className="transition-transform duration-300 group-hover:scale-110">
-                    {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                    {isCollapsed ? (
+                        <ChevronRight size={14} />
+                    ) : (
+                        <ChevronLeft size={14} />
+                    )}
                 </div>
             </button>
 
@@ -78,7 +89,9 @@ function Sidebar() {
                                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
                                     <Leaf className="w-5 h-5 text-white animate-leaf-sway" />
                                 </div>
-                                <span className="transition-all duration-300 group-hover:tracking-wider">FreshVeggies</span>
+                                <span className="transition-all duration-300 group-hover:tracking-wider">
+                                    FreshVeggies
+                                </span>
                             </div>
                         )}
                     </div>
@@ -109,8 +122,17 @@ function Sidebar() {
                         </h3>
                     )}
                     <nav className="space-y-1">
-                        <NavItem icon={<Home size={20} />} text="Home" active collapsed={isCollapsed} />
-                        <NavItem icon={<Clock size={20} />} text="Fresh Today" collapsed={isCollapsed} />
+                        <NavItem
+                            icon={<Home size={20} />}
+                            text="Home"
+                            active
+                            collapsed={isCollapsed}
+                        />
+                        <NavItem
+                            icon={<Clock size={20} />}
+                            text="Fresh Today"
+                            collapsed={isCollapsed}
+                        />
                     </nav>
                 </div>
 
@@ -119,15 +141,27 @@ function Sidebar() {
                     {!isCollapsed && (
                         <h3
                             className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-4 px-2
-                                     transition-all duration-300 hover:text-gray-600 dark:hover:text-gray-300"
+                                    transition-all duration-300 hover:text-gray-600 dark:hover:text-gray-300"
                         >
                             My List
                         </h3>
                     )}
                     <nav className="space-y-1">
-                        <NavItem icon={<Heart size={20} />} text="Favorites" collapsed={isCollapsed} />
-                        <NavItem icon={<Star size={20} />} text="Watchlist" collapsed={isCollapsed} />
-                        <NavItem icon={<ShoppingCart size={20} />} text="Downloads" collapsed={isCollapsed} />
+                        <NavItem
+                            icon={<Heart size={20} />}
+                            text="Favorites"
+                            collapsed={isCollapsed}
+                        />
+                        <NavItem
+                            icon={<Star size={20} />}
+                            text="Watchlist"
+                            collapsed={isCollapsed}
+                        />
+                        <NavItem
+                            icon={<ShoppingCart size={20} />}
+                            text="Downloads"
+                            collapsed={isCollapsed}
+                        />
                     </nav>
                 </div>
 
@@ -136,16 +170,28 @@ function Sidebar() {
                     {!isCollapsed && (
                         <h3
                             className="text-xs font-bold uppercase tracking-widest mb-4 px-2
-                                     transition-all duration-300"
+                                    transition-all duration-300"
                             style={{ color: "hsl(var(--text-disabled))" }}
                         >
                             My Orders
                         </h3>
                     )}
                     <nav className="space-y-1">
-                        <NavItem icon={<Heart size={20} />} text="Favorites" collapsed={isCollapsed} />
-                        <NavItem icon={<Star size={20} />} text="Wishlist" collapsed={isCollapsed} />
-                        <NavItem icon={<ShoppingCart size={20} />} text="Cart" collapsed={isCollapsed} />
+                        <NavItem
+                            icon={<Heart size={20} />}
+                            text="Favorites"
+                            collapsed={isCollapsed}
+                        />
+                        <NavItem
+                            icon={<Star size={20} />}
+                            text="Wishlist"
+                            collapsed={isCollapsed}
+                        />
+                        <NavItem
+                            icon={<ShoppingCart size={20} />}
+                            text="Cart"
+                            collapsed={isCollapsed}
+                        />
                     </nav>
                 </div>
             </div>
@@ -164,17 +210,17 @@ function Sidebar() {
             >
                 <NavItem
                     icon={<LogOut size={20} />}
-                    text="Sign Out"
+                    text={typeof user !== null ? "Log In" : "Sign Out"}
                     className="hover:shadow-md"
-                    style={{
-                        color: "hsl(var(--error))",
-                        backgroundColor: "hsl(var(--error) / 0.1)",
-                    }}
+                    // style={{
+                    //     color: "hsl(var(--error))",
+                    //     backgroundColor: "hsl(var(--error) / 0.1)",
+                    // }}
                     collapsed={isCollapsed}
                 />
             </div>
         </aside>
-    )
+    );
 }
 
 export default Sidebar

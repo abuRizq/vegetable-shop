@@ -14,14 +14,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
-
-            <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
+            <div className="flex  w-full min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
                 <Providers>
                     <Sidbar />
                     {children}
                 </Providers>
-            </body>
-        </html>
+            </div>
     );
 }
