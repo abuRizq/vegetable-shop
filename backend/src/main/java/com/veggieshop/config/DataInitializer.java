@@ -39,14 +39,6 @@ public class DataInitializer {
             OrderItemRepository orderItemRepository
     ) {
         return args -> {
-            if (userRepository.count() > 0
-                    || categoryRepository.count() > 0
-                    || productRepository.count() > 0
-                    || offerRepository.count() > 0
-                    || orderRepository.count() > 0
-                    || orderItemRepository.count() > 0) {
-                return;
-            }
 
             // === USERS ===
             User user1 = userRepository.save(User.builder()

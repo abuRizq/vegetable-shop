@@ -2,7 +2,9 @@ package com.veggieshop.auth;
 
 import com.veggieshop.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -43,7 +45,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshToken validateToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token not found"));
 
         if (refreshToken.isRevoked() || refreshToken.getExpiryDate().isBefore(Instant.now())) {
             throw new IllegalArgumentException("Refresh token is expired or revoked");

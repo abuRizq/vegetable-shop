@@ -207,6 +207,8 @@ public class UserController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "User deleted"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(schema = @Schema(implementation = com.veggieshop.common.ApiError.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Cannot delete user due to database constraints",
                     content = @Content(schema = @Schema(implementation = com.veggieshop.common.ApiError.class)))
     })
     @DeleteMapping("/{id}")

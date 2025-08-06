@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Filter by user and status
     Page<Order> findByUserIdAndStatus(Long userId, Order.Status status, Pageable pageable);
+
+    boolean existsByIdAndUserId(Long orderId, Long userId);
 }

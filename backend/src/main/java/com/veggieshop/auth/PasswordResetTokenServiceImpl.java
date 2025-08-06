@@ -1,6 +1,6 @@
 package com.veggieshop.auth;
 
-import com.veggieshop.auth.exceptions.InvalidResetTokenException;
+import com.veggieshop.exception.InvalidResetTokenException;
 import com.veggieshop.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

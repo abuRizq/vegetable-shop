@@ -94,6 +94,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDto.ProductResponse> findByCategory(Long categoryId, Pageable pageable) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new ResourceNotFoundException("Category not found");
+        }
         return productRepository.findByCategoryIdAndActiveTrue(categoryId, pageable)
                 .map(productMapper::toProductResponse);
     }

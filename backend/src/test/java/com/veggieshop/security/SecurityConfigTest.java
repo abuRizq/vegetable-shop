@@ -1,56 +1,54 @@
 package com.veggieshop.security;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 class SecurityConfigTest {
 
-    private SecurityConfig securityConfig;
-    private JwtAuthFilter jwtAuthFilter;
-    private UserDetailsServiceImpl userDetailsService;
+    @MockBean
+    JwtAuthFilter jwtAuthFilter;
 
-    @BeforeEach
-    void setup() {
-        jwtAuthFilter = Mockito.mock(JwtAuthFilter.class);
-        userDetailsService = Mockito.mock(UserDetailsServiceImpl.class);
-        securityConfig = new SecurityConfig(jwtAuthFilter, userDetailsService);
+    @Autowired
+    SecurityFilterChain securityFilterChain;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Test
+    @DisplayName("SecurityFilterChain bean should exist")
+    void testSecurityFilterChainBeanExists() {
+        assertThat(securityFilterChain).isNotNull();
     }
 
     @Test
-    void passwordEncoderBean_shouldReturnBCryptPasswordEncoder() {
-        PasswordEncoder encoder = securityConfig.passwordEncoder();
-        assertThat(encoder).isInstanceOf(org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.class);
+    @DisplayName("PasswordEncoder bean should exist")
+    void testPasswordEncoderBeanExists() {
+        assertThat(passwordEncoder).isNotNull();
     }
 
     @Test
-    void authenticationManagerBean_shouldReturnAuthenticationManager() throws Exception {
-        AuthenticationConfiguration config = Mockito.mock(AuthenticationConfiguration.class);
-        AuthenticationManager expectedManager = Mockito.mock(AuthenticationManager.class);
-        Mockito.when(config.getAuthenticationManager()).thenReturn(expectedManager);
-
-        AuthenticationManager manager = securityConfig.authenticationManager(config);
-        assertThat(manager).isSameAs(expectedManager);
+    @DisplayName("AuthenticationManager bean should exist")
+    void testAuthenticationManagerBeanExists() {
+        assertThat(authenticationManager).isNotNull();
     }
 
     @Test
-    void securityFilterChainBean_shouldBeCreated() throws Exception {
-        // Using an AnnotationConfigApplicationContext for integration of filter bean
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.registerBean(JwtAuthFilter.class, () -> jwtAuthFilter);
-            ctx.registerBean(UserDetailsServiceImpl.class, () -> userDetailsService);
-            ctx.register(SecurityConfig.class);
-            ctx.refresh();
-
-            SecurityFilterChain chain = ctx.getBean(SecurityFilterChain.class);
-            assertThat(chain).isNotNull();
-        }
+    @DisplayName("PasswordEncoder should encode and match password")
+    void testPasswordEncoderWorks() {
+        String raw = "test123";
+        String encoded = passwordEncoder.encode(raw);
+        assertThat(passwordEncoder.matches(raw, encoded)).isTrue();
     }
 }

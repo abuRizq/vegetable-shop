@@ -2,6 +2,7 @@ package com.veggieshop.auth;
 
 import com.veggieshop.exception.BadRequestException;
 import com.veggieshop.exception.DuplicateException;
+import com.veggieshop.exception.ResourceNotFoundException;
 import com.veggieshop.security.JwtUtil;
 import com.veggieshop.user.User;
 import com.veggieshop.user.UserRepository;
@@ -9,6 +10,7 @@ import com.veggieshop.user.UserMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,36 +33,37 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    private static final String RESET_LINK_BASE = "https://your-frontend.com/reset-password?token=";
+    @Value("${app.reset-link-base}")
+    private String resetLinkBase;
+
+    @Value("${app.security.cookie-secure:true}")
+    private boolean cookieSecure;
+
+    @Value("${app.security.refresh-token-validity-seconds:1209600}")
+    private int refreshTokenValiditySeconds;
 
     @Override
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request, String deviceInfo, HttpServletResponse response) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateException("Email already exists");
         }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(User.Role.USER)
                 .build();
+
         user = userRepository.save(user);
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
-
+        UserDetails userDetails = buildUserDetails(user);
         String accessToken = jwtUtil.generateAccessToken(userDetails);
         RefreshToken refreshToken = refreshTokenService.createToken(user, deviceInfo);
 
         setRefreshTokenCookie(response, refreshToken.getToken());
 
-        AuthDto.AuthResponse authResponse = new AuthDto.AuthResponse();
-        authResponse.setToken(accessToken);
-        authResponse.setUser(userMapper.toUserResponse(user));
-        return authResponse;
+        return buildAuthResponse(accessToken, user);
     }
 
     @Override
@@ -68,6 +71,7 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
+
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
@@ -76,10 +80,7 @@ public class AuthServiceImpl implements AuthService {
 
         setRefreshTokenCookie(response, refreshToken.getToken());
 
-        AuthDto.AuthResponse resp = new AuthDto.AuthResponse();
-        resp.setToken(accessToken);
-        resp.setUser(userMapper.toUserResponse(user));
-        return resp;
+        return buildAuthResponse(accessToken, user);
     }
 
     @Override
@@ -89,11 +90,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenService.revokeToken(existingToken.getToken());
         RefreshToken newToken = refreshTokenService.createToken(existingToken.getUser(), deviceInfo);
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .withUsername(existingToken.getUser().getEmail())
-                .password(existingToken.getUser().getPassword())
-                .roles(existingToken.getUser().getRole().name())
-                .build();
+        UserDetails userDetails = buildUserDetails(existingToken.getUser());
         String newAccessToken = jwtUtil.generateAccessToken(userDetails);
 
         setRefreshTokenCookie(response, newToken.getToken());
@@ -114,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
     public void sendResetPasswordLink(AuthDto.ForgotPasswordRequest request, String requestIp) {
         userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
             PasswordResetToken token = passwordResetTokenService.createToken(user, requestIp);
-            String resetLink = RESET_LINK_BASE + token.getToken();
+            String resetLink = resetLinkBase + token.getToken();
             emailService.sendPasswordReset(user.getEmail(), user.getName(), resetLink);
         });
         // Always respond with success, never reveal if email exists or not
@@ -128,17 +125,33 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         passwordResetTokenService.markTokenAsUsed(token);
 
-        // (Optional) Logout from all devices after password reset
+        // Logout from all devices after password reset
         refreshTokenService.revokeAllUserTokens(user);
     }
 
-    // == Helper: set refresh token as HttpOnly, Secure cookie ==
+    // ============== Helper methods ==============
+
+    private UserDetails buildUserDetails(User user) {
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
+                .build();
+    }
+
+    private AuthDto.AuthResponse buildAuthResponse(String token, User user) {
+        AuthDto.AuthResponse resp = new AuthDto.AuthResponse();
+        resp.setToken(token);
+        resp.setUser(userMapper.toUserResponse(user));
+        return resp;
+    }
+
     private void setRefreshTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("refreshToken", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true); // enable only in production
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
-        cookie.setMaxAge((int) RefreshTokenServiceImpl.REFRESH_TOKEN_VALIDITY_SECONDS);
+        cookie.setMaxAge(refreshTokenValiditySeconds);
         response.addCookie(cookie);
     }
 }

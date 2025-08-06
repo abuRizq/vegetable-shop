@@ -14,12 +14,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.Cookie;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -247,10 +249,10 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         var token = refreshTokenRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Session not found"));
 
         if (!token.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Not your session!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
         token.setRevoked(true);
