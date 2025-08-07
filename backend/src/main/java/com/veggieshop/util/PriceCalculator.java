@@ -1,7 +1,7 @@
 package com.veggieshop.util;
 
-import com.veggieshop.entity.Offer;
-import com.veggieshop.entity.Product;
+import com.veggieshop.offer.Offer;
+import com.veggieshop.product.Product;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

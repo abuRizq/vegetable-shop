@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
 
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/login")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/forgot-password")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/auth/reset-password")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/products/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/categories/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/api/offers/**")).permitAll()
