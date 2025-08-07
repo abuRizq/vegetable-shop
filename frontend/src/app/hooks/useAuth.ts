@@ -60,7 +60,6 @@ export const useAuth = () => {
     })
     const isAuthenticated = !!(user && !isError);
     const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
-
     return {
         user,
         isAuthenticated,
