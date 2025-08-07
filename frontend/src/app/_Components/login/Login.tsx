@@ -7,29 +7,36 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/hooks/useAuth"
 import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart } from "lucide-react"
 import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { authService } from "@/app/service/auth.service"
 
 export const LoginForm = () => {
+  const { data: user, error, isLoading, } = useQuery({
+    queryKey: ['user', 'user'],
+    // queryFn: authService.login,
+    enabled: typeof window != undefined || !!localStorage.getItem('auth-token')
+  });
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { login, isAuthenticated, isLoading, error, clearError } = useAuth()
   const router = useRouter()
 
   // Redirect authenticated users
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/")
-    }
-  }, [isAuthenticated, router])
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     router.push("/")
+  //   }
+  // }, [isAuthenticated, router])
 
-  // Clear error when user starts typing
-  useEffect(() => {
-    if (error) {
-      clearError()
-    }
-  }, [email, password, clearError])
+  // // Clear error when user starts typing
+  // useEffect(() => {
+  //   if (error) {
+  //     clearError()
+  //   }
+  // }, [email, password, clearError])
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +47,7 @@ export const LoginForm = () => {
 
     setIsSubmitting(true)
     try {
-      await login({ email, password })
+      // await login({ email, password })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Login failed:", error.message)
@@ -50,7 +57,7 @@ export const LoginForm = () => {
   }
 
   // Show loading while checking existing auth
-  if (isLoading && !isSubmitting) {
+  if (false) {
     return (
       <div
         className="min-h-screen w-full flex items-center justify-center"
@@ -162,7 +169,7 @@ export const LoginForm = () => {
                 role="alert"
               >
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
+                <span className="text-sm"></span>
               </div>
             )}
 

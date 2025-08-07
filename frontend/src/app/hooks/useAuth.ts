@@ -5,6 +5,7 @@ const Authkey = {
     all: ['user'] as const,
     user: () => [...Authkey.all, 'user'] as const
 }
+
 export const useAuth = () => {
     const quryClinet = useQueryClient();
     const {
