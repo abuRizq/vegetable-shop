@@ -67,7 +67,7 @@ export const useAuth = () => {
         error: error?.massage || LoginMution.error?.message,
         login: LoginMution.mutate,
         logout: LogoutMution.mutate,
-        register: RegisterMution.mutate,
+        Register: RegisterMution.mutate,
         refetchUser: () =>
             quryClinet.invalidateQueries({ queryKey: Authkey.user() }),
         clearError: () => {

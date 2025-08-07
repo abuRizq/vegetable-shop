@@ -10,8 +10,11 @@ import Link from "next/link"
 import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query"
 
 export const LoginForm = () => {
+  const queryClient = useQueryClient()
+
   const router = useRouter()
   const { login, isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
@@ -29,6 +32,13 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data)
+      queryClient.setQueryData(["user", "user"], (prevUser) => {
+        if (!prevUser) return prevUser;
+        return {
+          ...prevUser,
+          isNew: true, // 👈 custom update
+        };
+      });
       setLoginError(null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

@@ -1,76 +1,62 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, User, Phone, MapPin, Check } from "lucide-react"
-import { useForm } from "react-hook-form";
+import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { RegisterFormData, registerSchema } from "@/app/lib/schemas/register"
+import { useQueryClient } from "@tanstack/react-query"
+import { useAuth } from "@/app/hooks/useAuth"
 
 export const RegisterForm = () => {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        address: "",
-        password: "",
-        confirmPassword: "",
+    const queryClient = useQueryClient();
+    const { Register } = useAuth()
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting }
+    } = useForm<RegisterFormData>({
+        resolver: zodResolver(registerSchema)
+
     })
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [agreeToTerms, setAgreeToTerms] = useState(false)
     const [subscribeNewsletter, setSubscribeNewsletter] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [errors, setErrors] = useState<Record<string, string>>({})
+    const [registerError, setRegisterError] = useState({
+        massage: ''
+    })
     const router = useRouter();
-    // Handle input changes
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
-
-        if (errors[name]) {
-            setErrors((prev) => ({ ...prev, [name]: "" }))
-        }
-    }
-
-    // Validate form
-    //   const validateForm = () => {
-    //     const newErrors: Record<string, string> = {}
-
-    //     if (!formData.firstName.trim()) newErrors.firstName = "First name is required"
-    //     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required"
-    //     if (!formData.email.trim()) newErrors.email = "Email is required"
-    //     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid"
-    //     if (!formData.phone.trim()) newErrors.phone = "Phone number is required"
-    //     if (!formData.address.trim()) newErrors.address = "Address is required"
-    //     if (!formData.password) newErrors.password = "Password is required"
-    //     else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters"
-    //     if (!formData.confirmPassword) newErrors.confirmPassword = "Please confirm your password"
-    //     else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match"
-    //     if (!agreeToTerms) newErrors.terms = "You must agree to the terms and conditions"
-
-    //     setErrors(newErrors)
-    //     return Object.keys(newErrors).length === 0
-    //   }
-
     // Handle form submission
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-
+    const onSubmit = async (data: RegisterFormData) => {
         // if (!validateForm()) return
-
-        setIsSubmitting(true)
         try {
             // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000))
+            // await new Promise((resolve) => setTimeout(resolve, 2000))
+            const RegisterCredentials = {
+                name: data.firstname + " " + data.lastname,
+                email: data.email,
+                password: data.password,
+                role: "ADMIN"
+            }
+            if (!RegisterCredentials) {
+                setRegisterError({ massage: "Registration failed. Please try again." })
+                return;
+            }
+            await Register({
+                name: data.firstname + " " + data.lastname,
+                email: data.email,
+                password: data.password,
+                role: "ADMIN"
+            });
 
-            // Mock registration success
-            console.log("Registration successful:", formData)
-            router.push("/login?registered=true")
+            // console.log("Registration successful:", data)
+            // router.push("/login?registered=true")
         } catch (error) {
-            setErrors({ submit: "Registration failed. Please try again." })
+            setRegisterError({ massage: "Registration failed. Please try again." })
         } finally {
-            setIsSubmitting(false)
+            // setIsSubmitting(false)
         }
     }
 
@@ -131,16 +117,25 @@ export const RegisterForm = () => {
                                 <Leaf className="w-8 h-8 text-white animate-leaf-sway" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold" style={{ color: "hsl(var(--text-primary))" }}>
+                                <h1
+                                    className="text-2xl font-bold"
+                                    style={{ color: "hsl(var(--text-primary))" }}
+                                >
                                     FreshVeggies
                                 </h1>
-                                <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+                                <p
+                                    className="text-sm"
+                                    style={{ color: "hsl(var(--text-secondary))" }}
+                                >
                                     Farm Fresh Delivery
                                 </p>
                             </div>
                         </div>
 
-                        <h2 className="text-2xl font-bold mb-2" style={{ color: "hsl(var(--text-primary))" }}>
+                        <h2
+                            className="text-2xl font-bold mb-2"
+                            style={{ color: "hsl(var(--text-primary))" }}
+                        >
                             Join FreshVeggies
                         </h2>
                         <p style={{ color: "hsl(var(--text-secondary))" }}>
@@ -149,9 +144,9 @@ export const RegisterForm = () => {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         {/* Submit Error Message */}
-                        {errors.submit && (
+                        {registerError.massage && (
                             <div
                                 className="flex items-center space-x-3 p-4 rounded-lg border"
                                 style={{
@@ -162,10 +157,9 @@ export const RegisterForm = () => {
                                 role="alert"
                             >
                                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                                <span className="text-sm">{errors.submit}</span>
+                                <span className="text-sm">{registerError.massage}</span>
                             </div>
                         )}
-
                         {/* Name Fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -183,20 +177,21 @@ export const RegisterForm = () => {
                                     />
                                     <input
                                         id="firstName"
+                                        {...register("firstname")}
                                         name="firstName"
                                         type="text"
-                                        value={formData.firstName}
-                                        onChange={handleInputChange}
                                         required
                                         disabled={isSubmitting}
                                         placeholder="Enter first name"
-                                        className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${errors.firstName ? "border-error" : ""
-                                            }`}
+                                        className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}
                                     />
                                 </div>
-                                {errors.firstName && (
-                                    <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
-                                        {errors.firstName}
+                                {errors.firstname && (
+                                    <p
+                                        className="text-sm"
+                                        style={{ color: "hsl(var(--error))" }}
+                                    >
+                                        {errors.firstname.message}
                                     </p>
                                 )}
                             </div>
@@ -216,20 +211,21 @@ export const RegisterForm = () => {
                                     />
                                     <input
                                         id="lastName"
-                                        name="lastName"
+                                        // name="lastName"
                                         type="text"
-                                        value={formData.lastName}
-                                        onChange={handleInputChange}
+                                        {...register("lastname")}
                                         required
                                         disabled={isSubmitting}
                                         placeholder="Enter last name"
-                                        className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${errors.lastName ? "border-error" : ""
-                                            }`}
+                                        className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed `}
                                     />
                                 </div>
-                                {errors.lastName && (
-                                    <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
-                                        {errors.lastName}
+                                {errors.lastname && (
+                                    <p
+                                        className="text-sm"
+                                        style={{ color: "hsl(var(--error))" }}
+                                    >
+                                        {errors.lastname.message}
                                     </p>
                                 )}
                             </div>
@@ -251,20 +247,18 @@ export const RegisterForm = () => {
                                 />
                                 <input
                                     id="email"
-                                    name="email"
+                                    // name="email"
                                     type="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
+                                    {...register("email")}
                                     required
                                     disabled={isSubmitting}
                                     placeholder="Enter your email"
-                                    className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${errors.email ? "border-error" : ""
-                                        }`}
+                                    className={`input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`}
                                 />
                             </div>
                             {errors.email && (
                                 <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
-                                    {errors.email}
+                                    {errors.email.message}
                                 </p>
                             )}
                         </div>
@@ -281,16 +275,22 @@ export const RegisterForm = () => {
                                 <div className="relative">
                                     <input
                                         id="password"
-                                        name="password"
+                                        // name="password"
                                         type={showPassword ? "text" : "password"}
-                                        value={formData.password}
-                                        onChange={handleInputChange}
+                                        {...register("password")}
                                         required
                                         disabled={isSubmitting}
                                         placeholder="Create password"
-                                        className={`input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${errors.password ? "border-error" : ""
-                                            }`}
+                                        className={`input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed `}
                                     />
+                                    {errors.password && (
+                                        <p
+                                            className="text-sm"
+                                            style={{ color: "hsl(var(--error))" }}
+                                        >
+                                            {errors.password.message}
+                                        </p>
+                                    )}
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
@@ -298,14 +298,18 @@ export const RegisterForm = () => {
                                         className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 disabled:opacity-50"
                                         style={{ color: "hsl(var(--text-disabled))" }}
                                     >
-                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        {showPassword ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
                                     </button>
                                 </div>
-                                {errors.password && (
+                                {/* {errors.password && (
                                     <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
                                         {errors.password}
                                     </p>
-                                )}
+                                )} */}
                             </div>
 
                             <div className="space-y-2">
@@ -319,31 +323,44 @@ export const RegisterForm = () => {
                                 <div className="relative">
                                     <input
                                         id="confirmPassword"
-                                        name="confirmPassword"
+                                        // name="confirmPassword"
                                         type={showConfirmPassword ? "text" : "password"}
-                                        value={formData.confirmPassword}
-                                        onChange={handleInputChange}
+                                        {...register("confirmPassword")}
                                         required
                                         disabled={isSubmitting}
                                         placeholder="Confirm password"
-                                        className={`input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${errors.confirmPassword ? "border-error" : ""
-                                            }`}
+                                        className={`input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed `}
                                     />
+                                    {errors.confirmPassword && (
+                                        <p
+                                            className="text-sm"
+                                            style={{ color: "hsl(var(--error))" }}
+                                        >
+                                            {errors.confirmPassword.message}
+                                        </p>
+                                    )}
+
                                     <button
                                         type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        onClick={() =>
+                                            setShowConfirmPassword(!showConfirmPassword)
+                                        }
                                         disabled={isSubmitting}
                                         className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 disabled:opacity-50"
                                         style={{ color: "hsl(var(--text-disabled))" }}
                                     >
-                                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
                                     </button>
                                 </div>
-                                {errors.confirmPassword && (
+                                {/* {errors.confirmPassword && (
                                     <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
                                         {errors.confirmPassword}
                                     </p>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
@@ -352,15 +369,17 @@ export const RegisterForm = () => {
                             <label className="flex items-start space-x-3">
                                 <input
                                     type="checkbox"
-                                    checked={agreeToTerms}
-                                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                                    {...register("acceptTerms")}
                                     className="w-4 h-4 mt-0.5 rounded border-2 focus:ring-2 focus:ring-offset-0"
                                     style={{
                                         accentColor: "hsl(var(--primary))",
                                         borderColor: "hsl(var(--divider))",
                                     }}
                                 />
-                                <span className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+                                <span
+                                    className="text-sm"
+                                    style={{ color: "hsl(var(--text-secondary))" }}
+                                >
                                     I agree to the{" "}
                                     <button
                                         type="button"
@@ -379,11 +398,11 @@ export const RegisterForm = () => {
                                     </button>
                                 </span>
                             </label>
-                            {errors.terms && (
+                            {/* {errors.terms && (
                                 <p className="text-sm" style={{ color: "hsl(var(--error))" }}>
                                     {errors.terms}
                                 </p>
-                            )}
+                            )} */}
 
                             <label className="flex items-start space-x-3">
                                 <input
@@ -396,8 +415,12 @@ export const RegisterForm = () => {
                                         borderColor: "hsl(var(--divider))",
                                     }}
                                 />
-                                <span className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
-                                    Subscribe to our newsletter for fresh deals and seasonal offers
+                                <span
+                                    className="text-sm"
+                                    style={{ color: "hsl(var(--text-secondary))" }}
+                                >
+                                    Subscribe to our newsletter for fresh deals and seasonal
+                                    offers
                                 </span>
                             </label>
                         </div>
@@ -444,13 +467,18 @@ export const RegisterForm = () => {
                                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                                 />
                             </svg>
-                            <span style={{ color: "hsl(var(--text-primary))" }}>Sign up with Google</span>
+                            <span style={{ color: "hsl(var(--text-primary))" }}>
+                                Sign up with Google
+                            </span>
                         </button>
                     </form>
 
                     {/* Sign In Link */}
                     <div className="mt-8 text-center">
-                        <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+                        <p
+                            className="text-sm"
+                            style={{ color: "hsl(var(--text-secondary))" }}
+                        >
                             Already have an account?{" "}
                             <button
                                 type="button"
@@ -465,12 +493,16 @@ export const RegisterForm = () => {
 
                     {/* Bottom tagline */}
                     <div className="mt-6 text-center">
-                        <p className="text-xs" style={{ color: "hsl(var(--text-disabled))" }}>
-                            🌱 Join thousands of happy customers • 🥬 Fresh produce delivered daily
+                        <p
+                            className="text-xs"
+                            style={{ color: "hsl(var(--text-disabled))" }}
+                        >
+                            🌱 Join thousands of happy customers • 🥬 Fresh produce
+                            delivered daily
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
