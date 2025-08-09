@@ -31,3 +31,27 @@ export interface AuthContextType {
     register: (name: string, email: string, password: string, role: "ADMIN" | "USER") => Promise<void>;
     clearError: () => void;
 };
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ForgotPasswordResponse {
+    success: boolean;
+    message: string;
+}
+
+export interface ResetPasswordRequest {
+    token: string; // From URL parameter
+    newPassword: string;
+    confirmPassword: string;
+}
+export interface ResetPasswordResponse {
+    success: boolean;
+    message: string;
+}
+export interface VerifyResetTokenResponse {
+    valid: boolean;
+    message?: string;
+    email?: string; // Optional: show which email the token belongs to
+}
+
