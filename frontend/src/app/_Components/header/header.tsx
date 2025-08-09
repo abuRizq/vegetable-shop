@@ -33,7 +33,6 @@ function Header() {
         {/* Notifications */}
         <div className="transition-all duration-300 hover:scale-105">
           <ThemeToggle />
-
         </div>
         <div
           className="relative p-2 rounded-xl transition-all duration-200 hover:scale-105 group"

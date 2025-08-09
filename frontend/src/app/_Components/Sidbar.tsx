@@ -24,7 +24,7 @@ function Sidebar() {
     return (
         <aside
             className={`
-            h-screen flex flex-col 
+            min-h-screen   flex flex-col 
             border-r shadow-2xl
             transition-all duration-500 ease-in-out relative
             backdrop-blur-xl sidebar-transition
