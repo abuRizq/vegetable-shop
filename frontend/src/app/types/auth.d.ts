@@ -15,8 +15,6 @@ export interface RegisterCredentials {
     password: string;
     role: "ADMIN" | "USER";
 }
-
-
 export interface LoginResponse {
     token: string;
     user: User;
