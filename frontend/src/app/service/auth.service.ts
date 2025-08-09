@@ -1,4 +1,4 @@
-import { LoginCredentials, LoginResponse, RegisterCredentials, User } from "../types/auth";
+import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
 
 class AuthService {
     private baseURL = process.env.NEXT_PUBLIC_API_URL;
@@ -16,9 +16,29 @@ class AuthService {
     private removeTokenFromLocalStorage(): void {
         localStorage.removeItem('token');
     }
+    async validateTokenAndGetUser(): Promise<LoginResponse> {
+        const token = this.getTokenFromLocalStorage();
+        try {
+            const response = await fetch(`http://localhost:8080/api/auth/validate-token`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await (response).json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
+            }
+            const data: LoginResponse = await response.json();
+            return data;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
     async login(credentials: LoginCredentials): Promise<LoginResponse> {
         try {
-            const response = await fetch(`${this.baseURL}/auth/login`, {
+            const response = await fetch(`http://localhost:8080/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,7 +46,7 @@ class AuthService {
                 body: JSON.stringify(credentials),
             });
             if (!response.ok) {
-                const errorData = await (await response).json().catch(() => ({}));
+                const errorData = await (response).json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
             }
             const data: LoginResponse = await response.json();
@@ -65,31 +85,62 @@ class AuthService {
             throw error;
         }
     }
-    async validateTokenAndGetUser(): Promise<User | null> {
-        const token = this.getTokenFromLocalStorage();
-        if (!token) {
-            return null;
-        }
+    async sendResetPasswordLink(eamil: string): Promise<void> {
         try {
-            const response = await fetch(`${this.baseURL}/api/auth/me`, {
+            const response = await fetch(`${this.baseURL}/`, {
+                method: "POST",
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                }
+                },
+                body: JSON.stringify({
+                    email: eamil,
+                }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to send OTP');
+            }
+            const data = await response.json()
+        } catch (error) {
+            console.error('Send OTP error:', error);
+            throw error;
+        }
+    }
+    async verifyResetToken(token: string): Promise<VerifyResetTokenResponse> {
+        try {
+            const response = await fetch(`${this.baseURL}/api/auth/verify-reset-token/${token}`, {
+                method: "GET",
+            });
+            if (!response.ok) {
+                return {
+                    valid: false,
+                    message: 'Invalid or expired reset link'
+                };
+            }
+            return await response.json();
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'An error occurred while verifying the reset token'
+            };
+        }
+    }
+    async resetPasswordWithLink(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+        try {
+            const response = await fetch(`${this.baseURL}/api/auth/reset-password`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
             })
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    this.removeTokenFromLocalStorage()
-                    throw new Error('Authentication expired');
-                } else {
-                    throw new Error('Invalid token or user not found');
-                }
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to reset password');
             }
-            const user: User = await response.json();
-            return user;
-        }
-        catch (error) {
-            this.removeTokenFromLocalStorage()
+            return await response.json();
+        } catch (error) {
+            console.error('Reset password error:', error);
             throw error;
         }
     }
