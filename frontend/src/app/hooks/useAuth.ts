@@ -5,6 +5,7 @@ const Authkey = {
     all: ['user'] as const,
     user: () => [...Authkey.all, 'user'] as const
 }
+
 export const useAuth = () => {
     const quryClinet = useQueryClient();
     const {
@@ -30,7 +31,7 @@ export const useAuth = () => {
         refetchOnReconnect: true
     });
     const LoginMution = useMutation({
-        mutationFn: authService.login,
+        mutationFn: authService.login,  
         onSuccess: (data) => {
             quryClinet.setQueryData(Authkey.user(), data.user)
             quryClinet.invalidateQueries({ queryKey: Authkey.user() })
@@ -59,7 +60,6 @@ export const useAuth = () => {
     })
     const isAuthenticated = !!(user && !isError);
     const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
-
     return {
         user,
         isAuthenticated,
@@ -67,7 +67,7 @@ export const useAuth = () => {
         error: error?.massage || LoginMution.error?.message,
         login: LoginMution.mutate,
         logout: LogoutMution.mutate,
-        register: RegisterMution.mutate,
+        Register: RegisterMution.mutate,
         refetchUser: () =>
             quryClinet.invalidateQueries({ queryKey: Authkey.user() }),
         clearError: () => {
