@@ -16,6 +16,26 @@ class AuthService {
     private removeTokenFromLocalStorage(): void {
         localStorage.removeItem('token');
     }
+    async validateTokenAndGetUser(): Promise<LoginResponse> {
+        const token = this.getTokenFromLocalStorage();
+        try {
+            const response = await fetch(`http://localhost:8080/api/auth/validate-token`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await (response).json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
+            }
+            const data: LoginResponse = await response.json();
+            return data;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
     async login(credentials: LoginCredentials): Promise<LoginResponse> {
         try {
             const response = await fetch(`http://localhost:8080/api/auth/login`, {
