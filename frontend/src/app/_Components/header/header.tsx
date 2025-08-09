@@ -6,6 +6,7 @@ import Searchbar from "./Searchbar"
 import { useQuery } from "@tanstack/react-query"
 import { authService } from "@/app/service/auth.service"
 import Link from "next/link"
+import ThemeToggle from "../ThemeToggle"
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -30,21 +31,29 @@ function Header() {
       {/* Right Section - User Profile & Actions */}
       < div className="flex items-center space-x-4 ml-6 flex-shrink-0" >
         {/* Notifications */}
+        <div className="transition-all duration-300 hover:scale-105">
+          <ThemeToggle />
+
+        </div>
         <div
           className="relative p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
           style={{ backgroundColor: "hsl(var(--elevated))" }
           }
+
         >
           <Bell
             size={20}
             style={{ color: "hsl(var(--text-secondary))" }}
             className="group-hover:text-primary-color transition-colors duration-200"
           />
+
           {/* Notification Badge */}
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full animate-pulse">
             <div className="absolute inset-0 bg-secondary rounded-full animate-ping opacity-75"></div>
           </div>
         </div >
+
+
 
         {/* Settings */}
         < button

@@ -99,11 +99,7 @@ function Sidebar() {
                         )}
                     </div>
                 </div>
-                {!isCollapsed && (
-                    <div className="transition-all duration-300 hover:scale-105">
-                        <ThemeToggle />
-                    </div>
-                )}
+          
             </div>
 
             {/* Navigation Content */}
