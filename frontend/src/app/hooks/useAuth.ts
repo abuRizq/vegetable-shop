@@ -31,7 +31,7 @@ export const useAuth = () => {
         refetchOnReconnect: true
     });
     const LoginMution = useMutation({
-        mutationFn: authService.login,
+        mutationFn: authService.login,  
         onSuccess: (data) => {
             quryClinet.setQueryData(Authkey.user(), data.user)
             quryClinet.invalidateQueries({ queryKey: Authkey.user() })

@@ -26,7 +26,7 @@ class AuthService {
                 body: JSON.stringify(credentials),
             });
             if (!response.ok) {
-                const errorData = await (await response).json().catch(() => ({}));
+                const errorData = await (response).json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
             }
             const data: LoginResponse = await response.json();

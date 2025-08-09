@@ -193,7 +193,9 @@ export const LoginForm = () => {
                 />
                 <div>
                   {errors.email && (
-                    <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -221,7 +223,9 @@ export const LoginForm = () => {
                 />
                 <div>
                   {errors.password && (
-                    <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
                 <button
@@ -333,6 +337,16 @@ export const LoginForm = () => {
                 Create account
               </Link>
             </p>
+          </div>
+          <div className="mt-3 text-center">
+            <Link
+              href={"/FrogetPassWord"}
+              type="button"
+              className="font-medium transition-colors duration-200 hover:underline text-red-500"
+              // style={{ color: "hsl(var(--primary))" }}
+            >
+              Forget Password ?
+            </Link>
           </div>
 
           {/* Bottom tagline */}

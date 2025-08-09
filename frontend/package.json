@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -19,6 +20,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "react-toastify": "^11.0.5",
     "remixicon-react": "^1.0.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.0.14"
