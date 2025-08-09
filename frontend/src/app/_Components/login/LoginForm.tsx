@@ -340,7 +340,7 @@ export const LoginForm = () => {
           </div>
           <div className="mt-3 text-center">
             <Link
-              href={"/FrogetPassWord"}
+              href={"/EnterEmail"}
               type="button"
               className="font-medium transition-colors duration-200 hover:underline text-red-500"
               // style={{ color: "hsl(var(--primary))" }}
@@ -348,7 +348,6 @@ export const LoginForm = () => {
               Forget Password ?
             </Link>
           </div>
-
           {/* Bottom tagline */}
           <div className="mt-6 text-center">
             <p
