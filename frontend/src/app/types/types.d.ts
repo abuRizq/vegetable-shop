@@ -30,7 +30,6 @@ declare namespace Poudects {
         created_at?: string;
         updated_at?: string;
     }
-
     export interface proudect {
         id: number;
         name: string;
@@ -59,8 +58,6 @@ export type OrderItem = Orders.OrderItem;
 export type Product = Products.Product;
 export type Category = Products.Category;
 export type Offer = Products.Offer;
-
-
 // API Response types (useful for frontend)
 export interface ApiResponse<T> {
     data: T;
@@ -75,7 +72,6 @@ export interface PaginatedResponse<T> {
     limit: number;
     totalPages: number;
 }
-
 export type UserResponse = ApiResponse<User>;
 export type UsersResponse = ApiResponse<PaginatedResponse<User>>;
 export type OrderResponse = ApiResponse<Order>;

@@ -6,9 +6,7 @@ const Authkey = {
     all: ['user'] as const,
     user: () => [...Authkey.all, 'user'] as const,
     resetToken: (token: string) => [...Authkey.all, 'resetToken', token] as const
-
 }
-
 export const useAuth = () => {
     const quryClinet = useQueryClient();
     const {
@@ -39,7 +37,7 @@ export const useAuth = () => {
             quryClinet.setQueryData(Authkey.user(), data.user)
             quryClinet.invalidateQueries({ queryKey: Authkey.user() })
         },
-        onError: (error) => {
+        onError: () => {
             quryClinet.removeQueries({ queryKey: Authkey.user() });
         }
     });
@@ -98,7 +96,6 @@ export const useAuth = () => {
             error: forgotPasswordMutation.error?.message,
             data: forgotPasswordMutation.data,
         },
-
         resetPasswordState: {
             isPending: resetPasswordMutation.isPending,
             isSuccess: resetPasswordMutation.isSuccess,

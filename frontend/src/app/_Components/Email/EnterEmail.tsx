@@ -4,6 +4,8 @@ import type React from "react"
 
 import { useState } from "react"
 import { Mail, Leaf, Loader2, Send } from "lucide-react"
+import { useAuth } from "@/app/hooks/useAuth"
+// import { ToastContainer, toast } from 'react-toastify';
 
 type EnterEmailProps = {
     title?: string
@@ -23,50 +25,37 @@ export default function EnterEmail({
     title = "Forgot your password?",
     subtitle = "Enter your email and we'll send you a 6‑digit code to verify it’s you.",
     buttonText = "Send verification code",
-    onSend,
-    onSuccessNavigate,
+    // onSend,
+    // onSuccessNavigate,
     defaultEmail = "",
 }: EnterEmailProps) {
     const [email, setEmail] = useState(defaultEmail)
-    const [loading, setLoading] = useState(false)
+
+    const { forgotPassword, forgotPasswordState } = useAuth();
+    const loading = forgotPasswordState.isPending;
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
-
-    const validateEmail = (value: string) => /\S+@\S+\.\S+/.test(value)
+    const validateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
         setSuccess(null)
-
         if (!email || !validateEmail(email)) {
             setError("Please enter a valid email address.")
-            return
+            return;
         }
-
-        setLoading(true)
-        try {
-            // Simulate sending the code
-            await new Promise((r) => setTimeout(r, 1000))
-            const code = generateCode(6)
-
-            // Store for later verification (10 min expiry), consistent with earlier flow
-            const key = `reset-code:${email.toLowerCase()}`
-            const payload = { code, expiresAt: Date.now() + 10 * 60 * 1000 }
-            sessionStorage.setItem(key, JSON.stringify(payload))
-
-            // External hook if provided (e.g., call API)
-            if (onSend) await onSend(email, code)
-
-            setSuccess("We’ve sent a verification code to your email.")
-            if (onSuccessNavigate) {
-                onSuccessNavigate(email)
+        forgotPassword(email, {
+            onSuccess: () => {
+                setSuccess("A verification code has been sent to your email address.")
+            },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (error: any) => {
+                console.error('Failed to send reset link:', error);
+                setError(error.message || "Failed to send reset link");
             }
-        } catch {
-            setError("Unable to send the code. Please try again.")
-        } finally {
-            setLoading(false)
-        }
+        })
+
     }
 
     return (
@@ -116,12 +105,12 @@ export default function EnterEmail({
                             className="input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none"
                         />
                     </div>
-                    {error && (
+                    {forgotPasswordState.error && (
                         <p className="text-sm mt-1" style={{ color: "hsl(var(--error))" }} aria-live="polite">
-                            {error}
+                            {forgotPasswordState.error}
                         </p>
                     )}
-                    {success && (
+                    {forgotPasswordState.isSuccess && (
                         <p className="text-sm mt-1" style={{ color: "hsl(var(--success))" }} aria-live="polite">
                             {success}
                         </p>
@@ -153,3 +142,4 @@ export default function EnterEmail({
         </div>
     )
 }
+
