@@ -77,7 +77,7 @@ function Searchbar() {
             }
             ${isAnimating ? "animate-pulse" : ""}
           `}
-          placeholder="Search movies, shows, actors..."
+          placeholder="Search vagatable, Fruite, shops..."
           style={{
             fontFamily: "Geist, Roboto, Arial, sans-serif",
             fontSize: 15,
