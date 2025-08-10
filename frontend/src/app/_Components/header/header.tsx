@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, Settings, ChevronDown, User } from "lucide-react"
+import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./Searchbar"
 import { useQuery } from "@tanstack/react-query"
 import { authService } from "@/app/service/auth.service"
@@ -38,7 +38,8 @@ function Header() {
           className="relative p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
           style={{ backgroundColor: "hsl(var(--elevated))" }}
         >
-          <Bell
+
+          <ShoppingCart
             size={20}
             style={{ color: "hsl(var(--text-secondary))" }}
             className="group-hover:text-primary-color transition-colors duration-200"
