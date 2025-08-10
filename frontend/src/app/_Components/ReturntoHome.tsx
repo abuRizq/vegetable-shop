@@ -8,7 +8,7 @@ export default function ReturnToHome() {
     <Link
       href="/"
       className="
-        fixed top-6 left-6 z-50
+        fixed top-6 right-6 z-50
         flex items-center space-x-2 px-4 py-3 rounded-xl
         backdrop-blur-xl border shadow-lg
         transition-all duration-300 ease-out
@@ -42,7 +42,10 @@ export default function ReturnToHome() {
         >
           Back to Home
         </span>
-        <span className="text-xs transition-colors duration-200" style={{ color: "hsl(var(--text-secondary))" }}>
+        <span
+          className="text-xs transition-colors duration-200"
+          style={{ color: "hsl(var(--text-secondary))" }}
+        >
           FreshVeggies
         </span>
       </div>
@@ -62,7 +65,8 @@ export default function ReturnToHome() {
           transition-opacity duration-300 ease-out pointer-events-none
         "
         style={{
-          background: "linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1))",
+          background:
+            "linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.1))",
         }}
       />
 
@@ -76,5 +80,5 @@ export default function ReturnToHome() {
         style={{ backgroundColor: "hsl(var(--primary) / 0.2)" }}
       />
     </Link>
-  )
+  );
 }

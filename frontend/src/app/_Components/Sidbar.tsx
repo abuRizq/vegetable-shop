@@ -24,7 +24,7 @@ function Sidebar() {
     return (
         <aside
             className={`
-            h-screen flex flex-col 
+            min-h-screen   flex flex-col 
             border-r shadow-2xl
             transition-all duration-500 ease-in-out relative
             backdrop-blur-xl sidebar-transition
@@ -99,11 +99,6 @@ function Sidebar() {
                         )}
                     </div>
                 </div>
-                {!isCollapsed && (
-                    <div className="transition-all duration-300 hover:scale-105">
-                        <ThemeToggle />
-                    </div>
-                )}
             </div>
 
             {/* Navigation Content */}
@@ -152,17 +147,17 @@ function Sidebar() {
                     <nav className="space-y-1">
                         <NavItem
                             icon={<Heart size={20} />}
-                            text="Favorites"
+                            text="Offers & Discounts"
                             collapsed={isCollapsed}
                         />
                         <NavItem
                             icon={<Star size={20} />}
-                            text="Watchlist"
+                            text="Best Sellers"
                             collapsed={isCollapsed}
                         />
                         <NavItem
                             icon={<ShoppingCart size={20} />}
-                            text="Downloads"
+                            text="Orders"
                             collapsed={isCollapsed}
                         />
                     </nav>
@@ -182,19 +177,14 @@ function Sidebar() {
                     <nav className="space-y-1">
                         <NavItem
                             icon={<Heart size={20} />}
-                            text="Favorites"
+                            text="shopping list"
                             collapsed={isCollapsed}
                         />
-                        <NavItem
-                            icon={<Star size={20} />}
-                            text="Wishlist"
-                            collapsed={isCollapsed}
-                        />
-                        <NavItem
+                        {/* <NavItem
                             icon={<ShoppingCart size={20} />}
                             text="Cart"
                             collapsed={isCollapsed}
-                        />
+                        /> */}
                     </nav>
                 </div>
             </div>
@@ -218,13 +208,13 @@ function Sidebar() {
                     nav-item-transition
                     focus:outline-none focus:ring-2 focus:ring-opacity-50
                     backdrop-blur-sm
-                    ${isCollapsed ? "px-3 py-3 justify-center mx-1" : "px-4 py-3 mx-2"}                            
+                    ${isCollapsed
+                            ? "px-3 py-3 justify-center mx-1"
+                            : "px-4 py-3 mx-2"
+                        }                            
                 `}
-
                 >
-                    <LogOut size={20}
-                        className={` ${isCollapsed ? "px-2" : "px-4"}`}
-                    />
+                    <LogOut size={20} className={` ${isCollapsed ? "px-2" : "px-4"}`} />
                     <span>{isLoggedIn ? "Sign Out" : "Log In"}</span>
                 </Link>
             </div>
