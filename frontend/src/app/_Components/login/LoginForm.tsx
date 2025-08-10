@@ -7,50 +7,53 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/hooks/useAuth"
 import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart } from "lucide-react"
 import Link from "next/link"
+import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query"
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const queryClient = useQueryClient()
+
+  const router = useRouter()
+  const { login, isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { login, isAuthenticated, isLoading, error, clearError } = useAuth()
-  const router = useRouter()
+  const [loginError, setLoginError] = useState<string | null>(null)
 
-  // Redirect authenticated users
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/")
-    }
-  }, [isAuthenticated, router])
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(LoginSchema),
+  })
 
-  // Clear error when user starts typing
-  useEffect(() => {
-    if (error) {
-      clearError()
-    }
-  }, [email, password, clearError])
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || !password) {
-      return
-    }
-
-    setIsSubmitting(true)
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      await login({ email, password })
+      await login(data)
+      queryClient.setQueryData(["user", "user"], (prevUser) => {
+        if (!prevUser) return prevUser;
+        return {
+          ...prevUser,
+          isNew: true, // 👈 custom update
+        };
+      });
+      setLoginError(null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Login failed:", error.message)
-    } finally {
-      setIsSubmitting(false)
+      setLoginError(error.message)
     }
   }
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/") // or any dashboard route
+    }
+  }, [isAuthenticated])
+
   // Show loading while checking existing auth
-  if (isLoading && !isSubmitting) {
+  if (false) {
     return (
       <div
         className="min-h-screen w-full flex items-center justify-center"
@@ -136,7 +139,6 @@ export const LoginForm = () => {
                 </p>
               </div>
             </div>
-
             <h2
               className="text-2xl font-bold mb-2"
               style={{ color: "hsl(var(--text-primary))" }}
@@ -149,9 +151,9 @@ export const LoginForm = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Error Message */}
-            {error && (
+            {loginError && (
               <div
                 className="flex items-center space-x-3 p-4 rounded-lg border"
                 style={{
@@ -162,10 +164,9 @@ export const LoginForm = () => {
                 role="alert"
               >
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
+                <span className="text-sm">{loginError}</span>
               </div>
             )}
-
             {/* Email Field */}
             <div className="space-y-2">
               <label
@@ -181,16 +182,22 @@ export const LoginForm = () => {
                   style={{ color: "hsl(var(--text-disabled))" }}
                 />
                 <input
+                  {...register("email")}
                   id="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={isSubmitting}
                   autoComplete="email"
                   placeholder="Enter your email"
                   className="input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                <div>
+                  {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -207,14 +214,20 @@ export const LoginForm = () => {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
                   required
                   disabled={isSubmitting}
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   className="input w-full px-4 py-3 pr-12 rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                <div>
+                  {errors.password && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -263,7 +276,7 @@ export const LoginForm = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting || !email || !password}
+              disabled={isSubmitting}
               className="btn-primary w-full py-3 px-4 rounded-lg font-semibold transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
             >
               {isSubmitting ? (
@@ -325,7 +338,16 @@ export const LoginForm = () => {
               </Link>
             </p>
           </div>
-
+          <div className="mt-3 text-center">
+            <Link
+              href={"/EnterEmail"}
+              type="button"
+              className="font-medium transition-colors duration-200 hover:underline text-red-500"
+              // style={{ color: "hsl(var(--primary))" }}
+            >
+              Forget Password ?
+            </Link>
+          </div>
           {/* Bottom tagline */}
           <div className="mt-6 text-center">
             <p

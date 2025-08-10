@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authService } from "../service/auth.service";
+import { on } from "events";
 
 const Authkey = {
     all: ['user'] as const,
-    user: () => [...Authkey.all, 'user'] as const
+    user: () => [...Authkey.all, 'user'] as const,
+    resetToken: (token: string) => [...Authkey.all, 'resetToken', token] as const
 }
 export const useAuth = () => {
     const quryClinet = useQueryClient();
@@ -35,7 +37,7 @@ export const useAuth = () => {
             quryClinet.setQueryData(Authkey.user(), data.user)
             quryClinet.invalidateQueries({ queryKey: Authkey.user() })
         },
-        onError: (error) => {
+        onError: () => {
             quryClinet.removeQueries({ queryKey: Authkey.user() });
         }
     });
@@ -57,9 +59,25 @@ export const useAuth = () => {
             quryClinet.removeQueries({ queryKey: Authkey.user() })
         }
     })
-    const isAuthenticated = !!(user && !isError);
+    const forgotPasswordMutation = useMutation({
+        mutationFn: authService.sendResetPasswordLink
+    })
+    const resetPasswordMutation = useMutation({
+        mutationFn: authService.resetPasswordWithLink,
+        onSuccess: (data) => {
+            quryClinet.removeQueries({ queryKey: Authkey.user() })
+        },
+    })
+    const useVerifyResetToken = (token: string) => {
+        return useQuery({
+            queryKey: Authkey.resetToken(token),
+            queryFn: () => authService.verifyResetToken(token),
+            enabled: !!token,
+            retry: false,
+            staleTime: 0, // Always fresh check
+        });
+    }; const isAuthenticated = !!(user && !isError);
     const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
-
     return {
         user,
         isAuthenticated,
@@ -67,7 +85,24 @@ export const useAuth = () => {
         error: error?.massage || LoginMution.error?.message,
         login: LoginMution.mutate,
         logout: LogoutMution.mutate,
-        register: RegisterMution.mutate,
+        Register: RegisterMution.mutate,
+        forgotPassword: forgotPasswordMutation.mutate,
+        resetPassword: resetPasswordMutation.mutate,
+        useVerifyResetToken,
+        forgotPasswordState: {
+            isPending: forgotPasswordMutation.isPending,
+            isSuccess: forgotPasswordMutation.isSuccess,
+            isError: forgotPasswordMutation.isError,
+            error: forgotPasswordMutation.error?.message,
+            data: forgotPasswordMutation.data,
+        },
+        resetPasswordState: {
+            isPending: resetPasswordMutation.isPending,
+            isSuccess: resetPasswordMutation.isSuccess,
+            isError: resetPasswordMutation.isError,
+            error: resetPasswordMutation.error?.message,
+            data: resetPasswordMutation.data,
+        },
         refetchUser: () =>
             quryClinet.invalidateQueries({ queryKey: Authkey.user() }),
         clearError: () => {
