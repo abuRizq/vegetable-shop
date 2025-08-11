@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authService } from "../service/auth.service";
-import { on } from "events";
 
 const Authkey = {
     all: ['user'] as const,
     user: () => [...Authkey.all, 'user'] as const,
     resetToken: (token: string) => [...Authkey.all, 'resetToken', token] as const
 }
+
 export const useAuth = () => {
     const quryClinet = useQueryClient();
     const {
@@ -77,7 +77,9 @@ export const useAuth = () => {
             staleTime: 0, // Always fresh check
         });
     }; const isAuthenticated = !!(user && !isError);
+
     const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
+
     return {
         user,
         isAuthenticated,

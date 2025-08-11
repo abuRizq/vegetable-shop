@@ -113,7 +113,7 @@ function Sidebar() {
                     {!isCollapsed && (
                         <h3
                             className="text-xs font-bold uppercase tracking-widest mb-4 px-2 
-                                     transition-all duration-300"
+                                    transition-all duration-300"
                             style={{ color: "hsl(var(--text-disabled))" }}
                         >
                             Browse

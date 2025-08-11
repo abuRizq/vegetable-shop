@@ -14,20 +14,32 @@ class AuthService {
         }
     }
     private removeTokenFromLocalStorage(): void {
-        localStorage.removeItem('token');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+        }
     }
-    async validateTokenAndGetUser(): Promise<LoginResponse> {
+    async validateTokenAndGetUser(): Promise<LoginResponse | null> {
         const token = this.getTokenFromLocalStorage();
+        if (typeof token === null) {
+            return null;
+        }
         try {
-            const response = await fetch(`http://localhost:8080/api/auth/validate-token`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+            const response = await fetch(
+                `http://localhost:8080/api/auth/validate-token`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             if (!response.ok) {
-                const errorData = await (response).json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
+                const errorData = await (response)
+                    .json()
+                    .catch(() => ({}));
+                throw new Error(
+                    errorData.message || `HTTP ${response.status}: Login failed`
+                );
             }
             const data: LoginResponse = await response.json();
             return data;
@@ -55,8 +67,9 @@ class AuthService {
             }
             this.setTokenToLoacalStorage(data.token);
             return data;
-        } catch (error) {
-            console.error('Error during login:', error);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            console.error('Error during login:', error.massage);
             this.removeTokenFromLocalStorage();
             throw error;
         }
@@ -108,7 +121,7 @@ class AuthService {
     }
     async verifyResetToken(token: string): Promise<VerifyResetTokenResponse> {
         try {
-            const response = await fetch(`${this.baseURL}/api/auth/verify-reset-token/${token}`, {
+            const response = await fetch(`${this.baseURL}/auth/verify-reset-token/${token}`, {
                 method: "GET",
             });
             if (!response.ok) {
