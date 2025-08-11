@@ -1,8 +1,8 @@
 package com.veggieshop.unit.user;
 
 import com.veggieshop.user.User;
-import com.veggieshop.user.UserDto;
-import com.veggieshop.user.UserMapper;
+import com.veggieshop.user.dto.UserDto;
+import com.veggieshop.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;

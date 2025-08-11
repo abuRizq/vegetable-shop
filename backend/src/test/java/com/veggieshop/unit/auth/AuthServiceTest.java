@@ -1,13 +1,16 @@
 package com.veggieshop.unit.auth;
 
 import com.veggieshop.auth.*;
+import com.veggieshop.auth.dto.AuthDto;
+import com.veggieshop.auth.token.RefreshToken;
+import com.veggieshop.auth.token.RefreshTokenService;
 import com.veggieshop.exception.BadRequestException;
 import com.veggieshop.exception.DuplicateException;
-import com.veggieshop.security.JwtUtil;
+import com.veggieshop.security.forDelete.JwtUtil;
 import com.veggieshop.user.User;
-import com.veggieshop.user.UserDto;
-import com.veggieshop.user.UserMapper;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.dto.UserDto;
+import com.veggieshop.user.mapper.UserMapper;
+import com.veggieshop.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.*;
@@ -18,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.Optional;
 

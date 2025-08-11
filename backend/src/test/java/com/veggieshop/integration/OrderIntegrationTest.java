@@ -1,7 +1,6 @@
 package com.veggieshop.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.veggieshop.common.ApiResponse;
 import com.veggieshop.order.Order;
 import com.veggieshop.order.OrderDto.*;
 import com.veggieshop.order.OrderItemDto;
@@ -10,7 +9,7 @@ import com.veggieshop.product.Product;
 import com.veggieshop.product.ProductRepository;
 import com.veggieshop.category.Category;
 import com.veggieshop.category.CategoryRepository;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

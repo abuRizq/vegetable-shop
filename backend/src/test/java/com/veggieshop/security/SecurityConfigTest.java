@@ -1,5 +1,6 @@
 package com.veggieshop.security;
 
+import com.veggieshop.security.forDelete.JwtAuthFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

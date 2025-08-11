@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Enterprise-grade Logback configuration for Spring Boot
+  - Local/dev: human-friendly colored console logs (with traceId)
+  - Prod/staging: structured JSON to stdout (container friendly) + optional rolling files
+  - MDC fields and logstash markers included
+  - Sensitive-data masking via regex
+  - Async appenders for latency protection; bounded disk usage if files are enabled
+  - Profile-driven config via <springProfile>
+-->
+
+<configuration scan="true" scanPeriod="30 seconds" debug="false">
+
+    <!-- Surface Spring properties -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="veggie-shop"/>
+    <springProperty scope="context" name="ENV"      source="SPRING_PROFILES_ACTIVE" defaultValue="local"/>
+    <springProperty scope="context" name="LOG_FILE" source="logging.file.name" defaultValue="logs/${APP_NAME}.log"/>
+    <springProperty scope="context" name="ROOT_LVL" source="logging.level.root" defaultValue="INFO"/>
+
+    <!-- Common properties -->
+    <property name="TZ"               value="UTC"/>
+    <property name="TOTAL_SIZE_CAP"   value="5GB"/>
+    <property name="MAX_FILE_SIZE"    value="200MB"/>
+    <property name="MAX_HISTORY_DAYS" value="30"/>
+
+    <!-- Base pattern for text logs -->
+    <property name="PATTERN_TEXT"
+              value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS, ${TZ}} %highlight(%-5level) [%thread] traceId=%X{traceId} %logger{36} - %msg%n%rEx{full,10}"/>
+
+    <!-- Logback's own diagnostics -->
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <!-- ========================================================= -->
+    <!-- Appenders                                                 -->
+    <!-- ========================================================= -->
+
+    <!-- Local/dev: human-friendly colored console -->
+    <appender name="CONSOLE_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${PATTERN_TEXT}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- JSON to stdout (container/k8s friendly)
+         Requires: net.logstash.logback:logstash-logback-encoder -->
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- ISO timestamp -->
+                <timestamp>
+                    <timeZone>${TZ}</timeZone>
+                </timestamp>
+
+                <!-- Level / logger / thread -->
+                <pattern>
+                    <pattern>{ "level":"%level","logger":"%logger{36}","thread":"%thread" }</pattern>
+                </pattern>
+
+                <!-- Stable trace id field always present -->
+                <pattern>
+                    <pattern>{ "trace_id":"%X{traceId:-}" }</pattern>
+                </pattern>
+
+                <!-- Message and structured arguments -->
+                <message/>
+                <arguments/>
+
+                <!-- Logstash markers (for structured fields passed as markers) -->
+                <logstashMarkers/>
+
+                <!-- MDC map (includes userId/sessionId/etc if put in MDC) -->
+                <mdc/>
+
+                <!-- Application / environment tags -->
+                <pattern>
+                    <pattern>{ "app":"${APP_NAME}", "env":"${ENV}" }</pattern>
+                </pattern>
+
+                <!-- Stack trace with shortening -->
+                <stackTrace>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <maxLength>8192</maxLength>
+                        <shortenedClassNameLength>20</shortenedClassNameLength>
+                        <exclude>sun\..*</exclude>
+                        <exclude>java\..*</exclude>
+                        <exclude>javax\..*</exclude>
+                        <exclude>org\.springframework\.boot\.autoconfigure\..*</exclude>
+                    </throwableConverter>
+                </stackTrace>
+            </providers>
+
+            <!-- Mask sensitive fields across the rendered JSON payload -->
+            <maskPatterns>
+                <!-- naive examples, adjust to your domain -->
+                <maskPattern>"password"\s*:\s*".*?"</maskPattern>
+                <maskPattern>"token"\s*:\s*"[A-Za-z0-9\._\-]{10,}"</maskPattern>
+                <maskPattern>"apiKey"\s*:\s*"[A-Za-z0-9\._\-]{10,}"</maskPattern>
+                <maskPattern>"authorization"\s*:\s*".*?"</maskPattern>
+            </maskPatterns>
+        </encoder>
+    </appender>
+
+    <!-- Rolling JSON file (optional; good for on-prem or sidecar shipping) -->
+    <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp><timeZone>${TZ}</timeZone></timestamp>
+                <pattern><pattern>{ "level":"%level","logger":"%logger{36}","thread":"%thread" }</pattern></pattern>
+                <pattern><pattern>{ "trace_id":"%X{traceId:-}" }</pattern></pattern>
+                <message/>
+                <arguments/>
+                <logstashMarkers/>
+                <mdc/>
+                <pattern><pattern>{ "app":"${APP_NAME}", "env":"${ENV}" }</pattern></pattern>
+                <stackTrace/>
+            </providers>
+            <maskPatterns>
+                <maskPattern>"password"\s*:\s*".*?"</maskPattern>
+                <maskPattern>"token"\s*:\s*"[A-Za-z0-9\._\-]{10,}"</maskPattern>
+                <maskPattern>"apiKey"\s*:\s*"[A-Za-z0-9\._\-]{10,}"</maskPattern>
+                <maskPattern>"authorization"\s*:\s*".*?"</maskPattern>
+            </maskPatterns>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${APP_NAME}.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY_DAYS}</maxHistory>
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Errors-only rolling JSON file (helps tailing critical issues) -->
+    <appender name="FILE_JSON_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${APP_NAME}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp><timeZone>${TZ}</timeZone></timestamp>
+                <pattern><pattern>{ "level":"%level","logger":"%logger{36}","thread":"%thread" }</pattern></pattern>
+                <pattern><pattern>{ "trace_id":"%X{traceId:-}" }</pattern></pattern>
+                <message/>
+                <arguments/>
+                <logstashMarkers/>
+                <mdc/>
+                <pattern><pattern>{ "app":"${APP_NAME}", "env":"${ENV}" }</pattern></pattern>
+                <stackTrace/>
+            </providers>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${APP_NAME}-error.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>${MAX_HISTORY_DAYS}</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Async wrappers (protect request latency) -->
+    <appender name="ASYNC_CONSOLE_JSON" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="CONSOLE_JSON"/>
+        <queueSize>8192</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <neverBlock>true</neverBlock>
+    </appender>
+
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE_JSON"/>
+        <queueSize>8192</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <neverBlock>true</neverBlock>
+    </appender>
+
+    <appender name="ASYNC_FILE_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE_JSON_ERROR"/>
+        <queueSize>10000</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <!-- Do not lose error logs under pressure -->
+        <neverBlock>false</neverBlock>
+        <maxFlushTime>2000</maxFlushTime>
+    </appender>
+
+    <!-- ========================================================= -->
+    <!-- Noise control / filters                                   -->
+    <!-- ========================================================= -->
+
+    <!-- Drop very chatty health/metrics access logs if any (optional sample) -->
+    <!--
+    <turboFilter class="ch.qos.logback.classic.turbo.DuplicateMessageFilter">
+      <AllowedRepetitions>5</AllowedRepetitions>
+      <CacheSize>1000</CacheSize>
+    </turboFilter>
+    -->
+
+    <!-- ========================================================= -->
+    <!-- Profiles                                                  -->
+    <!-- ========================================================= -->
+
+    <!-- Local / Dev -->
+    <springProfile name="local,dev">
+        <root level="${ROOT_LVL}">
+            <appender-ref ref="CONSOLE_TEXT"/>
+        </root>
+
+        <!-- App & common frameworks -->
+        <logger name="com.veggieshop" level="DEBUG"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.web" level="INFO"/>
+
+        <!-- Hibernate SQL noise -->
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+    </springProfile>
+
+    <!-- Prod / Staging -->
+    <springProfile name="prod,staging">
+        <!-- JSON to stdout is preferred in containers -->
+        <root level="${ROOT_LVL}">
+            <appender-ref ref="ASYNC_CONSOLE_JSON"/>
+            <!-- Optional: also persist to files if you need local retention -->
+            <!-- <appender-ref ref="ASYNC_FILE"/> -->
+            <appender-ref ref="ASYNC_FILE_ERROR"/>
+        </root>
+
+        <logger name="com.veggieshop" level="INFO"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+    </springProfile>
+
+</configuration>

@@ -1,7 +1,8 @@
 package com.veggieshop.security;
 
+import com.veggieshop.security.forDelete.UserDetailsServiceImpl;
 import com.veggieshop.user.User;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

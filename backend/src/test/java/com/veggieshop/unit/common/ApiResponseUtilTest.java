@@ -1,6 +1,6 @@
 package com.veggieshop.unit.common;
 
-import com.veggieshop.common.ApiError;
+import com.veggieshop.common.dto.ApiError;
 import com.veggieshop.common.ApiResponse;
 import com.veggieshop.common.ApiResponseUtil;
 import com.veggieshop.common.Meta;

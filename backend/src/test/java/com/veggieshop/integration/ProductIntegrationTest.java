@@ -6,7 +6,7 @@ import com.veggieshop.product.ProductDto.*;
 import com.veggieshop.product.ProductRepository;
 import com.veggieshop.category.Category;
 import com.veggieshop.category.CategoryRepository;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.Optional;

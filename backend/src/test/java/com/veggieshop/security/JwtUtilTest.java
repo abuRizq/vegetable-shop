@@ -1,5 +1,6 @@
 package com.veggieshop.security;
 
+import com.veggieshop.security.forDelete.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,9 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.crypto.SecretKey;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Date;
 
 import static org.assertj.core.api.Assertions.*;
 

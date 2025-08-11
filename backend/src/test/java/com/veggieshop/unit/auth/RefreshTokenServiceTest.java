@@ -1,8 +1,8 @@
 package com.veggieshop.unit.auth;
 
-import com.veggieshop.auth.RefreshToken;
-import com.veggieshop.auth.RefreshTokenRepository;
-import com.veggieshop.auth.RefreshTokenServiceImpl;
+import com.veggieshop.auth.token.RefreshToken;
+import com.veggieshop.auth.token.RefreshTokenRepository;
+import com.veggieshop.auth.token.RefreshTokenServiceImpl;
 import com.veggieshop.user.User;
 import org.junit.jupiter.api.*;
 import org.mockito.*;

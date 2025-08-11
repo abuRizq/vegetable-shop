@@ -2,7 +2,7 @@ package com.veggieshop.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.veggieshop.user.User;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

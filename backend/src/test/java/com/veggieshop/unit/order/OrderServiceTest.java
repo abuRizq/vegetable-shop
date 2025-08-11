@@ -7,7 +7,7 @@ import com.veggieshop.order.Order;
 import com.veggieshop.product.Product;
 import com.veggieshop.product.ProductRepository;
 import com.veggieshop.user.User;
-import com.veggieshop.user.UserRepository;
+import com.veggieshop.user.repository.UserRepository;
 import com.veggieshop.util.PriceCalculator;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
