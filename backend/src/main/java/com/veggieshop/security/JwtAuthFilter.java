@@ -21,55 +21,51 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 import java.io.IOException;
 
-/**
- * Filter that authenticates requests based on JWT tokens in the Authorization header.
- */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // مرّر preflight بدون تحقق
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         String jwtToken = null;
         String username = null;
 
-        // Extract token from header
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
             jwtToken = authHeader.substring(7);
             try {
                 username = jwtUtil.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException e) {
-                logger.warn("JWT token is expired: {}", e.getMessage());
+                log.warn("JWT expired: {}", e.getMessage());
             } catch (JwtException | IllegalArgumentException e) {
-                logger.warn("Invalid JWT token: {}", e.getMessage());
+                log.warn("Invalid JWT: {}", e.getMessage());
             }
         }
 
-        // Only set authentication if user is not already authenticated and username was successfully parsed
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(auth);
             } else {
-                logger.debug("JWT token validation failed for user: {}", username);
+                log.debug("JWT validation failed for user: {}", username);
             }
         }
 
