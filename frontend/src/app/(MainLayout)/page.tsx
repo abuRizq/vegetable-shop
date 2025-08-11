@@ -17,6 +17,8 @@ import Searchbar from "../_Components/header/Searchbar";
 import Header from "../_Components/header/header";
 import HeroSlider from "../_Components/main/Hero";
 import Catagry from "../_Components/main/Catagry";
+import { FreshlyArrived } from "../_Components/main/freshly-arrived";
+import { SeasonalSection } from "../_Components/main/seasonal-section";
 
 // --- Types
 
@@ -86,6 +88,10 @@ export default function HomePage() {
         <Header />
         <HeroSlider />
         <Catagry />
+
+        {/* Seasonal & Freshly Arrived Sections */}
+        <SeasonalSection />
+        <FreshlyArrived />
       </main>
     </div>
   );
