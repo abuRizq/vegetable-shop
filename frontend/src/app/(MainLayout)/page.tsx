@@ -19,6 +19,7 @@ import HeroSlider from "../_Components/main/Hero";
 import Catagry from "../_Components/main/Catagry";
 import { FreshlyArrived } from "../_Components/main/freshly-arrived";
 import { SeasonalSection } from "../_Components/main/seasonal-section";
+import { CustomerReviews } from "../_Components/main/customer-reviews";
 
 // --- Types
 
@@ -92,6 +93,8 @@ export default function HomePage() {
         {/* Seasonal & Freshly Arrived Sections */}
         <SeasonalSection />
         <FreshlyArrived />
+        {/* Customer Reviews Section */}
+        <CustomerReviews />
       </main>
     </div>
   );
