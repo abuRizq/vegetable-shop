@@ -2,19 +2,18 @@
 
 import { useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
-import Searchbar from "./Searchbar"
-import { useQuery } from "@tanstack/react-query"
-import { authService } from "@/app/service/auth.service"
+import Searchbar from "./Searchbar";
 import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
+import { useAuth } from "@/app/hooks/useAuth"
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { data: user } = useQuery({
-    queryKey: ['user', 'user'],
-    queryFn: authService.validateTokenAndGetUser,
-    enabled: typeof window != undefined || !!localStorage.getItem('auth-token')
-  })
+  const { user } = useAuth();
+  if (typeof user === typeof User) {
+    console.log("from main page " + user);
+  }
+
   return (
     <header
       className="w-full flex flex-row justify-between items-center p-6 backdrop-blur-xl border-b sticky top-0 z-40"
@@ -67,7 +66,7 @@ function Header() {
         {/* Profile Section */}
 
         <div className="relative">
-          {user?.name == "" ? (
+          {user !=undefined ? (
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center space-x-3 p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
@@ -79,7 +78,7 @@ function Header() {
                   className="text-sm font-semibold group-hover:text-primary-color transition-colors duration-200"
                   style={{ color: "hsl(var(--text-primary))" }}
                 >
-                  John Doe
+                  {user.user.name || "khaled"}
                 </div>
                 <div
                   className="text-xs"
