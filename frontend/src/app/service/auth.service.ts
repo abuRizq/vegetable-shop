@@ -1,25 +1,25 @@
 import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
-
+function setTokenToLoacalStorage(token: string): void {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('token', token);
+    }
+}
+function getTokenFromLocalStorage(): string | null {
+    if (typeof window !== 'undefined') {
+        return localStorage.getItem('token');
+    }
+    return null;
+}
+function removeTokenFromLocalStorage(): void {
+    localStorage.removeItem('token');
+}
 class AuthService {
     private baseURL = process.env.NEXT_PUBLIC_API_URL;
-    private getTokenFromLocalStorage(): string | null {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('token');
-        }
-        return null;
-    }
-    private setTokenToLoacalStorage(token: string): void {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('token', token);
-        }
-    }
-    private removeTokenFromLocalStorage(): void {
-        localStorage.removeItem('token');
-    }
-    async validateTokenAndGetUser(): Promise<LoginResponse> {
-        const token = this.getTokenFromLocalStorage();
+
+    async validateTokenAndGetUser(): Promise<User> {
+        const token = getTokenFromLocalStorage();
         try {
-            const response = await fetch(`http://localhost:8080/api/auth/validate-token`, {
+            const response = await fetch(`http://localhost:8080/api/users/me`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -30,7 +30,9 @@ class AuthService {
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
             }
             const data = await response.json();
-            return data.data as LoginResponse;
+            const User = data.data;
+            console.log("form the vrfiy fun :" + data.token);
+            return User;
         } catch (error) {
             console.error(error);
             throw error;
@@ -52,24 +54,15 @@ class AuthService {
             }
             const body = await response.json();
             const data = body.data;
-            const token =
-                body?.token ??
-                body?.accessToken ??
-                body?.data?.token ??
-                body?.data?.accessToken;
-            const user =
-                body?.user ??
-                body?.data?.user;
-            if (!token || !user) {
+            setTokenToLoacalStorage(data.token)
+            if (!data.token || !data.user) {
                 console.log("this is the response " + response.json());
                 throw new Error('Invalid response format from server');
             }
-            console.log("this is the response " + data);
-
             return data;
         } catch (error) {
             console.error('Error during login:', error);
-            this.removeTokenFromLocalStorage();
+            removeTokenFromLocalStorage();
             throw error;
         }
     }
@@ -90,10 +83,10 @@ class AuthService {
             if (!data.token || !data.user) {
                 throw new Error('Invalid response format from server');
             }
-            this.setTokenToLoacalStorage(data.token);
+            setTokenToLoacalStorage(data.token);
             return data;
         } catch (error) {
-            this.removeTokenFromLocalStorage();
+            removeTokenFromLocalStorage();
             throw error;
         }
     }
@@ -157,7 +150,7 @@ class AuthService {
         }
     }
     async virfyToken(): Promise<LoginResponse | null> {
-        const token = this.getTokenFromLocalStorage();
+        const token = getTokenFromLocalStorage();
         if (!token) {
             return null;
         }
@@ -170,36 +163,35 @@ class AuthService {
                 },
             });
             if (!response.ok) {
-                this.removeTokenFromLocalStorage();
+                removeTokenFromLocalStorage();
                 return null;
             }
             const user: LoginResponse = await response.json();
             return user;
         } catch (error) {
             console.error('Error during token verification:', error);
-            this.removeTokenFromLocalStorage();
+            removeTokenFromLocalStorage();
             return null;
         }
     }
     async logout(): Promise<void> {
         try {
-            const token = this.getTokenFromLocalStorage();
+            const token = getTokenFromLocalStorage();
             if (!token) return;
-            await fetch(`${this.baseURL
-                } / auth / logout`, {
+            await fetch(`http://localhost:8080/api/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token} `,
                 },
             });
-            this.removeTokenFromLocalStorage();
+            removeTokenFromLocalStorage();
         } catch (error) {
             console.error('Error during logout:', error);
         }
     }
     getAuthHeader(): Record<string, string> {
-        const token = this.getTokenFromLocalStorage();
+        const token = getTokenFromLocalStorage();
         return token ? { 'Authorization': `Bearer ${token} ` } : {};
     }
 }

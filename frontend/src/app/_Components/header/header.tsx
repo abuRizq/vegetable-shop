@@ -1,18 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./Searchbar";
 import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
 import { useAuth } from "@/app/hooks/useAuth"
+import router from "next/router";
 
 function Header() {
+
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { user } = useAuth();
-  if (typeof user === typeof User) {
-    console.log("from main page " + user);
+  const { user, logout, isAuthenticated } = useAuth();
+
+  const onSubmit = async () => {
+    try {
+      await logout();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+    }
   }
+  useEffect(() => {
+    // router.push("/") // or any dashboard route
+  }, [isAuthenticated])
 
   return (
     <header
@@ -37,7 +47,6 @@ function Header() {
           className="relative p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
           style={{ backgroundColor: "hsl(var(--elevated))" }}
         >
-
           <ShoppingCart
             size={20}
             style={{ color: "hsl(var(--text-secondary))" }}
@@ -66,7 +75,7 @@ function Header() {
         {/* Profile Section */}
 
         <div className="relative">
-          {user !=undefined ? (
+          {user != undefined ? (
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center space-x-3 p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
@@ -78,7 +87,7 @@ function Header() {
                   className="text-sm font-semibold group-hover:text-primary-color transition-colors duration-200"
                   style={{ color: "hsl(var(--text-primary))" }}
                 >
-                  {user.user.name || "khaled"}
+                  {user.name}
                 </div>
                 <div
                   className="text-xs"
@@ -167,13 +176,13 @@ function Header() {
                       className="font-semibold"
                       style={{ color: "hsl(var(--text-primary))" }}
                     >
-                      John Doe
+                      {user?.name}
                     </div>
                     <div
                       className="text-sm"
                       style={{ color: "hsl(var(--text-secondary))" }}
                     >
-                      john.doe@email.com
+                      {user?.email}
                     </div>
                   </div>
                 </div>
@@ -239,6 +248,7 @@ function Header() {
                 style={{ borderColor: "hsl(var(--divider))" }}
               >
                 <button
+                  onClick={onSubmit}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 group"
                   style={{
                     backgroundColor: "hsl(var(--error) / 0.1)",
