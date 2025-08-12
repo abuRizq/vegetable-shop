@@ -16,7 +16,8 @@ export const LoginForm = () => {
   const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated,user } = useAuth()
+
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -28,17 +29,10 @@ export const LoginForm = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
   })
-
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data)
-      queryClient.setQueryData(["user", "user"], (prevUser) => {
-        if (!prevUser) return prevUser;
-        return {
-          ...prevUser,
-          isNew: true, // 👈 custom update
-        };
-      });
+      
       setLoginError(null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -48,12 +42,20 @@ export const LoginForm = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log(user?.user.name);
+      queryClient.setQueryData(["user", "user"], (prevUser) => {
+        if (!prevUser) return prevUser;
+        return {
+          ...prevUser,
+          isNew: true, // 👈 custom update
+        };
+      });
       router.push("/") // or any dashboard route
     }
   }, [isAuthenticated])
 
   // Show loading while checking existing auth
-  if (false) {
+  if (isAuthenticated) {
     return (
       <div
         className="min-h-screen w-full flex items-center justify-center"
@@ -343,7 +345,7 @@ export const LoginForm = () => {
               href={"/EnterEmail"}
               type="button"
               className="font-medium transition-colors duration-200 hover:underline text-red-500"
-              // style={{ color: "hsl(var(--primary))" }}
+            // style={{ color: "hsl(var(--primary))" }}
             >
               Forget Password ?
             </Link>

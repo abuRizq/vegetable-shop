@@ -29,8 +29,8 @@ class AuthService {
                 const errorData = await (response).json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
             }
-            const data: LoginResponse = await response.json();
-            return data;
+            const data = await response.json();
+            return data.data as LoginResponse;
         } catch (error) {
             console.error(error);
             throw error;
@@ -46,14 +46,26 @@ class AuthService {
                 body: JSON.stringify(credentials),
             });
             if (!response.ok) {
+                console.log("this is the response " + response);
                 const errorData = await (response).json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
             }
-            const data: LoginResponse = await response.json();
-            if (!data.token || !data.user) {
+            const body = await response.json();
+            const data = body.data;
+            const token =
+                body?.token ??
+                body?.accessToken ??
+                body?.data?.token ??
+                body?.data?.accessToken;
+            const user =
+                body?.user ??
+                body?.data?.user;
+            if (!token || !user) {
+                console.log("this is the response " + response.json());
                 throw new Error('Invalid response format from server');
             }
-            this.setTokenToLoacalStorage(data.token);
+            console.log("this is the response " + data);
+
             return data;
         } catch (error) {
             console.error('Error during login:', error);
