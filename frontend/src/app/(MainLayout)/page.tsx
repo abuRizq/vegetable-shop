@@ -91,10 +91,10 @@ export default function HomePage() {
         <Catagry />
 
         {/* Seasonal & Freshly Arrived Sections */}
-        <SeasonalSection />
-        <FreshlyArrived />
+        {/* <SeasonalSection /> */}
+        {/* <FreshlyArrived /> */}
         {/* Customer Reviews Section */}
-        <CustomerReviews />
+        {/* <CustomerReviews /> */}
       </main>
     </div>
   );

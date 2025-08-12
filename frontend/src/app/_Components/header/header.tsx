@@ -1,20 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
-import Searchbar from "./Searchbar"
-import { useQuery } from "@tanstack/react-query"
-import { authService } from "@/app/service/auth.service"
+import Searchbar from "./Searchbar";
 import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
+import { useAuth } from "@/app/hooks/useAuth"
+import router from "next/router";
 
 function Header() {
+
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { data: user } = useQuery({
-    queryKey: ['user', 'user'],
-    queryFn: authService.validateTokenAndGetUser,
-    enabled: typeof window != undefined || !!localStorage.getItem('auth-token')
-  })
+  const { user, logout, isAuthenticated } = useAuth();
+
+  const onSubmit = async () => {
+    try {
+      await logout();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+    }
+  }
+  useEffect(() => {
+    // router.push("/") // or any dashboard route
+  }, [isAuthenticated])
+
   return (
     <header
       className="w-full flex flex-row justify-between items-center p-6 backdrop-blur-xl border-b sticky top-0 z-40"
@@ -38,7 +47,6 @@ function Header() {
           className="relative p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
           style={{ backgroundColor: "hsl(var(--elevated))" }}
         >
-
           <ShoppingCart
             size={20}
             style={{ color: "hsl(var(--text-secondary))" }}
@@ -67,7 +75,7 @@ function Header() {
         {/* Profile Section */}
 
         <div className="relative">
-          {user?.name == "" ? (
+          {user != undefined ? (
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center space-x-3 p-2 rounded-xl transition-all duration-200 hover:scale-105 group"
@@ -79,7 +87,7 @@ function Header() {
                   className="text-sm font-semibold group-hover:text-primary-color transition-colors duration-200"
                   style={{ color: "hsl(var(--text-primary))" }}
                 >
-                  John Doe
+                  {user.name}
                 </div>
                 <div
                   className="text-xs"
@@ -168,13 +176,13 @@ function Header() {
                       className="font-semibold"
                       style={{ color: "hsl(var(--text-primary))" }}
                     >
-                      John Doe
+                      {user?.name}
                     </div>
                     <div
                       className="text-sm"
                       style={{ color: "hsl(var(--text-secondary))" }}
                     >
-                      john.doe@email.com
+                      {user?.email}
                     </div>
                   </div>
                 </div>
@@ -240,6 +248,7 @@ function Header() {
                 style={{ borderColor: "hsl(var(--divider))" }}
               >
                 <button
+                  onClick={onSubmit}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 group"
                   style={{
                     backgroundColor: "hsl(var(--error) / 0.1)",
