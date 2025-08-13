@@ -2,20 +2,27 @@
 
 import { useState } from "react"
 
-import { Home, Heart, Clock, ShoppingCart, Tag, Settings, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
+import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
 import NavItem from "./NavItem"
-import ThemeToggle from "./ThemeToggle"
-import { useQuery } from "@tanstack/react-query"
-import { authService } from "../service/auth.service"
-import Link from "next/link"
+import { useAuth } from "../hooks/useAuth"
+import { useRouter } from "next/navigation"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
-    const { data: user } = useQuery({
-        queryKey: ['user', 'user'],
-        queryFn: authService.validateTokenAndGetUser,
-        enabled: typeof window != undefined || !!localStorage.getItem('auth-token')
-    })
+    const { user, logout } = useAuth();
+    const route = useRouter();
+    const onSubmit = async () => {
+        if (user) {
+            await logout();
+        /***
+         * Add refrech page here
+         * 
+         */
+        } else {
+            route.push('/login')
+        }
+    }
+
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed)
     }
@@ -201,10 +208,10 @@ function Sidebar() {
                     backgroundColor: "hsl(var(--action-hover))",
                 }}
             >
-                <Link
-                    href={isLoggedIn ? "/" : "/login"}
+                <button
+                    onClick={onSubmit}
                     className={`
-            flex items-center rounded-xl
+                    flex items-center rounded-xl
                     nav-item-transition
                     focus:outline-none focus:ring-2 focus:ring-opacity-50
                     backdrop-blur-sm
@@ -215,11 +222,15 @@ function Sidebar() {
                 `}
                 >
                     <LogOut size={20} className={` ${isCollapsed ? "px-2" : "px-4"}`} />
-                    <span>{isLoggedIn ? "Sign Out" : "Log In"}</span>
-                </Link>
+                    <span>{user ? "Sign Out" : "Log In"}</span>
+                </button>
             </div>
         </aside>
     );
 }
 
 export default Sidebar
+// function setShowProfileMenu(arg0: boolean) {
+//     throw new Error("Function not implemented.")
+// }
+

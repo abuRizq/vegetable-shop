@@ -1,41 +1,42 @@
 import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
 function setTokenToLoacalStorage(token: string): void {
     if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
+        localStorage.setItem('auth_token', token);
     }
 }
 function getTokenFromLocalStorage(): string | null {
     if (typeof window !== 'undefined') {
-        return localStorage.getItem('token');
+        return localStorage.getItem('auth_token');
     }
     return null;
 }
 function removeTokenFromLocalStorage(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
 }
 class AuthService {
     private baseURL = process.env.NEXT_PUBLIC_API_URL;
-
-    async validateTokenAndGetUser(): Promise<User> {
+    async validateTokenAndGetUser(): Promise<User | null> {
         const token = getTokenFromLocalStorage();
-        try {
-            const response = await fetch(`http://localhost:8080/api/users/me`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            if (!response.ok) {
-                const errorData = await (response).json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
-            }
-            const data = await response.json();
-            const User = data.data;
-            console.log("form the vrfiy fun :" + data.token);
-            return User;
-        } catch (error) {
-            console.error(error);
-            throw error;
+            try {
+                const response = await fetch(`http://localhost:8080/api/users/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) {
+                    return null
+                    const errorData = await (response).json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
+                }
+                const data = await response.json();
+                const User = data.data;
+                console.log("form the vrfiy fun :" + data.token);
+                return User;
+            } catch (error) {
+                console.error(error);
+                throw error;
+            
         }
     }
     async login(credentials: LoginCredentials): Promise<LoginResponse> {

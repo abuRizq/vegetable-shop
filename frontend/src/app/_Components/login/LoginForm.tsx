@@ -32,7 +32,6 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data)
-      
       setLoginError(null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -42,14 +41,16 @@ export const LoginForm = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log(user?.user.name);
-      queryClient.setQueryData(["user", "user"], (prevUser) => {
-        if (!prevUser) return prevUser;
-        return {
-          ...prevUser,
-          isNew: true, // 👈 custom update
-        };
-      });
+      /***
+       * what the bnifet form this code 
+       */
+      // queryClient.setQueryData(["user", "user"], (prevUser) => {
+      //   if (!prevUser) return prevUser;
+      //   return {
+      //     ...prevUser,
+      //     isNew: true, // 👈 custom update
+      //   };
+      // });
       router.push("/") // or any dashboard route
     }
   }, [isAuthenticated])

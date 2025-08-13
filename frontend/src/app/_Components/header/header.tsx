@@ -6,7 +6,7 @@ import Searchbar from "./Searchbar";
 import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
 import { useAuth } from "@/app/hooks/useAuth"
-import router from "next/router";
+// import router from "next/router";
 
 function Header() {
 
@@ -16,6 +16,7 @@ function Header() {
   const onSubmit = async () => {
     try {
       await logout();
+      setShowProfileMenu(false)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
     }
