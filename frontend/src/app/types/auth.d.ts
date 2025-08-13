@@ -15,6 +15,7 @@ export interface RegisterCredentials {
     password: string;
     role: "ADMIN" | "USER";
 }
+export const USER_QK = ['user'] as const;
 export interface LoginResponse {
     token: string;
     user: User;

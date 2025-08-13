@@ -7,11 +7,9 @@ import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "luci
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { RegisterFormData, registerSchema } from "@/app/lib/schemas/register"
-import { useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/app/hooks/useAuth"
 
 export const RegisterForm = () => {
-    const queryClient = useQueryClient();
     const { Register } = useAuth()
     const {
         register,
@@ -19,7 +17,6 @@ export const RegisterForm = () => {
         formState: { errors, isSubmitting }
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema)
-
     })
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)

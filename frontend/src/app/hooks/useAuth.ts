@@ -33,7 +33,7 @@ export const useAuth = () => {
     const LoginMution = useMutation({
         mutationFn: authService.login,
         onSuccess: (data) => {
-            quryClinet.setQueryData(Authkey.user(), data)
+            quryClinet.setQueryData(Authkey.user(), data.user)
             quryClinet.invalidateQueries({ queryKey: Authkey.user() })
         },
         onError: () => {
