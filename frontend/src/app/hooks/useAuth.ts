@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authService } from "../service/auth.service";
+import { USER_QK } from "../types/auth";
+
 
 const Authkey = {
     all: ['user'] as const,
@@ -14,7 +16,7 @@ export const useAuth = () => {
         error,
         isError,
     } = useQuery({
-        queryKey: Authkey.user(),
+        queryKey: USER_QK,
         queryFn: authService.validateTokenAndGetUser,
         enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth_token'),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,14 +33,16 @@ export const useAuth = () => {
         refetchOnReconnect: true
     });
     const LoginMution = useMutation({
-        mutationFn: authService.login,
-        onSuccess: (data) => {
-            quryClinet.setQueryData(Authkey.user(), data.user)
-            quryClinet.invalidateQueries({ queryKey: Authkey.user() })
+        mutationFn: async (creds: { email: string; password: string }) => {
+            const res = await fetch('/api/auth/login',
+                {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(creds)
+                })
+            if (!res.ok) throw new Error('Login failed')
+            return (await res.json()) as { success: true }
         },
-        onError: () => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() });
-        }
+        onSuccess: () => quryClinet.invalidateQueries({ queryKey: USER_QK }),
     });
     const LogoutMution = useMutation({
         mutationFn: authService.logout,
