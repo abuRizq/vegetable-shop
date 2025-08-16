@@ -6,24 +6,25 @@ import Searchbar from "./Searchbar";
 import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
 import { useAuth } from "@/app/hooks/useAuth"
+import { useRouter } from "next/navigation";
 // import router from "next/router";
 
 function Header() {
 
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const { user, logout, isAuthenticated } = useAuth();
-
+  const router = useRouter()
   const onSubmit = async () => {
-    try {
-      await logout();
-      setShowProfileMenu(false)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-    }
+    logout();
+    setShowProfileMenu(false)
+    window.location.reload()
   }
+
   useEffect(() => {
-    // router.push("/") // or any dashboard route
-  }, [isAuthenticated])
+    if (!isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router])
 
   return (
     <header

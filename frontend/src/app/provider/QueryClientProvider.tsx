@@ -20,8 +20,9 @@ export function QueryProviders({ children, dehydratedState }: any) {
     );
     return (
         <QueryClientProvider client={queryClient}>
-            <HydrationBoundary state={dehydratedState}>{children}</HydrationBoundary>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {children}
+            {/* <HydrationBoundary state={dehydratedState}></HydrationBoundary> */}
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </QueryClientProvider>
     );
 }

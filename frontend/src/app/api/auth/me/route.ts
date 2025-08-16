@@ -1,23 +1,49 @@
-import { User } from '@/app/types/auth';
-import { cookies } from 'next/headers'
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import type { User } from "@/app/types/auth";
 
-type ApiResponse<T> = { success: boolean; data: T; error: string | null; meta: unknown | null }
+type ApiResponse<T> = {
+    success: boolean;
+    data: T | null;
+    error: string | null;
+    meta: unknown | null;
+};
 
-const GET = async () => {
-    const token = (await cookies()).get('at')?.value
-    if (!token)
-        return { success: false, data: null, error: "Not logged in", meta: null };
-    const res = await fetch(`https://localhost:3000/api/auth/me`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-    const data = (await res.json()) as ApiResponse<User>;
-    if (!res.ok || !data.success) {
-        return new Response(JSON.stringify(
-            { error: data.error ?? 'Unauthorized' }
-        )
-            , { status: res.status })
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET(req: Request) {
+    const token = (await cookies()).get("at")?.value;
+
+    if (!token) {
+        return NextResponse.json<ApiResponse<User>>(
+            { success: false, data: null, error: "Not logged in", meta: null },
+            { status: 401 }
+        );
     }
-    return { success: true, data: data, error: null, meta: null }
+    const upstream = await fetch("http://localhost:8080/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+    });
+
+    const body = await upstream.json().catch(() => null);
+
+    if (!upstream.ok || (body && body.success === false)) {
+        const msg =
+            (body && (body.error || body.message)) || upstream.statusText || "Unauthorized";
+        return NextResponse.json<ApiResponse<User>>(
+            { success: false, data: null, error: msg, meta: null },
+            { status: upstream.status || 401 }
+        );
+    }
+    const userResp = body as ApiResponse<User>;
+    return NextResponse.json<ApiResponse<User>>(
+        {
+            success: true,
+            data: userResp.data, // 
+            error: null,
+            meta: userResp.meta ?? null,
+        },
+        { status: 200 }
+    );
 }

@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authService } from "../service/auth.service";
-import { USER_QK } from "../types/auth";
-
+// import { USER_QK } from "../types/auth";
 
 const Authkey = {
     all: ['user'] as const,
@@ -16,7 +15,7 @@ export const useAuth = () => {
         error,
         isError,
     } = useQuery({
-        queryKey: USER_QK,
+        queryKey: Authkey.all,
         queryFn: authService.validateTokenAndGetUser,
         enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth_token'),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,16 +32,23 @@ export const useAuth = () => {
         refetchOnReconnect: true
     });
     const LoginMution = useMutation({
-        mutationFn: async (creds: { email: string; password: string }) => {
-            const res = await fetch('/api/auth/login',
-                {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(creds)
-                })
-            if (!res.ok) throw new Error('Login failed')
-            return (await res.json()) as { success: true }
+        mutationFn: authService.login,
+        // mutationFn: async (creds: { email: string; password: string }) => {
+        //     const res = await fetch("http://localhost:8080/api/auth/login", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify(creds),
+        //     });
+        //     if (!res.ok) throw new Error("Login failed");
+        //     return (await res.json()) as { success: true };
+        // },
+        onSuccess: (data) => {
+            quryClinet.invalidateQueries({ queryKey: Authkey.user() })
+            quryClinet.setQueryData(Authkey.user(), data.user)
         },
-        onSuccess: () => quryClinet.invalidateQueries({ queryKey: USER_QK }),
+        onError: () => {
+            quryClinet.removeQueries({ queryKey: Authkey.user() });
+        },
     });
     const LogoutMution = useMutation({
         mutationFn: authService.logout,

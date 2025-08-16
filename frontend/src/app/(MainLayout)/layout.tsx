@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Sidbar from "../_Components/Sidbar";
 import { Providers } from "../provider/ThemeProvider";
-import { QueryClient } from "@tanstack/react-query";
-import { getCurrentUser } from "../lib/auth-server";
-import { USER_QK } from "../types/auth";
+// import { QueryClient } from "@tanstack/react-query";
+// import { getCurrentUser } from "../lib/auth-server";
+// import { USER_QK } from "../types/auth";
 
 
 export const metadata: Metadata = {

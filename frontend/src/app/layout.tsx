@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import './globals.css'
 import { QueryProviders } from "./provider/QueryClientProvider";
-import { QueryClient } from "@tanstack/react-query";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "./lib/auth-server";
-import { USER_QK } from "./types/auth";
+// import { USER_QK } from "./types/auth";
 
 
 export const metadata: Metadata = {
@@ -16,14 +16,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const qc = new QueryClient()
-  const user = await getCurrentUser()
-  qc.setQueryData(USER_QK, user)
+  // const qc = new QueryClient()
+  // const user = await getCurrentUser()
+  // qc.setQueryData(["user"], user)
   return (
     <html lang="en" suppressHydrationWarning>
 
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-        <QueryProviders dehydratedState={dehydrate(qc)}>
+        <QueryProviders >
           {children}
         </QueryProviders>
       </body>

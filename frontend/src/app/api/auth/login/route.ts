@@ -1,15 +1,14 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server';
-const Base_url = process.env.NEXT_PUBLIC_API_URL;
+// const Base_url = process.env.NEXT_PUBLIC_API_URL;
 
 const POST = async (req: NextRequest) => {
     const body = await req.json();
-    const res = await fetch(`${Base_url}/api/auth/login`, {
+    const res = await fetch(`http://localhost:8080/api/auth/login`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify(body),
         cache: 'no-store',
-
     });
     const data = await res.json();
     if (!res.ok) {
@@ -32,5 +31,4 @@ const POST = async (req: NextRequest) => {
     })
     return new Response(JSON.stringify(data), { status: 200 });
 }
-
 export { POST };
