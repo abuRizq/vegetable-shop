@@ -2,21 +2,40 @@ server:
   port: 8080
 
 spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/vegetable_shop}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:admin}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
   security:
     user:
       name: ${ADMIN_USER:admin}
       password: ${ADMIN_PASS:admin123}
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/vegetable_shop}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:secret}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:kahledblata242@gmail.com}
+    password: ${MAIL_PASS:xtkamelnmhzdwrbb}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
+  reset-link-base: ${APP_RESET_LINK_BASE:http://localhost:3000/reset-password?token=}
   jwt:
-    secret: ${JWT_SECRET:5WTQ5zL14Ue0v5U6Hphqr5Zp6byKePG0A2hYXnN2OMpQyY4tdgWJ8xuvq1UHKADyB5m8fWlb6T6B6SGk9OKlOKg==}
-    expiration-ms: ${JWT_EXPIRATION:86400000}
+    secret: ${JWT_SECRET:iIIGkNFrF0081UfRhvktKjUkMy+LBm2dyjnB7KyoKphxtoxIvyabfxm31anMDclNBLizWm1BjfEcB9SAednQWg==}
+    expiration-ms: ${JWT_EXPIRATION:900000}
