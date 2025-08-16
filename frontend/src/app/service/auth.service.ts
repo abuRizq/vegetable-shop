@@ -1,9 +1,9 @@
 import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
-function setTokenToLoacalStorage(token: string): void {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', token);
-    }
-}
+// function setTokenToLoacalStorage(token: string): void {
+//     if (typeof window !== 'undefined') {
+//         localStorage.setItem('auth_token', token);
+//     }
+// }
 function getTokenFromLocalStorage(): string | null {
     if (typeof window !== 'undefined') {
         return localStorage.getItem('auth_token');
@@ -55,7 +55,7 @@ class AuthService {
             }
             const body = await response.json();
             const data = body.data;
-            setTokenToLoacalStorage(data.token)
+            // setTokenToLoacalStorage(data.token)
             if (!data.token || !data.user) {
                 console.log("this is the response " + response.json());
                 throw new Error('Invalid response format from server');
@@ -84,7 +84,7 @@ class AuthService {
             if (!data.token || !data.user) {
                 throw new Error('Invalid response format from server');
             }
-            setTokenToLoacalStorage(data.token);
+            // setTokenToLoacalStorage(data.token);
             return data;
         } catch (error) {
             removeTokenFromLocalStorage();
@@ -186,14 +186,14 @@ class AuthService {
                     'Authorization': `Bearer ${token} `,
                 },
             });
-            removeTokenFromLocalStorage();
+            // removeTokenFromLocalStorage();
         } catch (error) {
             console.error('Error during logout:', error);
         }
     }
-    getAuthHeader(): Record<string, string> {
-        const token = getTokenFromLocalStorage();
-        return token ? { 'Authorization': `Bearer ${token} ` } : {};
-    }
+    // getAuthHeader(): Record<string, string> {
+    //     // const token = getTokenFromLocalStorage();
+    //     return token ? { 'Authorization': `Bearer ${token} ` } : {};
+    // }
 }
 export const authService = new AuthService();
