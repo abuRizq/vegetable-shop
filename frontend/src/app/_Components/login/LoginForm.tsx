@@ -10,13 +10,13 @@ import Link from "next/link"
 import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query"
+// import { useQueryClient } from "@tanstack/react-query"
 
 export const LoginForm = () => {
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { login, isAuthenticated,user } = useAuth()
+  const { login, isAuthenticated } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
@@ -31,8 +31,9 @@ export const LoginForm = () => {
   })
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data)
+      login(data)
       setLoginError(null)
+      router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoginError(error.message)
@@ -41,6 +42,7 @@ export const LoginForm = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      router.push("/")
       /***
        * what the bnifet form this code 
        */
@@ -51,9 +53,8 @@ export const LoginForm = () => {
       //     isNew: true, // 👈 custom update
       //   };
       // });
-      router.push("/") // or any dashboard route
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, router])
 
   // Show loading while checking existing auth
   if (isAuthenticated) {

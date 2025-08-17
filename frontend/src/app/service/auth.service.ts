@@ -1,9 +1,9 @@
 import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
-// function setTokenToLoacalStorage(token: string): void {
-//     if (typeof window !== 'undefined') {
-//         localStorage.setItem('auth_token', token);
-//     }
-// }
+function setTokenToLoacalStorage(token: string): void {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', token);
+    }
+}
 function getTokenFromLocalStorage(): string | null {
     if (typeof window !== 'undefined') {
         return localStorage.getItem('auth_token');
@@ -13,35 +13,32 @@ function getTokenFromLocalStorage(): string | null {
 function removeTokenFromLocalStorage(): void {
     localStorage.removeItem('auth_token');
 }
+
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
+
 class AuthService {
-    private baseURL = process.env.NEXT_PUBLIC_API_URL;
     async validateTokenAndGetUser(): Promise<User | null> {
-        const token = getTokenFromLocalStorage();
-            try {
-                const response = await fetch(`http://localhost:8080/api/users/me`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) {
-                    return null
-                    const errorData = await (response).json().catch(() => ({}));
-                    throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
-                }
-                const data = await response.json();
-                const User = data.data;
-                console.log("form the vrfiy fun :" + data.token);
-                return User;
-            } catch (error) {
-                console.error(error);
-                throw error;
-            
+        // const token = getTokenFromLocalStorage();
+        try {
+            const response = await fetch(`/api/auth/me`, {
+                method: 'GET',
+            });
+            if (!response.ok) {
+                return null
+            }
+            const data = await response.json();
+            const User = data.data;
+            console.log("form the vrfiy fun :" + data.token);
+            return User;
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
     }
+    
     async login(credentials: LoginCredentials): Promise<LoginResponse> {
         try {
-            const response = await fetch(`http://localhost:8080/api/auth/login`, {
+            const response = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +52,7 @@ class AuthService {
             }
             const body = await response.json();
             const data = body.data;
-            // setTokenToLoacalStorage(data.token)
+            setTokenToLoacalStorage(data.token)
             if (!data.token || !data.user) {
                 console.log("this is the response " + response.json());
                 throw new Error('Invalid response format from server');
@@ -63,13 +60,13 @@ class AuthService {
             return data;
         } catch (error) {
             console.error('Error during login:', error);
-            removeTokenFromLocalStorage();
+            // removeTokenFromLocalStorage();
             throw error;
         }
     }
     async Register(credentials: RegisterCredentials): Promise<LoginResponse> {
         try {
-            const response = await fetch(`${this.baseURL}/users/register`, {
+            const response = await fetch(`${baseURL}/users/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -93,7 +90,7 @@ class AuthService {
     }
     async sendResetPasswordLink(eamil: string): Promise<void> {
         try {
-            const response = await fetch(`${this.baseURL}/`, {
+            const response = await fetch(`${baseURL}/`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -114,7 +111,7 @@ class AuthService {
     }
     async verifyResetToken(token: string): Promise<VerifyResetTokenResponse> {
         try {
-            const response = await fetch(`${this.baseURL}/api/auth/verify-reset-token/${token}`, {
+            const response = await fetch(`${baseURL}/api/auth/verify-reset-token/${token}`, {
                 method: "GET",
             });
             if (!response.ok) {
@@ -133,7 +130,7 @@ class AuthService {
     }
     async resetPasswordWithLink(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
         try {
-            const response = await fetch(`${this.baseURL}/api/auth/reset-password`, {
+            const response = await fetch(`${baseURL}/api/auth/reset-password`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,7 +153,7 @@ class AuthService {
             return null;
         }
         try {
-            const response = await fetch(`${this.baseURL}/auth/me`, {
+            const response = await fetch(`${baseURL}/auth/me`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -179,14 +176,14 @@ class AuthService {
         try {
             const token = getTokenFromLocalStorage();
             if (!token) return;
-            await fetch(`http://localhost:8080/api/auth/logout`, {
+            await fetch(`${baseURL}/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token} `,
                 },
             });
-            // removeTokenFromLocalStorage();
+            removeTokenFromLocalStorage();
         } catch (error) {
             console.error('Error during logout:', error);
         }
@@ -195,5 +192,5 @@ class AuthService {
     //     // const token = getTokenFromLocalStorage();
     //     return token ? { 'Authorization': `Bearer ${token} ` } : {};
     // }
-}
+}   
 export const authService = new AuthService();

@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server';
-// const Base_url = process.env.NEXT_PUBLIC_API_URL;
+const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const POST = async (req: NextRequest) => {
     const body = await req.json();
-    const res = await fetch(`http://localhost:8080/api/auth/login`, {
+    const res = await fetch(`${BaseUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify(body),

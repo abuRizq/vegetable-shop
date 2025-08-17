@@ -7,16 +7,26 @@ import Link from "next/link"
 import ThemeToggle from "../ThemeToggle"
 import { useAuth } from "@/app/hooks/useAuth"
 import { useRouter } from "next/navigation";
+import { useLogoutMution } from "@/app/hooks/auth";
 // import router from "next/router";
 
 function Header() {
-
+  
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { user, logout, isAuthenticated } = useAuth();
-  const router = useRouter()
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const {mutate: logout } = useLogoutMution({
+    onSuccess: (data) => {
+      console.log("Data is here!!: ", data)
+    },
+    onError: (error) => {
+      console.error(error.message)
+    }
+  })
+
   const onSubmit = async () => {
-    logout();
-    setShowProfileMenu(false)
+    setShowProfileMenu(false);
+    logout()
     window.location.reload()
   }
 

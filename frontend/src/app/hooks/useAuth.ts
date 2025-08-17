@@ -17,7 +17,7 @@ export const useAuth = () => {
     } = useQuery({
         queryKey: Authkey.all,
         queryFn: authService.validateTokenAndGetUser,
-        enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth_token'),
+        // enabled: typeof window !== 'undefined' && !!localStorage.getItem('auth_token'),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         retry: (failureCount, error: any) => {
             if (error?.message?.includes('Authentication expired') ||
@@ -31,50 +31,40 @@ export const useAuth = () => {
         refetchOnWindowFocus: true,
         refetchOnReconnect: true
     });
+    
     const LoginMution = useMutation({
         mutationFn: authService.login,
-        // mutationFn: async (creds: { email: string; password: string }) => {
-        //     const res = await fetch("http://localhost:8080/api/auth/login", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(creds),
-        //     });
-        //     if (!res.ok) throw new Error("Login failed");
-        //     return (await res.json()) as { success: true };
-        // },
-        onSuccess: (data) => {
-            quryClinet.invalidateQueries({ queryKey: Authkey.user() })
-            quryClinet.setQueryData(Authkey.user(), data.user)
+        onSuccess: (data) => {  
+            quryClinet.invalidateQueries({ queryKey: ["user"] })
+            quryClinet.setQueryData(["user"], data.user)
         },
-        onError: () => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() });
+        onError: (error) => {
+            // TODO: Error handling and toast notification if excits.
         },
     });
-    const LogoutMution = useMutation({
-        mutationFn: authService.logout,
-        onSuccess: () => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() });
-        },
-        onError: () => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() });
-        }
-    })
     const RegisterMution = useMutation({
         mutationFn: authService.Register,
         onSuccess: (data) => {
             quryClinet.setQueryData(Authkey.user(), data.user)
         },
         onError: (error) => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() })
+            // TODO: Error handling and toast notification if excits.
         }
     })
+    /**
+     * EnterEmail
+     * Input Field: Email Address --> Form on submit(It will send request to the backend having the email address).
+     * Back-End: Will validate Email address: It will send email with link to reset password. /froget-password?token=3454-gdf545-gdfg-3445
+     * The back-end will send 
+     * /froget-password --> UI
+     */
     const forgotPasswordMutation = useMutation({
         mutationFn: authService.sendResetPasswordLink
     })
     const resetPasswordMutation = useMutation({
         mutationFn: authService.resetPasswordWithLink,
         onSuccess: (data) => {
-            quryClinet.removeQueries({ queryKey: Authkey.user() })
+            // quryClinet.removeQueries({ queryKey: Authkey.user() })
         },
     })
     const useVerifyResetToken = (token: string) => {
@@ -87,14 +77,13 @@ export const useAuth = () => {
         });
     };
     const isAuthenticated = !!(user && !isError);
-    const isLoading = isCheckingAuth || LoginMution.isPending || LogoutMution.isPending;
+    const isLoading = isCheckingAuth || LoginMution.isPending;
     return {
         user,
         isAuthenticated,
         isLoading,
         error: error?.massage || LoginMution.error?.message,
         login: LoginMution.mutate,
-        logout: LogoutMution.mutate,
         Register: RegisterMution.mutate,
         forgotPassword: forgotPasswordMutation.mutate,
         resetPassword: resetPasswordMutation.mutate,

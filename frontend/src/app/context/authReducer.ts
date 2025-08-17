@@ -10,7 +10,6 @@ export interface AuthState {
     Error: string | null;
 }
 
-
 type AuthAction =
     | { type: "LOGIN" }
     | { type: "LOGIN_SUCCESS"; payload: LoginResponse }

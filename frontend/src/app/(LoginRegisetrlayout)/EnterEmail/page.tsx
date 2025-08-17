@@ -1,10 +1,20 @@
 "use client"
 
 import EnterEmail from "@/app/_Components/Email/EnterEmail"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 export default function EnterEmailPage() {
-    const router = useRouter()
+    
+    const router = useRouter();
+    const { resetToken } = useParams();
+
+    if(resetToken) {
+        return (
+            <>
+            {/* Component */}
+            </>
+        )
+    }
 
     return (
         <main
