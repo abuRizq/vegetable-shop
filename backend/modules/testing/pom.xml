@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Testing (shared test fixtures: ArchUnit rules, RestAssured/WireMock base) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>testing</artifactId>
+  <name>Vegetable Shop :: Testing</name>
+  <description>Shared test utilities: ArchUnit rules, RestAssured base, WireMock helpers</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly name; optional since this module primarily publishes a test-jar -->
+    <automatic.module.name>com.veggieshop.testing</automatic.module.name>
+  </properties>
+
+  <!--
+    This module intentionally keeps dependencies in TEST scope,
+    because its primary deliverable is the test-jar built from src/test/java.
+    Consumers should depend on it like:
+      <dependency>
+        <groupId>com.veggieshop</groupId>
+        <artifactId>testing</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+  -->
+  <dependencies>
+    <!-- JUnit Jupiter (API + Engine pulled by surefire in consumer modules) -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- AssertJ for fluent assertions -->
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- RestAssured for HTTP contract/base tests -->
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- WireMock (standalone for simplicity in fixtures; switch to core if you prefer lighter deps) -->
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ArchUnit for architecture rules (used by ArchRules.java) -->
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- (Optional) JSON Path/Mapping if your ProblemDetails helpers parse JSON payloads directly.
+         Commented out by default; uncomment if needed.
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <scope>test</scope>
+    </dependency>
+    -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Build a test-jar from src/test/java so other modules can reuse these fixtures.
+           The normal (main) JAR may be empty, which is acceptable. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Inherit compiler/test/coverage/formatting/static-analysis from the parent POM.
+           No Spring Boot repackage here: this is a library of test fixtures. -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Inherit CI/PR/Release profiles from the parent; nothing custom here -->
+  </profiles>
+</project>

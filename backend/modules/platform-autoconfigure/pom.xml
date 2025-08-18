@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Platform Auto-Configure -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit company-wide conventions, dependency management, and pluginManagement -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>platform-autoconfigure</artifactId>
+  <name>Vegetable Shop :: Platform Auto-Configure</name>
+  <description>Spring Boot auto-configuration for the platform module</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly automatic module name for modular users -->
+    <automatic.module.name>com.veggieshop.platform.autoconfigure</automatic.module.name>
+
+    <!-- Explicitly compile against Java 21 (inherited by default, but declared for clarity) -->
+    <maven.compiler.release>21</maven.compiler.release>
+  </properties>
+
+  <dependencies>
+    <!-- Link to the core platform module -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>platform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Spring Boot auto-configuration APIs -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+
+    <!-- Optional: generates metadata for @ConfigurationProperties -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Lombok for boilerplate reduction (compile-time only) -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Standard Spring Boot test stack -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Compiler: enforce Java 21, include parameter names for reflection -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <parameters>true</parameters>
+          <!-- No need for explicit annotationProcessorPaths; handled via dependencies -->
+        </configuration>
+      </plugin>
+
+      <!-- JAR plugin: add Automatic-Module-Name to MANIFEST.MF -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

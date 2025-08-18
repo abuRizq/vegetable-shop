@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Context - Catalog -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>context-catalog</artifactId>
+  <name>Vegetable Shop :: Context - Catalog</name>
+  <description>Catalog bounded context (products, categories, tags, images, nutrition)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly name (optional but nice for downstream modular users) -->
+    <automatic.module.name>com.veggieshop.context.catalog</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <!-- Platform base: shared web error handling, persistence base, security helpers -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>platform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Spring Boot starters required by this context -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <!-- REST controllers + Jackson -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+      <!-- Bean Validation for DTOs and request payloads -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <!-- Repositories and JPA mappings (entities, projections, specs) -->
+    </dependency>
+
+    <!-- Hibernate types (JSON, arrays, etc.) if entities use them -->
+    <dependency>
+      <groupId>com.vladmihalcea</groupId>
+      <artifactId>hibernate-types-60</artifactId>
+    </dependency>
+
+    <!-- MapStruct for DTO/entity mapping (processor configured in parent) -->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+    </dependency>
+
+    <!-- Lombok for boilerplate reduction (compile-time only) -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Reuse shared testing fixtures (ArchRules, RestAssured/WireMock base) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>testing</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- (Optional) Enable if you run JPA tests with real DB here; otherwise system-tests module covers it.
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Add Automatic-Module-Name to the JAR manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Compiler/test/coverage/formatting/static-analysis plugins are inherited from the parent.
+           No Spring Boot repackage here: this is a library module, not an executable. -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Inherit CI/PR/Release profiles from parent -->
+  </profiles>
+</project>

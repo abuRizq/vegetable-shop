@@ -1,0 +1,114 @@
+# EditorConfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs.
+# See: https://editorconfig.org/
+
+# Top-most EditorConfig file
+root = true
+
+# -------------------------------------------------------------------
+# Global defaults for all files
+# -------------------------------------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+# -------------------------------------------------------------------
+# Java source files (main and test code)
+# -------------------------------------------------------------------
+[*.java]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 8
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# XML files (pom.xml, Spring configs, etc.)
+# -------------------------------------------------------------------
+[*.{xml,xsd}]
+indent_style = space
+indent_size = 2
+
+# -------------------------------------------------------------------
+# YAML / YML files (application.yml, Helm charts, GitHub workflows)
+# -------------------------------------------------------------------
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# Markdown documentation
+# -------------------------------------------------------------------
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false   # allow trailing spaces for Markdown line breaks
+max_line_length = off
+
+# -------------------------------------------------------------------
+# Properties files (.properties, .env)
+# -------------------------------------------------------------------
+[*.{properties,env}]
+indent_style = space
+indent_size = 2
+charset = utf-8
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# Shell scripts (bash, sh)
+# -------------------------------------------------------------------
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# JSON files (schemas, configs)
+# -------------------------------------------------------------------
+[*.json]
+indent_style = space
+indent_size = 2
+
+# -------------------------------------------------------------------
+# Mustache templates (codegen)
+# -------------------------------------------------------------------
+[*.mustache]
+indent_style = space
+indent_size = 2
+
+# -------------------------------------------------------------------
+# SQL files (migrations, seeds)
+# -------------------------------------------------------------------
+[*.sql]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# Dockerfiles
+# -------------------------------------------------------------------
+[Dockerfile*]
+indent_style = space
+indent_size = 2
+
+# -------------------------------------------------------------------
+# Makefiles (tabs are required for recipes)
+# -------------------------------------------------------------------
+[Makefile]
+indent_style = tab
+
+# -------------------------------------------------------------------
+# Markdown-based ADRs and Docs
+# -------------------------------------------------------------------
+[adr/**/*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+max_line_length = off

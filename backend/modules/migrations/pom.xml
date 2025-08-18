@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Migrations (Flyway SQL scripts only) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>migrations</artifactId>
+  <name>Vegetable Shop :: Migrations</name>
+  <description>Flyway database migrations (SQL-only, classpath resources)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly name; keeps the artifact consumable in modular projects -->
+    <automatic.module.name>com.veggieshop.migrations</automatic.module.name>
+  </properties>
+
+  <!--
+    This module intentionally has NO regular dependencies.
+    It packages SQL files from src/main/resources/db/migration into a JAR so:
+      - Spring Boot apps can pick them up via Flyway auto-configuration (classpath:db/migration).
+      - A dedicated "migrator" container/CLI can mount/copy these resources.
+  -->
+  <dependencies>
+    <!-- None on purpose -->
+  </dependencies>
+
+  <build>
+    <resources>
+      <!-- Ensure SQL files are included as-is on the classpath -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>db/migration/**</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <!-- Add a stable Automatic-Module-Name to the JAR manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Inherit compiler/test/coverage/formatting/static-analysis from the parent POM.
+           No Spring Boot repackage here: this is a library of SQL resources, not an executable. -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      db-tools: optional profile to run Flyway CLI via Maven plugin for local/dev usage.
+      IMPORTANT: no lifecycle binding (i.e., no <phase>) to avoid accidental DB changes.
+      Usage examples:
+        mvn -Pdb-tools org.flywaydb:flyway-maven-plugin:${flyway.version}:info     -Dflyway.url=jdbc:postgresql://... -Dflyway.user=... -Dflyway.password=...
+        mvn -Pdb-tools org.flywaydb:flyway-maven-plugin:${flyway.version}:validate -Dflyway.url=... -Dflyway.user=... -Dflyway.password=...
+        mvn -Pdb-tools org.flywaydb:flyway-maven-plugin:${flyway.version}:migrate  -Dflyway.url=... -Dflyway.user=... -Dflyway.password=...
+        mvn -Pdb-tools org.flywaydb:flyway-maven-plugin:${flyway.version}:repair   -Dflyway.url=... -Dflyway.user=... -Dflyway.password=...
+        # Clean is dangerous; enable only when you know what you're doing:
+        mvn -Pdb-tools -Dflyway.cleanDisabled=false org.flywaydb:flyway-maven-plugin:${flyway.version}:clean ...
+    -->
+    <profile>
+      <id>db-tools</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <version>${flyway.version}</version>
+            <configuration>
+              <!-- Keep defaults sane; values can be overridden via -Dflyway.* properties -->
+              <locations>
+                <location>classpath:db/migration</location>
+              </locations>
+              <encoding>UTF-8</encoding>
+              <baselineOnMigrate>true</baselineOnMigrate>
+              <cleanDisabled>true</cleanDisabled>
+              <!-- You can also pass schemas, placeholders, etc., via -Dflyway.schemas=public -->
+            </configuration>
+            <!-- Add JDBC driver for plugin runtime so users don't need it on the module's deps -->
+            <dependencies>
+              <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+              </dependency>
+            </dependencies>
+            <!-- No executions bound to lifecycle on purpose -->
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

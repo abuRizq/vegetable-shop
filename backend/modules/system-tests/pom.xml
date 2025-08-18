@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: System Tests (end-to-end & integration tests with Testcontainers) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>system-tests</artifactId>
+  <name>Vegetable Shop :: System Tests</name>
+  <description>End-to-end/system integration tests (Testcontainers, REST contracts, DB migrations)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- System tests run via Failsafe; skip unit tests in this module by default -->
+    <skipUTs>true</skipUTs>
+    <skipITs>false</skipITs>
+
+    <!-- Optional JPMS name (not strictly needed for test-only module) -->
+    <automatic.module.name>com.veggieshop.system.tests</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <!-- Bring the runnable application for @SpringBootTest or direct bootstrapping -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>veggieshop-service</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Contracts (OpenAPI YAML + event schemas) for contract checking -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>contracts</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Migrations resources (if tests validate or run Flyway against a container DB) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>migrations</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Shared testing fixtures (ArchRules, RestAssured/WireMock base) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>testing</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Spring Boot test stack (JUnit Jupiter, AssertJ, Mockito, Spring Test) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testcontainers (managed by BOM in parent) -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Include Kafka if your system tests exercise messaging flows -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- REST API testing -->
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- WireMock for HTTP stubbing if external integrations are simulated -->
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- (Optional) Flyway core if tests trigger migrations explicitly (app may already bring it) -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Lombok for any test-time boilerplate reduction -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Ensure unit-test phase is skipped here (Failsafe will run system tests) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>${skipUTs}</skipTests>
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+
+      <!-- Configure Failsafe to pick up typical IT/E2E/Contract naming patterns -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <!-- Include common patterns; adjust to your real class names -->
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*ITCase.java</include>
+            <include>**/*SystemTest.java</include>
+            <include>**/*E2E*.java</include>
+            <include>**/*ContractTest.java</include>
+            <!-- Include plain *Test in this module (e.g., OpenApiContractTest.java) -->
+            <include>**/*Test.java</include>
+          </includes>
+          <useModulePath>false</useModulePath>
+          <!-- Useful for Spring profiles in system tests; set as needed -->
+          <!--
+          <systemPropertyVariables>
+            <spring.profiles.active>system-test</spring.profiles.active>
+          </systemPropertyVariables>
+          -->
+        </configuration>
+      </plugin>
+
+      <!-- Optional: stable Automatic-Module-Name in manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- JaCoCo/Fmt/Static analysis plugins are inherited from the parent POM -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Inherit CI/PR/Release profiles from the parent; nothing custom here -->
+  </profiles>
+</project>

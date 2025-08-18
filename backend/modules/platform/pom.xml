@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Platform (cross-cutting web, security, persistence, observability utilities) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>platform</artifactId>
+  <name>Vegetable Shop :: Platform</name>
+  <description>Cross-cutting platform module (web error handling, security helpers, persistence base, observability)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly name; keeps the artifact consumable in modular projects -->
+    <automatic.module.name>com.veggieshop.platform</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <!-- Core Spring - annotations, configuration, scheduling, caching abstractions -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Spring Boot core (for @ConfigurationProperties and related boot APIs used by config classes).
+         Marked optional to avoid leaking it transitively to consumers. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Web utilities (filters, advice, problem details wrappers depend on spring-web and servlet APIs) -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+      <!-- provided: container/app brings the servlet API -->
+    </dependency>
+
+    <!-- Security helpers (PasswordPolicy, handlers, etc.). Keep optional to avoid forcing Spring Security transitively. -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Persistence base (BaseEntity, auditing config) -->
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Validation annotations for DTOs/value objects referenced by platform code -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- JWT utilities used in security helpers -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <!-- version under dependencyManagement in parent -->
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- OpenAPI support (only if OpenApiConfig references springdoc types). Keep it optional. -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Lombok for boilerplate reduction (compile-time only) -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test stack (JUnit Jupiter, AssertJ, Mockito, etc.) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- ArchUnit (if you keep architecture rules under modules/testing, you may not need it here) -->
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Generate @ConfigurationProperties metadata if any such properties live in this module.
+           We add the configuration processor here (in addition to the one in platform-autoconfigure)
+           because annotation processing does not cross module boundaries. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>0.2.0</version>
+            </path>
+            <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <!-- Add a stable Automatic-Module-Name to the JAR manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Inherit compiler/test/coverage/formatting/static-analysis from the parent POM.
+           No Spring Boot repackage here: this is a library, not an executable app. -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Inherit CI/PR/Release profiles from the parent; nothing custom here -->
+  </profiles>
+</project>

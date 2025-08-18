@@ -1,0 +1,117 @@
+###############################################################################
+# Git attributes for Vegetable Shop :: Backend
+# - Enforce consistent line endings across platforms
+# - Normalize text files in the repo (LF by default)
+# - Keep Windows batch files using CRLF (so they remain executable on Windows)
+# - Mark binary files to avoid broken diffs/merges
+# - Provide sensible Linguist hints for GitHub (optional, safe)
+###############################################################################
+
+# -----------------------------------------------------------------------------
+# Global normalization
+# -----------------------------------------------------------------------------
+# Auto-detect text files and perform LF normalization on check-in.
+*               text=auto eol=lf
+
+# -----------------------------------------------------------------------------
+# OS-specific scripts
+# -----------------------------------------------------------------------------
+# Windows batch files should keep CRLF (they break with pure LF)
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+
+# Shell scripts must be LF to run correctly on *nix
+*.sh            text eol=lf
+
+# Makefiles require literal tabs inside recipe lines (no EOL conversion issues)
+Makefile        text eol=lf
+
+# -----------------------------------------------------------------------------
+# Source code (Java / JVM ecosystem)
+# -----------------------------------------------------------------------------
+*.java          text eol=lf
+*.kt            text eol=lf
+*.groovy        text eol=lf
+
+# Build system & configuration
+pom.xml         text eol=lf
+*.xml           text eol=lf
+*.properties    text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.json          text eol=lf
+*.ini           text eol=lf
+.editorconfig   text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+
+# Templating & codegen
+*.mustache      text eol=lf
+*.tpl           text eol=lf
+
+# Database / SQL
+*.sql           text eol=lf
+
+# Documentation
+*.md            text eol=lf diff=markdown
+LICENSE         text eol=lf
+README*         text eol=lf
+CONTRIBUTING*   text eol=lf
+CODE_OF_CONDUCT* text eol=lf
+
+# Diagrams (PlantUML is text)
+*.puml          text eol=lf
+
+# -----------------------------------------------------------------------------
+# Binary assets (disable diffs/merges and EOL conversion)
+# -----------------------------------------------------------------------------
+*.jar           binary
+*.war           binary
+*.ear           binary
+
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.svg           text  # SVG is XML/text; keep as text for meaningful diffs
+*.ico           binary
+*.pdf           binary
+
+*.zip           binary
+*.gz            binary
+*.tgz           binary
+*.bz2           binary
+*.xz            binary
+*.7z            binary
+
+# -----------------------------------------------------------------------------
+# Misc & tooling
+# -----------------------------------------------------------------------------
+# Ensure wrapper JAR is treated as binary
+.mvn/wrapper/maven-wrapper.jar binary
+
+# Ensure scripts in repo stay executable when cloned on *nix (if set +x in Git)
+# (Note: this is a Git index permission; not controlled by .gitattributes,
+# but listed here as a reminder. To set: `git update-index --chmod=+x path.sh`)
+
+# -----------------------------------------------------------------------------
+# GitHub Linguist hints (purely cosmetic for language stats; safe to keep)
+# -----------------------------------------------------------------------------
+# Treat some directories as docs/vendor/generated if needed.
+# Uncomment if you want GitHub to de-emphasize them in language stats.
+
+# docs/**             linguist-documentation
+# adr/**              linguist-documentation
+# modules/**/target/** linguist-generated
+# tools/**            linguist-vendored
+
+# -----------------------------------------------------------------------------
+# Archive/export hygiene (optional)
+# -----------------------------------------------------------------------------
+# Exclude CI configs from source archives created via `git archive`
+# Uncomment if your release archives should not include CI/meta files.
+# .github/**         export-ignore
+# ci/**              export-ignore
+# .gitignore         export-ignore
+# .gitattributes     export-ignore

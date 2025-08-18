@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: App - VeggieShop Service (Spring Boot executable app) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>veggieshop-service</artifactId>
+  <name>Vegetable Shop :: App - VeggieShop Service</name>
+  <description>Executable Spring Boot application that composes all bounded contexts</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Optional JPMS-friendly name -->
+    <automatic.module.name>com.veggieshop.app.veggieshop.service</automatic.module.name>
+    <!-- Main class (helps tooling; Boot can auto-detect as well) -->
+    <start-class>com.veggieshop.bootstrap.VegetableShopApplication</start-class>
+  </properties>
+
+  <dependencies>
+    <!-- Bring platform auto-config and baseline Boot starter (logging, core, etc.) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>platform-starter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Actuator for health/metrics (observability) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Web entrypoint (controllers live in contexts; we include web explicitly at app level) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- OpenAPI UI (platform makes it optional; app opts in to expose docs) -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>${springdoc.version}</version>
+    </dependency>
+
+    <!-- Database: runtime driver + Flyway (migrations module provides scripts on classpath) -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <!-- Include migration resources so Flyway picks them from classpath:db/migration -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>migrations</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Messaging: enable Kafka at the app layer (messaging module keeps it optional) -->
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+    </dependency>
+
+    <!-- (Optional) Prometheus registry for metrics scraping -->
+    <!--
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    -->
+
+    <!-- Compose all bounded contexts (REST/JPA/validation inside each) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-auth</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-catalog</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-inventory</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-pricing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-customer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-order</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-checkout</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-vendor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-media</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-review</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-notification</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>context-audit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Lombok is optional for the app module but harmless if used in bootstrap classes -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- If you want light app-level container tests, you can add Testcontainers here;
+         otherwise the system-tests module already covers E2E. -->
+    <!--
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+    -->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Ensure Boot repackages this module into an executable fat JAR.
+           Parent sets skip=true for the aggregator; we explicitly unskip here. -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <skip>false</skip>
+          <mainClass>${start-class}</mainClass>
+          <layers>
+            <enabled>true</enabled>
+          </layers>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+          <!-- Optional: build container image on demand (not bound by default)
+          <execution>
+            <id>build-image</id>
+            <goals><goal>build-image</goal></goals>
+            <configuration>
+              <imageName>veggieshop/veggieshop-service:${project.version}</imageName>
+            </configuration>
+          </execution>
+          -->
+        </executions>
+      </plugin>
+
+      <!-- Add Automatic-Module-Name to the JAR manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Generate configuration metadata for any @ConfigurationProperties defined in app -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+              <version>${spring-boot.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>0.2.0</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <!-- JaCoCo/Spotless/Static-analysis are inherited from parent -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Inherit PR/CI/Release profiles from parent; add optional image/profile if desired -->
+    <!--
+    <profile>
+      <id>image</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>boot-build-image</id>
+                <goals><goal>build-image</goal></goals>
+                <configuration>
+                  <imageName>veggieshop/veggieshop-service:${project.version}</imageName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    -->
+  </profiles>
+</project>
