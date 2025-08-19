@@ -15,7 +15,6 @@ export default function EnterEmailPage() {
             </>
         )
     }
-
     return (
         <main
             className="min-h-screen flex items-center justify-center px-4 py-10 w-full"
