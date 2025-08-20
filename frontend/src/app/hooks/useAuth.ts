@@ -7,6 +7,14 @@ const Authkey = {
     user: () => [...Authkey.all, 'user'] as const,
     resetToken: (token: string) => [...Authkey.all, 'resetToken', token] as const
 }
+
+/**
+   * EnterEmail
+   * Input Field: Email Address --> Form on submit(It will send request to the backend having the email address).
+   * Back-End: Will validate Email address: It will send email with link to reset password. /froget-password?token=3454-gdf545-gdfg-3445
+   * The back-end will send 
+   * /froget-password --> UI
+   */
 export const useAuth = () => {
     const quryClinet = useQueryClient();
     const {
@@ -31,10 +39,10 @@ export const useAuth = () => {
         refetchOnWindowFocus: true,
         refetchOnReconnect: true
     });
-    
+
     const LoginMution = useMutation({
         mutationFn: authService.login,
-        onSuccess: (data) => {  
+        onSuccess: (data) => {
             quryClinet.invalidateQueries({ queryKey: ["user"] })
             quryClinet.setQueryData(["user"], data.user)
         },
@@ -51,13 +59,6 @@ export const useAuth = () => {
             // TODO: Error handling and toast notification if excits.
         }
     })
-    /**
-     * EnterEmail
-     * Input Field: Email Address --> Form on submit(It will send request to the backend having the email address).
-     * Back-End: Will validate Email address: It will send email with link to reset password. /froget-password?token=3454-gdf545-gdfg-3445
-     * The back-end will send 
-     * /froget-password --> UI
-     */
     const forgotPasswordMutation = useMutation({
         mutationFn: authService.sendResetPasswordLink
     })

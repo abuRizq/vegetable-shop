@@ -22,7 +22,6 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
                 .catch(() => ({ error: 'Failed to parse error response' }));
                 throw new Error(errorData.message || 'Failed to create user');
             }
-            
             return response.json();
         },
         onSuccess: (data, variables, ctx) => {

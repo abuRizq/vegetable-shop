@@ -2,25 +2,21 @@
 import { cookies } from "next/headers";
 import type { User } from "@/app/types/auth";
 import { baseURL } from "@/app/constants";
+import { NextResponse } from "next/server";
 
-async function GET() {
-    try {
-        const token = (await cookies()).get("at")?.value;
-        if (!token) {
-            return null
-        }
-        const res = await fetch(`http://localhost:8080/api/users/me`, {
-            method: "GET"
-        });
-        if (!res.ok) {
-            return
-        }
-        const data = await res.json();
-        const user = data.user;
-        return user as User;
-    } catch (error) {
-
+const GET = async () => {
+    const token = (await cookies()).get("at")?.value;
+    if (!token) {
+        return null
     }
-
+    const res = await fetch(`${baseURL}/users/me`, {
+        method: "GET"
+    });
+    if (!res.ok) {
+        return new NextResponse(JSON.stringify({ error: 'No token' }), { status: 500 })
+    }
+    const data = await res.json();
+    const user = data.user;
+    return user as User;
 }
 export { GET }

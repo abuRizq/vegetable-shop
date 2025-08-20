@@ -12,18 +12,22 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution) => {
                 const response = await fetch(`/api/auth/logout`, {
                     method: 'POST',
                 });
+                if (!response.ok) {
+                    const errordata = await response.json().catch(() => ({ error: 'Failed to parse error response' }))
+                    throw new Error(errordata.error || "try agian");
+                }
                 return response.json();
             } catch (error) {
                 return console.error(error)
             }
         },
         onSuccess: (data, variables, ctx) => {
-            if(!!onSuccess) {
+            if (!!onSuccess) {
                 onSuccess(data, variables, ctx)
             };
         },
         onError: (error, variables, ctx) => {
-            if(!!onError) {
+            if (!!onError) {
                 onError(error, variables, ctx)
             };
         }

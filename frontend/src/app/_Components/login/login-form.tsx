@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/hooks/useAuth"
-import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart } from "lucide-react"
+import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart, Variable } from "lucide-react"
 import Link from "next/link"
 import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
 import { useForm } from "react-hook-form"
@@ -19,14 +19,17 @@ export const LoginForm = () => {
   const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
   const { mutate: login } = useLoginMution({
-    onSuccess: (data) => {
+    onSuccess: (data , Variable,ctx ) => {
       console.log(data);
+      console.log(Variable);
+      console.log(ctx);
     },
-    onError: (error) => {
+    onError: (error, Varibles, ctx) => {
       console.error(error);
+      console.log(Varibles);
+      console.log(ctx);
     }
   })
-
   const {
     register,
     handleSubmit,
@@ -36,15 +39,12 @@ export const LoginForm = () => {
   })
   const onSubmit = async (data: LoginFormData) => {
     try {
-      setLoginError(null)
-      router.push("/");
       login(data)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoginError(error.message)
     }
   }
-
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/")
