@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Sidbar from "../_Components/Sidbar";
+import Sidbar from "../_Components/sidbar";
 import { Providers } from "../provider/ThemeProvider";
 // import { QueryClient } from "@tanstack/react-query";
 // import { getCurrentUser } from "../lib/auth-server";

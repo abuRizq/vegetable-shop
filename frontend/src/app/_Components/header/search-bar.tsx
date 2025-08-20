@@ -54,7 +54,7 @@ function Searchbar() {
 
         {/* Input Field */}
         <input
-        
+
           ref={inputRef}
           type="text"
           value={searchValue}

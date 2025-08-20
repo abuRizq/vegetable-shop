@@ -18,9 +18,8 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 class AuthService {
     async validateTokenAndGetUser(): Promise<User | null> {
-        // const token = getTokenFromLocalStorage();
         try {
-            const response = await fetch(`/api/auth/me`, {
+            const response = await fetch(`http://localhost:8080/api/users/me`, {
                 method: 'GET',
             });
             if (!response.ok) {

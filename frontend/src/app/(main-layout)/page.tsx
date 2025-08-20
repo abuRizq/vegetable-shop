@@ -12,11 +12,11 @@ import {
   Heart,
   Play,
 } from "lucide-react";
-import Sidbar from "../_Components/Sidbar";
-import Searchbar from "../_Components/header/Searchbar";
+import Sidbar from "../_Components/sidbar";
+import Searchbar from "../_Components/header/search-bar";
 import Header from "../_Components/header/header";
 import HeroSlider from "../_Components/main/Hero";
-import Catagry from "../_Components/main/Catagry";
+import Catagry from "../_Components/main/catagry";
 import { FreshlyArrived } from "../_Components/main/freshly-arrived";
 import { SeasonalSection } from "../_Components/main/seasonal-section";
 import { CustomerReviews } from "../_Components/main/customer-reviews";

@@ -29,5 +29,4 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution) => {
         }
     });
 }
-
 export { useLogoutMution };

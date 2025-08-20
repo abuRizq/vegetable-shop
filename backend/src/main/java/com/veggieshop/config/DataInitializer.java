@@ -58,7 +58,6 @@ public class DataInitializer {
                     .enabled(true)
                     .createdAt(Instant.now())
                     .build());
-
             User user3 = userRepository.save(User.builder()
                     .name("Alice Brown")
                     .email("alice@example.com")

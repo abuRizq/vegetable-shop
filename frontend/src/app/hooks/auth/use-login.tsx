@@ -5,10 +5,8 @@ type TLoginMution = {
     onSuccess?: (data: void, variables: LoginCredentials, context: unknown) => unknown;
     onError?: (error: Error, variables: LoginCredentials, context: unknown) => unknown;
 }
-
 const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
     const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (credentials: LoginCredentials) => {
                 const response = await fetch(`/api/auth/login`, {
@@ -18,14 +16,13 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
                 },
                 body: JSON.stringify(credentials),
             });            
-
             if (!response.ok) {
                 const errorData = await response
                 .json()
                 .catch(() => ({ error: 'Failed to parse error response' }));
                 throw new Error(errorData.message || 'Failed to create user');
             }
-
+            
             return response.json();
         },
         onSuccess: (data, variables, ctx) => {

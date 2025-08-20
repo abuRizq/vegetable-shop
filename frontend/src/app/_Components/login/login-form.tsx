@@ -10,17 +10,22 @@ import Link from "next/link"
 import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { useQueryClient } from "@tanstack/react-query"
-
+import { useLoginMution } from '@/app/hooks/auth';
 export const LoginForm = () => {
-  // const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { login, isAuthenticated } = useAuth()
-
+  const { isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
+  const { mutate: login } = useLoginMution({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.error(error);
+    }
+  })
 
   const {
     register,
@@ -31,9 +36,9 @@ export const LoginForm = () => {
   })
   const onSubmit = async (data: LoginFormData) => {
     try {
-      login(data)
       setLoginError(null)
       router.push("/");
+      login(data)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoginError(error.message)

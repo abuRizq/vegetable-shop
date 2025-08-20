@@ -3,15 +3,13 @@ import { cookies } from "next/headers";
 import type { User } from "@/app/types/auth";
 import { baseURL } from "@/app/constants";
 
-
-
 async function GET() {
     try {
         const token = (await cookies()).get("at")?.value;
         if (!token) {
             return null
         }
-        const res = await fetch(`${baseURL}/auth/me`, {
+        const res = await fetch(`http://localhost:8080/api/users/me`, {
             method: "GET"
         });
         if (!res.ok) {

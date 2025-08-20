@@ -3,21 +3,21 @@
 import { useState } from "react"
 
 import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
-import NavItem from "./NavItem"
+import NavItem from "./nav-item"
 import { useAuth } from "../hooks/useAuth"
 import { useRouter } from "next/navigation"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
-    const { user, logout } = useAuth();
+    const { user, } = useAuth();
     const route = useRouter();
     const onSubmit = async () => {
         if (user) {
-            await logout();
-        /***
-         * Add refrech page here
-         * 
-         */
+            // await logout();
+            /***
+             * Add refrech page here
+             * 
+             */
         } else {
             route.push('/login')
         }

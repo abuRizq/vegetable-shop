@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import './globals.css'
 import { QueryProviders } from "./provider/QueryClientProvider";
-// import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { getCurrentUser } from "./lib/auth-server";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-// import { USER_QK } from "./types/auth";
+import { getCurrentUser } from "./service/auth-server";
+import { QueryClient } from "@tanstack/react-query";
 
 
 export const metadata: Metadata = {
@@ -18,14 +16,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const queryClient = new QueryClient();
-  const user = await getCurrentUser();
-  console.log(user);
-  if (user) {
-    queryClient.setQueryData(['user', "user"], user)
-  } else {
-    queryClient.setQueryData(["user", 'user'], null);
-  }
+  // const queryClient = new QueryClient();
+  // const user = await getCurrentUser();
+  // console.log(user);
+  // if (user) {
+  //   queryClient.setQueryData(['user', "user"], user)
+  // } else {
+  //   queryClient.setQueryData(["user", 'user'], null);
+  // }
 
   // const dehydratedState = dehydrate(queryClient);
   return (

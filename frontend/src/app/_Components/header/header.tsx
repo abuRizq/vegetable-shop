@@ -2,16 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
-import Searchbar from "./Searchbar";
+import Searchbar from "./search-bar";
 import Link from "next/link"
-import ThemeToggle from "../ThemeToggle"
+import ThemeToggle from "../theme-toggle"
 import { useAuth } from "@/app/hooks/useAuth"
 import { useRouter } from "next/navigation";
 import { useLogoutMution } from "@/app/hooks/auth";
-// import router from "next/router";
 
 function Header() {
-  
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -29,7 +27,6 @@ function Header() {
     logout()
     window.location.reload()
   }
-
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/");
