@@ -1,10 +1,6 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-
-
-
+import { useQuery} from "@tanstack/react-query"
 
 const useAuthQuery = () => {
-    const qureyClient = useQueryClient()
     return useQuery({
         queryKey: ['user'],
         queryFn: async () => {

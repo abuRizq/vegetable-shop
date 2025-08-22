@@ -1,6 +1,7 @@
+import Sidbar from "@/_Components/cross-componets/sidbar";
+import { Providers } from "@/app/provider/theme-provider";
 import type { Metadata } from "next";
-import Sidbar from "../_Components/sidbar";
-import { Providers } from "../provider/ThemeProvider";
+
 // import { QueryClient } from "@tanstack/react-query";
 // import { getCurrentUser } from "../lib/auth-server";
 // import { USER_QK } from "../types/auth";

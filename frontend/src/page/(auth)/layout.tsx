@@ -1,5 +1,5 @@
+import ReturntoHome from "@/_Components/cross-componets/returnto-home";
 
-import ReturntoHome from "../_Components/returnto-home";
 
 
 
@@ -11,8 +11,8 @@ export default function RootLayout({
     return (
 
         <div className="flex w-full min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-            <ReturntoHome/>
-                {children}
+            <ReturntoHome />
+            {children}
         </div>
     );
 }

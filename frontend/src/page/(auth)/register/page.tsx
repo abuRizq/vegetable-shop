@@ -1,4 +1,4 @@
-import { RegisterForm } from '@/app/_Components/register/register-form'
+import { RegisterForm } from '@/_Components/register/register-form'
 import React from 'react'
 
 function page() {

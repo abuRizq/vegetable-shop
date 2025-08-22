@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import './globals.css'
-import { QueryProviders } from "./provider/QueryClientProvider";
-import { getCurrentUser } from "./service/auth-server";
-import { QueryClient } from "@tanstack/react-query";
-
+import { QueryProviders } from "./provider/query-client-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,17 +12,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  // const queryClient = new QueryClient();
-  // const user = await getCurrentUser();
-  // console.log(user);
-  // if (user) {
-  //   queryClient.setQueryData(['user', "user"], user)
-  // } else {
-  //   queryClient.setQueryData(["user", 'user'], null);
-  // }
-
-  // const dehydratedState = dehydrate(queryClient);
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
