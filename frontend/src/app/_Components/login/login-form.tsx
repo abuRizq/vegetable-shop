@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/hooks/useAuth"
 import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart, Variable } from "lucide-react"
 import Link from "next/link"
-import { LoginFormData, LoginSchema } from "@/app/lib/schemas/login"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMution } from '@/app/hooks/auth';
+import { LoginFormData, LoginSchema } from "@/shared/lib/schemas/login"
 export const LoginForm = () => {
 
   const router = useRouter()

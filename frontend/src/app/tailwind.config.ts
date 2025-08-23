@@ -3,8 +3,13 @@ import type { Config } from 'tailwindcss'
 
 export default {
     darkMode: 'class',  // Enabling dark mode based on class, you can also use 'media'
-    content: ['./src/**/*.{js,ts,jsx,tsx}'],
-    theme: {
+    content: [
+        './src/**/*.{js,ts,jsx,tsx}',     // ✅ ADD THIS
+        './app/**/*.{js,ts,jsx,tsx}',     // ✅ Keep this
+        './pages/**/*.{js,ts,jsx,tsx}',   // ✅ If using pages
+        './components/**/*.{js,ts,jsx,tsx}', // ✅ If you have components
+    ],
+     theme: {
         extend: {
             colors: {
                 // Primary colors for both themes

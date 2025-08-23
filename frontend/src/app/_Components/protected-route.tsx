@@ -3,7 +3,7 @@
 
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useAuth } from "../app/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 
 interface Iprops {
     children: React.ReactNode;

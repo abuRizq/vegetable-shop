@@ -1,8 +1,10 @@
 "use client";
 
-import Header from "@/_Components/header/header";
-import Catagry from "@/_Components/main/catagry";
-import HeroSlider from "@/_Components/main/Hero";
+import Header from "@/app/_Components/header/header";
+import Catagry from "@/app/_Components/main/catagry";
+import HeroSlider from "@/app/_Components/main/Hero";
+
+
 
 
 // ----------- Main Page -----------
@@ -16,7 +18,6 @@ export default function HomePage  ()  {
         <Header />
         <HeroSlider />
         <Catagry />
-
         {/* Seasonal & Freshly Arrived Sections */}
         {/* <SeasonalSection /> */}
         {/* <FreshlyArrived /> */}

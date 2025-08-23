@@ -1,4 +1,4 @@
-import Sidbar from "@/_Components/cross-componets/sidbar";
+import Sidbar from "@/app/_Components/cross-componets/sidbar";
 import { Providers } from "@/app/provider/theme-provider";
 import type { Metadata } from "next";
 
