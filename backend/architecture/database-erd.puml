@@ -1,0 +1,452 @@
+@startuml database-erd
+title VeggieShop — Database ERD (Core Tables)
+
+skinparam shadowing false
+hide circle
+hide methods
+hide stereotypes
+
+' -----------------------
+' Auth
+' -----------------------
+entity "auth_user" as auth_user {
+  * id: UUID <<PK>>
+  --
+  email: varchar(255) <<UQ>>
+  password_hash: varchar(255)
+  status: varchar(20)
+  created_at: timestamptz
+  updated_at: timestamptz
+}
+
+entity "auth_role" as auth_role {
+  * id: UUID <<PK>>
+  --
+  name: varchar(64) <<UQ>>
+}
+
+entity "auth_permission" as auth_perm {
+  * id: UUID <<PK>>
+  --
+  code: varchar(64) <<UQ>>
+}
+
+entity "auth_user_role" as auth_user_role {
+  * user_id: UUID <<PK>>
+  * role_id: UUID <<PK>>
+}
+
+entity "auth_role_permission" as auth_role_perm {
+  * role_id: UUID <<PK>>
+  * permission_id: UUID <<PK>>
+}
+
+' -----------------------
+' Customer
+' -----------------------
+entity "customer" as customer {
+  * id: UUID <<PK>>
+  --
+  user_id: UUID <<FK auth_user>>
+  full_name: varchar(255)
+  phone: varchar(32)
+  created_at: timestamptz
+}
+
+entity "customer_profile" as customer_profile {
+  * id: UUID <<PK>>
+  --
+  customer_id: UUID <<FK customer>>
+  loyalty_points: int
+  birthdate: date
+  preferences: jsonb
+}
+
+entity "address" as address {
+  * id: UUID <<PK>>
+  --
+  customer_id: UUID <<FK customer>>
+  line1: varchar(255)
+  city: varchar(64)
+  country: char(2)
+  zip: varchar(16)
+  is_default: boolean
+}
+
+' -----------------------
+' Catalog
+' -----------------------
+entity "category" as category {
+  * id: UUID <<PK>>
+  --
+  parent_id: UUID <<FK category>>
+  name: varchar(128)
+  slug: varchar(128) <<UQ>>
+}
+
+entity "product" as product {
+  * id: UUID <<PK>>
+  --
+  sku: varchar(64) <<UQ>>
+  name: varchar(255)
+  description: text
+  nutrition_profile_id: UUID <<FK nutrition_profile>>
+  created_at: timestamptz
+  updated_at: timestamptz
+  is_active: boolean
+}
+
+entity "product_image" as product_image {
+  * id: UUID <<PK>>
+  --
+  product_id: UUID <<FK product>>
+  url: text
+  alt: varchar(255)
+  position: int
+}
+
+entity "nutrition_profile" as nutrition_profile {
+  * id: UUID <<PK>>
+  --
+  kcal_per_100g: int
+  allergens: jsonb
+  vitamins: jsonb
+}
+
+entity "tag" as tag {
+  * id: UUID <<PK>>
+  --
+  name: varchar(64) <<UQ>>
+}
+
+entity "product_tag" as product_tag {
+  * product_id: UUID <<PK>>
+  * tag_id: UUID <<PK>>
+}
+
+entity "product_category" as product_category {
+  * product_id: UUID <<PK>>
+  * category_id: UUID <<PK>>
+}
+
+' -----------------------
+' Inventory
+' -----------------------
+entity "warehouse" as warehouse {
+  * id: UUID <<PK>>
+  --
+  name: varchar(128)
+  location: varchar(255)
+}
+
+entity "inventory_item" as inventory_item {
+  * id: UUID <<PK>>
+  --
+  sku: varchar(64) <<UQ>>
+  product_id: UUID <<FK product>>
+}
+
+entity "stock_batch" as stock_batch {
+  * id: UUID <<PK>>
+  --
+  inventory_item_id: UUID <<FK inventory_item>>
+  quantity: numeric(12,3)
+  uom: varchar(16)
+  expiry_date: date
+  warehouse_id: UUID <<FK warehouse>>
+}
+
+entity "stock_movement" as stock_movement {
+  * id: UUID <<PK>>
+  --
+  inventory_item_id: UUID <<FK inventory_item>>
+  delta: numeric(12,3)
+  reason: varchar(64)
+  created_at: timestamptz
+}
+
+' -----------------------
+' Pricing
+' -----------------------
+entity "price_list" as price_list {
+  * id: UUID <<PK>>
+  --
+  name: varchar(128)
+  currency: char(3)
+  is_default: boolean
+}
+
+entity "price_entry" as price_entry {
+  * id: UUID <<PK>>
+  --
+  price_list_id: UUID <<FK price_list>>
+  sku: varchar(64) <<FK inventory_item.sku>>
+  unit_price: numeric(12,2)
+  tax_class_id: UUID <<FK tax_class>>
+}
+
+entity "tax_class" as tax_class {
+  * id: UUID <<PK>>
+  --
+  code: varchar(32) <<UQ>>
+  rate: numeric(5,2)
+}
+
+entity "promotion" as promotion {
+  * id: UUID <<PK>>
+  --
+  name: varchar(128)
+  discount_percent: numeric(5,2)
+  starts_at: timestamptz
+  ends_at: timestamptz
+  conditions: jsonb
+}
+
+entity "coupon" as coupon {
+  * id: UUID <<PK>>
+  --
+  code: varchar(32) <<UQ>>
+  discount_percent: numeric(5,2)
+  max_redemptions: int
+  valid_until: timestamptz
+}
+
+' -----------------------
+' Order & Checkout
+' -----------------------
+entity "cart" as cart {
+  * id: UUID <<PK>>
+  --
+  customer_id: UUID <<FK customer>>
+  created_at: timestamptz
+  updated_at: timestamptz
+  currency: char(3)
+}
+
+entity "cart_item" as cart_item {
+  * id: UUID <<PK>>
+  --
+  cart_id: UUID <<FK cart>>
+  sku: varchar(64) <<FK inventory_item.sku>>
+  quantity: numeric(12,3)
+  unit_price: numeric(12,2)
+}
+
+entity "order" as ord {
+  * id: UUID <<PK>>
+  --
+  customer_id: UUID <<FK customer>>
+  currency: char(3)
+  status: varchar(32)
+  total_amount: numeric(12,2)
+  created_at: timestamptz
+  updated_at: timestamptz
+}
+
+entity "order_item" as order_item {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  sku: varchar(64) <<FK inventory_item.sku>>
+  quantity: numeric(12,3)
+  unit_price: numeric(12,2)
+  tax: numeric(12,2)
+}
+
+entity "delivery_slot" as delivery_slot {
+  * id: UUID <<PK>>
+  --
+  start_time: timestamptz
+  end_time: timestamptz
+  capacity: int
+}
+
+entity "shipment" as shipment {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  delivery_slot_id: UUID <<FK delivery_slot>>
+  status: varchar(32)
+}
+
+entity "shipment_item" as shipment_item {
+  * id: UUID <<PK>>
+  --
+  shipment_id: UUID <<FK shipment>>
+  order_item_id: UUID <<FK order_item>>
+  quantity: numeric(12,3)
+}
+
+entity "payment" as payment {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  method: varchar(32)
+  status: varchar(32)
+  auth_id: varchar(64)
+  txn_id: varchar(64)
+}
+
+entity "invoice" as invoice {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  amount: numeric(12,2)
+  issued_at: timestamptz
+}
+
+entity "refund" as refund {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  amount: numeric(12,2)
+  reason: varchar(128)
+  created_at: timestamptz
+}
+
+entity "return_request" as return_req {
+  * id: UUID <<PK>>
+  --
+  order_id: UUID <<FK order>>
+  status: varchar(32)
+  created_at: timestamptz
+}
+
+' -----------------------
+' Media & Review
+' -----------------------
+entity "media_asset" as media_asset {
+  * id: UUID <<PK>>
+  --
+  product_id: UUID <<FK product>>
+  url: text
+  mime_type: varchar(64)
+}
+
+entity "review" as review {
+  * id: UUID <<PK>>
+  --
+  product_id: UUID <<FK product>>
+  customer_id: UUID <<FK customer>>
+  rating: int
+  comment: text
+  created_at: timestamptz
+}
+
+' -----------------------
+' Notification & Audit
+' -----------------------
+entity "notification" as notification {
+  * id: UUID <<PK>>
+  --
+  type: varchar(32)
+  recipient: varchar(255)
+  template: varchar(64)
+  data: jsonb
+  status: varchar(32)
+  created_at: timestamptz
+}
+
+entity "channel_preference" as channel_pref {
+  * id: UUID <<PK>>
+  --
+  customer_id: UUID <<FK customer>>
+  channel: varchar(32)
+  enabled: boolean
+}
+
+entity "audit_log" as audit_log {
+  * id: UUID <<PK>>
+  --
+  actor_user_id: UUID <<FK auth_user>>
+  action: varchar(64)
+  entity_type: varchar(64)
+  entity_id: varchar(64)
+  metadata: jsonb
+  occurred_at: timestamptz
+}
+
+' -----------------------
+' Outbox / Inbox
+' -----------------------
+entity "outbox" as outbox {
+  * id: UUID <<PK>>
+  --
+  aggregate_type: varchar(64)
+  aggregate_id: varchar(64)
+  event_type: varchar(64)
+  payload: jsonb
+  headers: jsonb
+  occurred_at: timestamptz
+  published_at: timestamptz
+  status: varchar(16)
+  attempt: int
+  partition_key: varchar(64)
+  dedup_key: varchar(64)
+}
+
+entity "inbox" as inbox {
+  * id: UUID <<PK>>
+  --
+  consumer: varchar(64)
+  event_id: UUID
+  received_at: timestamptz
+}
+
+' =======================
+' Relationships
+' =======================
+auth_user ||--o{ auth_user_role : has >
+auth_role ||--o{ auth_user_role : < assigned
+auth_role ||--o{ auth_role_perm : has >
+auth_perm ||--o{ auth_role_perm : < grants
+
+auth_user ||--|| customer : owns >
+customer ||--o{ address : has >
+customer ||--|| customer_profile : profile >
+
+category ||--o{ category : parent >
+product ||--o{ product_category : >
+category ||--o{ product_category : <
+product ||--o{ product_image : has >
+product ||--|| inventory_item : maps >
+product ||--|| nutrition_profile : has >
+product ||--o{ product_tag : >
+tag ||--o{ product_tag : <
+
+warehouse ||--o{ stock_batch : stores >
+inventory_item ||--o{ stock_batch : batches >
+inventory_item ||--o{ stock_movement : moves >
+inventory_item ||--|| price_entry : price for >
+
+price_list ||--o{ price_entry : contains >
+tax_class ||--o{ price_entry : used by >
+promotion ||.. cart : affects >
+coupon ||.. cart : applies to >
+
+customer ||--o{ cart : has >
+cart ||--o{ cart_item : contains >
+customer ||--o{ ord : places >
+ord ||--o{ order_item : includes >
+ord ||--|| payment : paid by >
+ord ||--|| invoice : invoiced by >
+ord ||--o{ refund : may have >
+ord ||--o{ return_req : may have >
+ord ||--o{ shipment : ships >
+shipment ||--o{ shipment_item : contains >
+delivery_slot ||--o{ shipment : schedules >
+
+product ||--o{ media_asset : media >
+product ||--o{ review : reviewed by >
+customer ||--o{ review : writes >
+
+customer ||--o{ channel_pref : sets >
+notification }o--|| ord : about >
+audit_log }o--|| auth_user : actor >
+
+outbox ..> ord : events
+outbox ..> payment : events
+outbox ..> inventory_item : events
+inbox ..> ord : consumed
+
+@enduml

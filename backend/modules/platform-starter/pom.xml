@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Platform Starter (unchanged except for doc comment).
+     It pulls platform-autoconfigure which now contains springdoc + OpenAPI auto-config. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>platform-starter</artifactId>
+  <name>Vegetable Shop :: Platform Starter</name>
+  <description>Starter that brings in platform auto-configuration and baseline Spring Boot infrastructure</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <automatic.module.name>com.veggieshop.platform.starter</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
+    <!-- Pull in the auto-config (transitively brings springdoc now) -->
+    <dependency>
+      <groupId>com.veggieshop</groupId>
+      <artifactId>platform-autoconfigure</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

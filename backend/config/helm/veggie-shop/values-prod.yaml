@@ -1,0 +1,134 @@
+# values-prod.yaml — Production-ready defaults
+replicaCount: 3
+
+image:
+  repository: ghcr.io/your-org/vegetable-shop/veggieshop-service
+  tag: ""                          # set via CI/CD (e.g., the git tag or SHA)
+  pullPolicy: IfNotPresent
+imagePullSecrets: []               # e.g., [{ name: ghcr }]
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.veggieshop.example
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: veggieshop-tls
+      hosts:
+        - api.veggieshop.example
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+  annotations: {}
+  path: /actuator/prometheus
+  portName: http
+
+# Enforce non-root with seccomp/cap drops
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: false
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "prod"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+    value: "health,info,prometheus"
+  - name: SPRING_DATASOURCE_URL
+    valueFrom:
+      secretKeyRef:
+        name: veggieshop-app-secrets
+        key: jdbcUrl
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    value: "kafka-bootstrap.kafka.svc.cluster.local:9092"    # managed service
+  - name: SPRING_REDIS_HOST
+    value: "redis-master.redis.svc.cluster.local"            # managed service
+  - name: SPRING_REDIS_PORT
+    value: "6379"
+  - name: MINIO_ENDPOINT
+    value: "https://minio.company.example"                   # managed object store
+
+envFrom:
+  secrets:
+    - name: veggieshop-app-secrets
+
+externalSecret:
+  enabled: true
+  name: veggieshop-app-secrets
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: corp-secrets-store          # adjust to your ESO store
+  target:
+    creationPolicy: Owner
+  data:
+    - secretKey: jdbcUrl
+      remoteRef:
+        key: "veggieshop/prod/db/jdbcUrl"
+    - secretKey: SPRING_DATASOURCE_USERNAME
+      remoteRef:
+        key: "veggieshop/prod/db/username"
+    - secretKey: SPRING_DATASOURCE_PASSWORD
+      remoteRef:
+        key: "veggieshop/prod/db/password"
+    - secretKey: JWT_SECRET
+      remoteRef:
+        key: "veggieshop/prod/jwt/secret"
+    - secretKey: MINIO_ACCESS_KEY
+      remoteRef:
+        key: "veggieshop/prod/minio/accessKey"
+    - secretKey: MINIO_SECRET_KEY
+      remoteRef:
+        key: "veggieshop/prod/minio/secretKey"
+
+# Production uses managed services; disable subcharts
+postgresql:
+  enabled: false
+redis:
+  enabled: false
+redpanda:
+  enabled: false
+
+# Optional topology spread constraints for HA across zones
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels: {}

@@ -1,0 +1,85 @@
+# ============================
+# Vegetable Shop - backend/.dockerignore
+# Purpose: minimize build context and speed up docker builds
+# Notes:
+#  - Do NOT ignore Maven essentials (pom.xml, mvnw, .mvn) or source code.
+#  - If you run tests inside docker build, keep test sources included.
+# ============================
+
+# --- VCS & Git metadata ---
+.git
+.git/**
+.github
+.gitignore
+.gitattributes
+.gitmodules
+
+# --- IDE / OS artifacts ---
+.idea
+.vscode
+*.iml
+.classpath
+.project
+.settings
+.DS_Store
+Thumbs.db
+
+# --- Maven / Build outputs ---
+**/target
+**/out
+**/build
+**/jacoco.exec
+**/site
+**/checkstyle-result.xml
+**/pmd.xml
+**/spotbugsXml.xml
+
+# --- Logs & temp ---
+*.log
+*.tmp
+*.swp
+*.swo
+**/.cache
+**/.pytest_cache
+**/.mvn/wrapper/maven-wrapper.jar.backup
+
+# --- Environment files (must not end up in images) ---
+.env
+*.env
+*.env.local
+**/.env
+**/.env.local
+
+# --- Secrets & keys (managed by SOPS/ExternalSecrets outside the image) ---
+secrets/
+**/*.pem
+**/*.key
+**/*.crt
+**/*.p12
+**/*.jks
+
+# --- Documentation & CI (not required inside runtime image) ---
+docs/
+adr/
+architecture/
+guides/
+ci/
+tests/
+sbom/
+
+# --- Local/Helm configs (not needed for building the app image) ---
+config/helm/
+config/local/
+
+# --- Docker artifacts (keep app Dockerfile; exclude infra ones) ---
+docker/infra/
+!docker/app/
+!docker/app/Dockerfile
+
+# --- Scripts & tools (not needed at runtime) ---
+scripts/
+tools/
+
+# --- Misc temporary files ---
+*~
+._*

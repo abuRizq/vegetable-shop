@@ -1,0 +1,49 @@
+{{- /*
+Deployment for Veggie Shop (nil-safe using 'default' + 'get')
+English notes:
+- 'default' ensures .Values.containerPorts is a map (dict) even if missing.
+- 'get' fetches keys safely; then 'default' applies the fallback.
+*/ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "veggie-shop.fullname" . }}
+  labels:
+    {{- include "veggie-shop.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount | default 2 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "veggie-shop.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "veggie-shop.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "veggie-shop.serviceAccountName" . }}
+
+      containers:
+        - name: {{ include "veggie-shop.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+
+          {{- $containerPorts := .Values.containerPorts | default (dict) }}
+
+          ports:
+            - name: http
+              containerPort: {{ (get $containerPorts "http") | default 8080 }}
+              protocol: TCP
+            {{- $mgmt := (get $containerPorts "management") }}
+            {{- if $mgmt }}
+            - name: management
+              containerPort: {{ $mgmt }}
+              protocol: TCP
+            {{- end }}
+
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | default "UTC" | quote }}
+            - name: JAVA_TOOL_OPTIONS
+              value: {{ .Values.javaToolOptions | default "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75 -XX:InitialRAMPercentage=25 -XX:+HeapDumpOnOutOfMemoryError -Duser.timezone=UTC" | quote }}

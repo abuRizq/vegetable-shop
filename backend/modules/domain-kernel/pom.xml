@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Domain Kernel (pure domain, no Spring dependencies) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>domain-kernel</artifactId>
+  <name>Vegetable Shop :: Domain Kernel</name>
+  <description>Shared domain primitives, value objects, and validation utilities (DDD kernel)</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Keep the module clean and framework-agnostic -->
+    <automatic.module.name>com.veggieshop.domain.kernel</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <!-- Lombok (compile-time only) -->
+    <!-- Version managed by parent; annotation processor is configured centrally -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Jakarta Bean Validation API for annotations like @NotNull (optional to avoid leaking transitively) -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Test stack (managed versions via parent/Spring Boot) -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Jar plugin: set a stable JPMS Automatic-Module-Name for better downstream usage -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Inherit maven-compiler-plugin from parent with annotationProcessorPaths (Lombok/MapStruct) -->
+      <!-- Inherit surefire/failsafe/jacoco/spotless from parent as well -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- Keep profiles minimal; inherit CI/PR/Release profiles from parent -->
+  </profiles>
+</project>

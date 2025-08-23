@@ -1,0 +1,74 @@
+# values-local.yaml — Local/dev defaults
+replicaCount: 1
+
+image:
+  repository: veggieshop/veggieshop-service
+  tag: "local"
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "500m"
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+pdb:
+  enabled: false
+
+serviceMonitor:
+  enabled: false
+
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "local"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+    value: "health,info,prometheus"
+  - name: SPRING_DATASOURCE_URL
+    value: "jdbc:postgresql://veggie-shop-postgresql:5432/veggieshop"   # check release name
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    value: "veggie-shop-redpanda:9092"                                  # check release name
+  - name: SPRING_REDIS_HOST
+    value: "veggie-shop-redis-master"                                    # bitnami redis service
+  - name: SPRING_REDIS_PORT
+    value: "6379"
+  - name: MINIO_ENDPOINT
+    value: "http://minio:9000"
+
+secret:
+  enabled: true
+  name: veggieshop-app-secrets
+  stringData:
+    SPRING_DATASOURCE_USERNAME: "veggie"
+    SPRING_DATASOURCE_PASSWORD: "veggie"
+    JWT_SECRET: "dev-jwt-secret"
+    MINIO_ACCESS_KEY: "minio"
+    MINIO_SECRET_KEY: "minio123"
+
+externalSecret:
+  enabled: false
+
+postgresql:
+  enabled: true
+  auth:
+    username: veggie
+    password: veggie
+    database: veggieshop
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+
+redpanda:
+  enabled: true

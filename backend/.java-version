@@ -1,0 +1,2 @@
+jenv alias 21 temurin64-21.0.5
+jenv local 21

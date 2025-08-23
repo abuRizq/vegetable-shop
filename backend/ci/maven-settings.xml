@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VeggieShop :: Backend
+  maven-settings.xml for CI and local automation
+  Goals:
+    - Reproducible, secure, and cache-friendly builds
+    - Minimal surprises (fail on checksum mismatch, disable snapshots from Central)
+    - Optional support for publishing/consuming from GitHub Packages or Sonatype OSSRH
+  Usage:
+    mvn -s ./backend/ci/maven-settings.xml -B -V -U clean verify
+    (In CI, set environment variables as needed, see 'servers' notes below.)
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+
+  <!--
+    Do NOT prompt in CI, and avoid offline unless explicitly requested.
+    localRepository: let Maven use the default (~/.m2/repository). Override only if your CI uses a custom cache path.
+  -->
+  <interactiveMode>false</interactiveMode>
+  <offline>false</offline>
+  <!-- <localRepository>${user.home}/.m2/repository</localRepository> -->
+
+  <!-- Mirrors
+       Prefer HTTPS Central. If you use an internal Nexus/Artifactory cache, set it here with mirrorOf="*".
+  -->
+  <mirrors>
+    <mirror>
+      <id>central-https</id>
+      <name>Maven Central (HTTPS)</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+    <!-- Example internal mirror (uncomment and adjust):
+    <mirror>
+      <id>company-nexus</id>
+      <name>Company Nexus mirror</name>
+      <url>https://nexus.mycorp.internal/repository/maven-public/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+    -->
+  </mirrors>
+
+  <!-- Servers (credentials injected from environment variables in CI)
+       * GitHub Packages (Maven): requires a PAT with "read:packages" to consume and "write:packages" to publish.
+         - Username: ${env.GITHUB_ACTOR} or a real username
+         - Password/Token: ${env.GITHUB_TOKEN} (or a PAT)
+       * Sonatype OSSRH (optional): set OSSRH_USERNAME / OSSRH_PASSWORD
+       NOTE: Do not commit secrets. The ${env.*} interpolation reads process .env vars at runtime.
+  -->
+  <servers>
+    <server>
+      <id>github</id>
+      <username>${env.GITHUB_ACTOR}</username>
+      <password>${env.GITHUB_TOKEN}</password>
+      <!-- Extra safety for GitHub Packages (adds HTTP Authorization header) -->
+      <configuration>
+        <httpHeaders>
+          <property>
+            <name>Authorization</name>
+            <value>Bearer ${env.GITHUB_TOKEN}</value>
+          </property>
+        </httpHeaders>
+      </configuration>
+    </server>
+
+    <server>
+      <id>ossrh</id>
+      <username>${env.OSSRH_USERNAME}</username>
+      <password>${env.OSSRH_PASSWORD}</password>
+    </server>
+
+    <server>
+      <id>ossrh-snapshots</id>
+      <username>${env.OSSRH_USERNAME}</username>
+      <password>${env.OSSRH_PASSWORD}</password>
+    </server>
+  </servers>
+
+  <!-- Proxies (disabled by default). If your CI sits behind a proxy, either:
+       * configure the network-level proxy for the runner, or
+       * enable and fill the block below (set <active>true</active> and values).
+       Common environment variables are HTTPS_PROXY / HTTP_PROXY, which you can parse externally and inject here.
+  -->
+  <proxies>
+    <proxy>
+      <id>corp-proxy</id>
+      <active>false</active>
+      <protocol>https</protocol>
+      <host>proxy.mycorp.local</host>
+      <port>8443</port>
+      <nonProxyHosts>localhost|127.0.0.1|*.local|10.*|192.168.*</nonProxyHosts>
+      <!-- <username>${env.PROXY_USER}</username> -->
+      <!-- <password>${env.PROXY_PASS}</password> -->
+    </proxy>
+  </proxies>
+
+  <!-- Profiles
+       'ci' profile: secure repository policies (fail on checksum), avoid snapshot resolution from Central, enable plugin repos.
+       'github-packages' profile: opt-in for consuming/publishing project modules to GitHub Packages (if needed).
+       'ossrh' profile: opt-in Sonatype endpoints for publishing open-source artifacts (if applicable).
+  -->
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- Auto-activate on CI runners that export CI=true (GitHub Actions, etc.).
+             Also safe to keep always active in CI by adding it under <activeProfiles> below.
+        -->
+        <property>
+          <name>env.CI</name>
+        </property>
+      </activation>
+
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+            <!--
+              For reproducibility, keep <updatePolicy>daily</updatePolicy> or 'never' on release builds with a warmed cache.
+              Using 'daily' is a good balance for CI that restores caches.
+            -->
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- Optional: GitHub Packages (Maven) for this repository org/project.
+         To use, publish/consume with repository id 'github' in your POM or via -DaltDeploymentRepository.
+         Typical URL shape: https://maven.pkg.github.com/<org>/<repo>
+         Replace 'your-org' and 'veggieshop' accordingly.
+    -->
+    <profile>
+      <id>github-packages</id>
+      <repositories>
+        <repository>
+          <id>github</id>
+          <name>GitHub Packages (VeggieShop)</name>
+          <url>https://maven.pkg.github.com/your-org/veggieshop</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>github</id>
+          <name>GitHub Packages (VeggieShop)</name>
+          <url>https://maven.pkg.github.com/your-org/veggieshop</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- Optional: Sonatype OSSRH endpoints for open-source publishing (adjust groupId rules in your POM).
+         Activate with -Possrh when releasing. Keep disabled in normal CI runs.
+    -->
+    <profile>
+      <id>ossrh</id>
+      <repositories>
+        <repository>
+          <id>ossrh-staging</id>
+          <url>https://s01.oss.sonatype.org/content/groups/staging/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>ossrh-snapshots</id>
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>ossrh-staging</id>
+          <url>https://s01.oss.sonatype.org/content/groups/staging/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <!-- Ensure the 'ci' profile is active even if CI .env var is absent.
+       Add/Remove 'github-packages' or 'ossrh' depending on your pipeline step.
+  -->
+  <activeProfiles>
+    <activeProfile>ci</activeProfile>
+    <!-- <activeProfile>github-packages</activeProfile> -->
+    <!-- <activeProfile>ossrh</activeProfile> -->
+  </activeProfiles>
+</settings>

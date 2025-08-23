@@ -1,0 +1,59 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *" # Run every day at 02:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Maven verify
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend # All Maven commands run from backend/ subfolder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin) with Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Show tool versions (debugging aid)
+        run: |
+          mvn -v
+          java -version
+
+      - name: Build & test
+        run: mvn -s ci/maven-settings.xml -B -U -ntp clean verify
+
+      - name: Upload surefire & failsafe reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          if-no-files-found: ignore
+          path: |
+            backend/**/target/surefire-reports/*
+            backend/**/target/failsafe-reports/*
+
+      - name: Upload built JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jars
+          if-no-files-found: ignore
+          path: backend/**/target/*.jar

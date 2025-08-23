@@ -1,0 +1,51 @@
+{{! ------------------------------------------------------------------------- }}
+{{! mapper.mustache — MapStruct mapper between Entity and DTO                   }}
+{{! Notes:                                                                      }}
+{{! - Strict mapping: unmappedTargetPolicy = ERROR to catch missing fields.     }}
+{{! - Null updates ignored by default in updateEntityFromDto.                   }}
+{{!                                                                             }}
+{{! Expected context keys (example):                                            }}
+{{!   packageName: com.veggieshop.catalog.api.mapper                             }}
+{{!   mapperClassName: ProductMapper                                            }}
+{{!   entityClass: com.veggieshop.catalog.domain.Product                        }}
+{{!   dtoClass: com.veggieshop.catalog.api.dto.ProductDTO                       }}
+{{!   imports: ["java.util.UUID"] (optional)                                    }}
+{{! ------------------------------------------------------------------------- }}
+package {{packageName}};
+
+import org.mapstruct.BeanMapping;
+import org.mapstruct.InheritConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
+{{#imports}}
+import {{.}};
+{{/imports}}
+
+@Mapper(
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.ERROR,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
+)
+public interface {{mapperClassName}} {
+
+  // Entity -> DTO
+  {{dtoClass}} toDto({{entityClass}} entity);
+
+  // DTO -> Entity
+  {{entityClass}} toEntity({{dtoClass}} dto);
+
+  // Partial update: copy non-null properties from DTO into existing entity
+  @BeanMapping(ignoreByDefault = false)
+  @InheritConfiguration(name = "toEntity")
+  void updateEntityFromDto({{dtoClass}} dto, @MappingTarget {{entityClass}} entity);
+
+  // Collections
+  List<{{dtoClass}}> toDtoList(List<{{entityClass}}> entities);
+  List<{{entityClass}}> toEntityList(List<{{dtoClass}}> dtos);
+}

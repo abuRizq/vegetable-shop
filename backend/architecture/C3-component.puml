@@ -1,0 +1,131 @@
+@startuml C3-component
+title VeggieShop — C3: Component Diagram (inside veggieshop-service)
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+left to right direction
+
+package "veggieshop-service (Spring Boot API)" #D6EAF8 {
+  package "API Layer\n(api/http)" as apiLayer {
+    [AuthController]
+    [CatalogController]
+    [InventoryController]
+    [PricingController]
+    [CustomerController]
+    [OrderController]
+    [CheckoutController]
+    [VendorController]
+    [MediaController]
+    [ReviewController]
+    [NotificationController]
+    [AuditController]
+  }
+
+  package "Application Layer\n(application)" as appLayer {
+    [AuthService]
+    [CatalogService]
+    [InventoryService]
+    [PricingService]
+    [CustomerService]
+    [OrderService]
+    [CheckoutService]
+    [VendorService]
+    [MediaService]
+    [ReviewService]
+    [NotificationService]
+    [AuditService]
+  }
+
+  package "Ports (Interfaces)\n(application/port)" as ports {
+    [UserRepositoryPort]
+    [ProductRepositoryPort]
+    [InventoryItemRepositoryPort]
+    [OrderRepositoryPort]
+    [PaymentGatewayPort]
+    [NotificationGatewayPort]
+    [MediaAssetRepositoryPort]
+    [AuditLogRepositoryPort]
+  }
+
+  package "Domain Layer\n(domain)" as domain {
+    [Entities & Aggregates\n(User, Role, Product, Order, Cart, Payment, etc.)]
+    [Value Objects\n(Money, Weight, Address, etc.)]
+    [Domain Services]
+  }
+
+  package "Infrastructure Adapters\n(infrastructure)" as infra {
+    [JPA Repositories\n(UserJpaRepository, ProductRepository, ...)]
+    [Specifications & Projections]
+    [PaymentGatewayAdapter]
+    [OAuthClientAdapter]
+    [NotificationAdapter]
+    [MediaStorageAdapter]
+    [OutboxPublisher\n(Kafka)]
+    [KafkaConsumers]
+  }
+
+  package "Platform Cross-Cutting\n(platform)" as platform {
+    [GlobalResponseAdvice\n(Problem Details)]
+    [SecurityConfig & Filters]
+    [Persistence Config & Converters]
+    [Observability (Tracing/Metrics)]
+    [RequestRateLimiter]
+  }
+}
+
+' Component Dependencies
+AuthController --> AuthService
+CatalogController --> CatalogService
+InventoryController --> InventoryService
+PricingController --> PricingService
+CustomerController --> CustomerService
+OrderController --> OrderService
+CheckoutController --> CheckoutService
+VendorController --> VendorService
+MediaController --> MediaService
+ReviewController --> ReviewService
+NotificationController --> NotificationService
+AuditController --> AuditService
+
+AuthService --> ports
+CatalogService --> ports
+InventoryService --> ports
+PricingService --> ports
+CustomerService --> ports
+OrderService --> ports
+CheckoutService --> ports
+VendorService --> ports
+MediaService --> ports
+ReviewService --> ports
+NotificationService --> ports
+AuditService --> ports
+
+domain -[hidden]-> appLayer
+appLayer -[hidden]-> apiLayer
+
+infra --> ports : implements
+platform <-[dotted]- apiLayer : security, error handling
+platform <-[dotted]- appLayer : tx mgmt, tracing
+infra --> platform : uses configs
+
+' External deps
+database "PostgreSQL" as PG
+rectangle "Kafka" as Kafka #FFE6E6
+rectangle "OAuth Provider" as OAuth #FFF2CC
+rectangle "Payment Gateway" as Pay #FFF2CC
+rectangle "Email/SMS Provider" as Comm #FFF2CC
+rectangle "Object Storage" as S3 #FFF2CC
+
+infra --> PG : JPA
+infra --> Kafka : produce/consume
+infra --> OAuth
+infra --> Pay
+infra --> Comm
+infra --> S3
+
+note bottom
+  Rules:\n• Controllers → Services → Domain\n• Adapters implement Ports; Domain is framework-free\n• Errors mapped via Problem Details (ADR-0003)\n• Events via Outbox → Kafka (ADR-0004)\n• Boundaries enforced by ArchUnit (ADR-0005)
+end note
+
+@enduml

@@ -1,0 +1,43 @@
+apiVersion: v2
+name: veggie-shop
+description: >
+  Vegetable Shop backend service (Spring Boot). Includes optional dependencies for
+  PostgreSQL, Redis, and Kafka-compatible broker (Redpanda) via conditional subcharts.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.25.0-0"
+
+home: https://example.com/veggie-shop
+sources:
+  - https://example.com/veggie-shop/backend
+keywords:
+  - spring-boot
+  - java
+  - ecommerce
+  - ddd
+  - kafka
+  - postgres
+  - redis
+
+maintainers:
+  - name: Veggie Shop Team
+    email: team@veggieshop.example
+  - name: Platform Engineering
+    email: platform@veggieshop.example
+
+# Optional chart dependencies. These are enabled via values (e.g., postgresql.enabled=true).
+# The parent chart may deploy only the application by default and rely on managed services in prod.
+dependencies:
+  - name: postgresql
+    repository: https://charts.bitnami.com/bitnami
+    version: ">= 15.0.0"
+    condition: postgresql.enabled
+  - name: redis
+    repository: https://charts.bitnami.com/bitnami
+    version: ">= 18.0.0"
+    condition: redis.enabled
+  - name: redpanda
+    repository: https://charts.redpanda.com
+    version: ">= 5.0.0"
+    condition: redpanda.enabled

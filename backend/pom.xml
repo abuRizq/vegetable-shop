@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Backend (Parent / Aggregator POM) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.3</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.veggieshop</groupId>
+  <artifactId>backend</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Vegetable Shop :: Backend</name>
+  <description>Parent project for Vegetable Shop backend (DDD + Hexagonal multi-module)</description>
+  <url>https://example.com/veggieshop</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Vegetable Shop</name>
+    <url>https://example.com/veggieshop</url>
+  </organization>
+
+  <scm>
+    <connection>scm:git:https://github.com/your-org/veggieshop.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/your-org/veggieshop.git</developerConnection>
+    <url>https://github.com/your-org/veggieshop</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/your-org/veggieshop/issues</url>
+  </issueManagement>
+
+  <properties>
+    <!-- Java & encoding -->
+    <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+    <spring-boot.version>3.5.3</spring-boot.version>
+
+    <!-- Spring Cloud (BOM import) -->
+    <spring-cloud.version>2025.0.0</spring-cloud.version>
+    <springdoc.version>2.6.0</springdoc.version>
+
+    <!-- DB / Persistence -->
+    <flyway.version>11.10.2</flyway.version>
+    <postgresql.version>42.7.5</postgresql.version>
+    <!-- FIX: استخدم نسخة متوفّرة على Central -->
+    <hibernate.types.version>2.21.1</hibernate.types.version>
+
+    <!-- Messaging -->
+    <kafka.clients.version>3.9.0</kafka.clients.version>
+
+    <!-- Mapping / Utils -->
+    <mapstruct.version>1.6.2</mapstruct.version>
+    <lombok.version>1.18.38</lombok.version>
+    <jjwt.version>0.12.6</jjwt.version>
+
+    <!-- Testing -->
+    <testcontainers.version>1.21.3</testcontainers.version>
+    <assertj.version>3.27.4</assertj.version>
+    <restassured.version>5.5.1</restassured.version>
+    <wiremock.version>3.9.2</wiremock.version>
+    <archunit.version>1.4.1</archunit.version>
+    <jacoco.version>0.8.13</jacoco.version>
+
+    <!-- Build / Quality plugins -->
+    <maven-enforcer.version>3.6.1</maven-enforcer.version>
+    <maven-compiler.plugin.version>3.13.0</maven-compiler.plugin.version>
+    <maven-surefire.plugin.version>3.5.3</maven-surefire.plugin.version>
+    <maven-failsafe.plugin.version>3.5.3</maven-failsafe.plugin.version>
+    <spotless.version>2.44.5</spotless.version>
+    <checkstyle.version>3.6.0</checkstyle.version>
+    <pmd.version>3.27.0</pmd.version>
+    <spotbugs.version>4.9.3.2</spotbugs.version>
+    <owasp.depcheck.version>12.1.0</owasp.depcheck.version>
+    <cyclonedx.version>2.9.1</cyclonedx.version>
+    <versions.plugin.version>2.18.0</versions.plugin.version>
+    <gpg.version>3.2.8</gpg.version>
+
+    <!-- Reproducible builds -->
+    <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
+
+    <!-- Toggles (defaults) -->
+    <skipITs>false</skipITs>
+    <skipUTs>false</skipUTs>
+  </properties>
+
+  <modules>
+    <module>modules/domain-kernel</module>
+    <module>modules/platform</module>
+    <module>modules/platform-autoconfigure</module>
+    <module>modules/platform-starter</module>
+    <module>modules/messaging</module>
+    <module>modules/migrations</module>
+    <module>modules/contracts</module>
+    <module>modules/testing</module>
+    <module>modules/system-tests</module>
+
+    <module>modules/contexts/context-auth</module>
+    <module>modules/contexts/context-catalog</module>
+    <module>modules/contexts/context-inventory</module>
+    <module>modules/contexts/context-pricing</module>
+    <module>modules/contexts/context-customer</module>
+    <module>modules/contexts/context-order</module>
+    <module>modules/contexts/context-checkout</module>
+    <module>modules/contexts/context-vendor</module>
+    <module>modules/contexts/context-media</module>
+    <module>modules/contexts/context-review</module>
+    <module>modules/contexts/context-notification</module>
+    <module>modules/contexts/context-audit</module>
+
+    <module>apps/veggieshop-service</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Spring Cloud BOM -->
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- MapStruct -->
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+
+      <!-- Lombok -->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+
+      <!-- DB -->
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>${flyway.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.vladmihalcea</groupId>
+        <artifactId>hibernate-types-60</artifactId>
+        <version>${hibernate.types.version}</version>
+      </dependency>
+
+      <!-- Messaging -->
+      <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>${kafka.clients.version}</version>
+      </dependency>
+
+      <!-- JWT -->
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>${jjwt.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>${jjwt.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+
+      <!-- OpenAPI -->
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>${springdoc.version}</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <version>${restassured.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wiremock</groupId>
+        <artifactId>wiremock-standalone</artifactId>
+        <version>${wiremock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit</artifactId>
+        <version>${archunit.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Enforcer -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer.version}</version>
+          <executions>
+            <execution>
+              <id>enforce</id>
+              <goals><goal>enforce</goal></goals>
+              <configuration>
+                <rules>
+                  <requireJavaVersion><version>[${java.version},)</version></requireJavaVersion>
+                  <requireMavenVersion><version>[3.9,)</version></requireMavenVersion>
+                  <dependencyConvergence/>
+                  <banDuplicatePomDependencyVersions/>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Spring Boot plugin (skip on aggregator) -->
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration><skip>true</skip></configuration>
+        </plugin>
+
+        <!-- Compiler: Lombok + MapStruct processors -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler.plugin.version}</version>
+          <configuration>
+            <release>${java.version}</release>
+            <parameters>true</parameters>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+              </path>
+              <path>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+              </path>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-mapstruct-binding</artifactId>
+                <version>0.2.0</version>
+              </path>
+            </annotationProcessorPaths>
+          </configuration>
+        </plugin>
+
+        <!-- Tests -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire.plugin.version}</version>
+          <configuration>
+            <skipTests>${skipUTs}</skipTests>
+            <useModulePath>false</useModulePath>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-failsafe.plugin.version}</version>
+          <executions>
+            <execution>
+              <id>integration-tests</id>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+              <configuration>
+                <skipITs>${skipITs}</skipITs>
+                <useModulePath>false</useModulePath>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Coverage -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.version}</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals><goal>prepare-agent</goal></goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>verify</phase>
+              <goals><goal>report</goal></goals>
+            </execution>
+            <execution>
+              <id>report-aggregate</id>
+              <phase>verify</phase>
+              <goals><goal>report-aggregate</goal></goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Formatting -->
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless.version}</version>
+          <configuration>
+            <java>
+              <googleJavaFormat/>
+              <importOrder/>
+              <removeUnusedImports/>
+            </java>
+          </configuration>
+          <executions>
+            <execution><id>spotless-apply</id><goals><goal>apply</goal></goals></execution>
+            <execution><id>spotless-check</id><goals><goal>check</goal></goals></execution>
+          </executions>
+        </plugin>
+
+        <!-- Static Analysis / Security / SBOM -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${checkstyle.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${pmd.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${spotbugs.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>${owasp.depcheck.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.cyclonedx</groupId>
+          <artifactId>cyclonedx-maven-plugin</artifactId>
+          <version>${cyclonedx.version}</version>
+        </plugin>
+
+        <!-- Versions helper -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions.plugin.version}</version>
+        </plugin>
+
+        <!-- GPG (for release only) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${gpg.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <!-- Inherit plugins -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration><skip>true</skip></configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>pr-checks</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <executions>
+              <execution><id>checkstyle</id><phase>verify</phase><goals><goal>check</goal></goals></execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <executions>
+              <execution><id>pmd</id><phase>verify</phase><goals><goal>check</goal></goals></execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <executions>
+              <execution><id>spotbugs</id><phase>verify</phase><goals><goal>check</goal></goals></execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <skipUTs>false</skipUTs>
+        <skipITs>true</skipITs>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>ci</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.cyclonedx</groupId>
+            <artifactId>cyclonedx-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sbom</id>
+                <phase>verify</phase>
+                <goals><goal>makeAggregateBom</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <executions>
+              <execution>
+                <id>owasp</id>
+                <phase>verify</phase>
+                <goals><goal>aggregate</goal></goals>
+                <configuration>
+                  <failBuildOnCVSS>7</failBuildOnCVSS>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <skipUTs>false</skipUTs>
+        <skipITs>false</skipITs>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals><goal>sign</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>no-snapshots</id>
+                <goals><goal>enforce</goal></goals>
+                <configuration>
+                  <rules>
+                    <requireReleaseDeps/>
+                    <requireNoSnapshots/>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <skipUTs>false</skipUTs>
+        <skipITs>false</skipITs>
+      </properties>
+    </profile>
+  </profiles>
+</project>

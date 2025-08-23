@@ -1,0 +1,28 @@
+{{! ------------------------------------------------------------------------- }}
+{{! page-mapper.mustache — MapStruct helper to map Page<Entity> -> Page<DTO>    }}
+{{! Notes:                                                                      }}
+{{! - Delegates element mapping to an existing mapper's toDto method.           }}
+{{! - Keeps pagination metadata intact using Page.map.                          }}
+{{!                                                                             }}
+{{! Expected context keys (example):                                            }}
+{{!   packageName: com.veggieshop.common.mapper                                 }}
+{{!   pageMapperClassName: ProductPageMapper                                    }}
+{{!   entityClass: com.veggieshop.catalog.domain.Product                        }}
+{{!   dtoClass: com.veggieshop.catalog.api.dto.ProductDTO                       }}
+{{!   delegateMapperClass: com.veggieshop.catalog.api.mapper.ProductMapper      }}
+{{! ------------------------------------------------------------------------- }}
+package {{packageName}};
+
+import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
+
+@Mapper(componentModel = "spring", uses = { {{delegateMapperClass}} })
+public interface {{pageMapperClassName}} {
+
+  // Provided by delegate mapper
+  {{dtoClass}} toDto({{entityClass}} entity);
+
+  default Page<{{dtoClass}}> toDtoPage(Page<{{entityClass}}> page) {
+    return page.map(this::toDto);
+  }
+}

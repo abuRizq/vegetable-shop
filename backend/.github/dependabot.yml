@@ -1,0 +1,103 @@
+version: 2
+enable-beta-ecosystems: false
+updates:
+- package-ecosystem: maven
+  directory: /
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:00
+    timezone: Asia/Gaza
+  open-pull-requests-limit: 10
+  rebase-strategy: auto
+  versioning-strategy: increase-if-necessary
+  labels:
+  - dependencies
+  - maven
+  reviewers:
+  - veggieshop/maintainers
+  commit-message:
+    prefix: deps
+    include: scope
+  groups:
+    spring-platform:
+      patterns:
+      - org.springframework.boot:*
+      - org.springframework.cloud:*
+    testcontainers:
+      patterns:
+      - org.testcontainers:*
+    jwt-and-security:
+      patterns:
+      - io.jsonwebtoken:*
+      - org.springframework.security:*
+    mapping-and-codegen:
+      patterns:
+      - org.mapstruct:*
+      - org.openapitools:*
+    maven-plugins:
+      patterns:
+      - org.apache.maven.plugins:*
+- package-ecosystem: docker
+  directory: /docker/app
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:30
+    timezone: Asia/Gaza
+  labels:
+  - dependencies
+  - docker
+  reviewers:
+  - veggieshop/infra
+  - veggieshop/platform
+- package-ecosystem: docker
+  directory: /docker/infra/nginx
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:35
+    timezone: Asia/Gaza
+  labels:
+  - dependencies
+  - docker
+  reviewers:
+  - veggieshop/infra
+- package-ecosystem: docker
+  directory: /docker/infra/migrator
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:40
+    timezone: Asia/Gaza
+  labels:
+  - dependencies
+  - docker
+  reviewers:
+  - veggieshop/infra
+  - veggieshop/db
+- package-ecosystem: docker
+  directory: /config/local
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:45
+    timezone: Asia/Gaza
+  labels:
+  - dependencies
+  - docker
+  - local-dev
+  reviewers:
+  - veggieshop/platform
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+    day: sunday
+    time: 03:15
+    timezone: Asia/Gaza
+  labels:
+  - dependencies
+  - ci
+  reviewers:
+  - veggieshop/infra

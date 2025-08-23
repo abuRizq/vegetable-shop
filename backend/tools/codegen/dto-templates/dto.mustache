@@ -1,0 +1,47 @@
+{{! ------------------------------------------------------------------------- }}
+{{! dto.mustache — DTO class template (Lombok + Jackson + OpenAPI)              }}
+{{! Notes:                                                                      }}
+{{! - Requires Lombok on the classpath.                                         }}
+{{! - Intended for read models / API responses.                                 }}
+{{! - Use request.mustache for write/request payloads with validation.          }}
+{{!                                                                             }}
+{{! Expected context keys (example):                                            }}
+{{!   packageName: com.veggieshop.catalog.api.dto                               }}
+{{!   className: ProductDTO                                                     }}
+{{!   description: "Product representation returned by the API"                 }}
+{{!   imports: ["java.time.Instant","java.util.UUID"]                           }}
+{{!   fields: [                                                                 }}
+{{!     { "type":"UUID","name":"id","description":"Identifier","required":true, }}
+{{!       "example":"f2c7e9d8-...","annotations":["@jakarta.validation.constraints.NotNull"] }, }}
+{{!     { "type":"String","name":"name","description":"Display name",           }}
+{{!       "required":true,"example":"Banana"}                                   }}
+{{!   ]                                                                          }}
+{{! ------------------------------------------------------------------------- }}
+package {{packageName}};
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Value;
+{{#imports}}
+import {{.}};
+{{/imports}}
+
+@Value
+@Builder(toBuilder = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(name = "{{className}}", description = "{{description}}")
+public class {{className}} {
+
+{{#fields}}
+  /** {{description}} */
+  @Schema(description = "{{description}}"{{#example}}, example = "{{example}}"{{/example}}{{^required}}, nullable = true{{/required}})
+  @JsonProperty("{{jsonName}}{{^jsonName}}{{name}}{{/jsonName}}")
+  {{#annotations}}
+  {{.}}
+  {{/annotations}}
+  {{type}} {{name}};
+{{/fields}}
+
+}

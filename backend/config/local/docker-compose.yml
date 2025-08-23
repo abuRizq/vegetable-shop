@@ -1,0 +1,170 @@
+# Vegetable Shop - Local Dev Stack (Docker Compose)
+# Services: Postgres, Redpanda (Kafka), Redis, MinIO, Flyway migrator, App, NGINX
+# Uses env file located at ../../.env (relative to this file).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: veggie-postgres
+    env_file:
+      - ../../.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-veggieshop}
+      POSTGRES_USER: ${POSTGRES_USER:-veggie}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-veggie}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [veggieshop]
+    restart: unless-stopped
+
+  kafka:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.1.7
+    container_name: veggie-kafka
+    command: ["redpanda", "start", "--overprovisioned", "--smp=1", "--memory=512M", "--reserve-memory=0M", "--check=false", "--advertise-kafka-addr=kafka:9092"]
+    ports:
+      - "127.0.0.1:9092:9092"
+    # If the image includes rpk, the healthcheck below will work; otherwise omit it.
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster info >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks: [veggieshop]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: veggie-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [veggieshop]
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest   # For reproducibility, pin to a specific release tag/digest when you can
+    container_name: veggie-minio
+    env_file:
+      - ../../.env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: ["server", "/data", "--console-address", ":9001"]
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio:/data
+    networks: [veggieshop]
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc:latest      # For reproducibility, pin to a specific release tag/digest when you can
+    container_name: veggie-minio-init
+    env_file:
+      - ../../.env
+    depends_on:
+      - minio
+    entrypoint: >
+      sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin} &&
+      mc mb -p local/${S3_BUCKET:-veggieshop-local} || true &&
+      mc anonymous set download local/${S3_BUCKET:-veggieshop-local} || true
+      "
+    networks: [veggieshop]
+    restart: "no"
+
+  migrator:
+    image: flyway/flyway:11-alpine
+    container_name: veggie-migrator
+    env_file:
+      - ../../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - -url=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-veggieshop}
+      - -user=${POSTGRES_USER:-veggie}
+      - -password=${POSTGRES_PASSWORD:-veggie}
+      - -connectRetries=60
+      - -locations=filesystem:/flyway/sql
+      - migrate
+    volumes:
+      - ../../modules/migrations/src/main/resources/db/migration:/flyway/sql:ro
+    networks: [veggieshop]
+    restart: "no"
+
+  app:
+    build:
+      context: ../..
+      dockerfile: docker/app/Dockerfile
+      args:
+        APP_VERSION: "local"
+        APP_REVISION: "dev"
+    image: veggieshop/veggieshop-service:local
+    container_name: veggie-app
+    env_file:
+      - ../../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      SERVER_PORT: "8080"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-veggieshop}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-veggie}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-veggie}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: "6379"
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${S3_BUCKET:-veggieshop-local}
+      S3_REGION: ${S3_REGION:-eu-central-1}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:-change_me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+      migrator:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_started
+    networks: [veggieshop]
+    restart: unless-stopped
+    # The app is not exposed directly; reach it via NGINX on :8080
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: veggie-nginx
+    depends_on:
+      app:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - veggieshop
+    restart: unless-stopped
+
+networks:
+  veggieshop: {}
+
+volumes:
+  pgdata: {}
+  minio: {}

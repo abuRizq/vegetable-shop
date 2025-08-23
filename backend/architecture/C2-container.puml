@@ -1,0 +1,55 @@
+@startuml C2-container
+title VeggieShop — C2: Container Diagram
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam rectangle {
+  RoundCorner 15
+}
+left to right direction
+
+' Boundary
+package "VeggieShop System" #D6EAF8 {
+  [Nginx Reverse Proxy\n(HTTP ingress)] as Nginx
+  [veggieshop-service\n(Spring Boot API)] as Api
+  [Outbox Relay\n(background worker)] as Relay
+  [Migrator Job\n(Flyway)] as Migrator
+}
+
+' Data & infra
+database "PostgreSQL\n(app schema)" as PG
+rectangle "Kafka\n(message broker)" as Kafka #FFE6E6
+rectangle "Object Storage\n(Media files)" as S3 #FFF2CC
+rectangle "Email/SMS Provider" as Comm #FFF2CC
+rectangle "OAuth Provider" as OAuth #FFF2CC
+rectangle "Payment Gateway" as Pay #FFF2CC
+rectangle "Prometheus / OTEL Collector" as Obs #FFF2CC
+
+' Flows
+Nginx --> Api : TLS-terminated HTTP
+Api --> PG : JDBC (JPA/Hibernate)
+Api --> Kafka : produce/consume events
+Relay --> PG : poll outbox table
+Relay --> Kafka : publish events
+Api --> S3 : upload/read media
+Api --> Comm : send notifications
+Api --> OAuth : login/link account
+Api --> Pay : payments API
+Obs <- Api : metrics/traces/logs
+Obs <- Relay : metrics/logs
+Migrator --> PG : apply Flyway migrations
+
+' Notes
+note bottom of Api
+  Modules:\n- contexts/* (Auth, Catalog, Inventory, Pricing, Customer, Order, Checkout, Vendor, Media, Review, Notification, Audit)\n- platform/* (web errors, security, persistence, observability)\n- messaging/* (outbox + Kafka)\n- domain-kernel (shared value objects)\nProfiles: local, prod
+end note
+
+legend right
+  |= Element =|= Meaning |
+  | Blue package | System boundary |
+  | Rectangle | Container / external service |
+  | Database | Stateful storage |
+  | Pink | Messaging |
+endlegend
+@enduml

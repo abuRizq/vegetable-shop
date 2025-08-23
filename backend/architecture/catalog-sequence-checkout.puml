@@ -1,0 +1,129 @@
+@startuml catalog-sequence-checkout
+title VeggieShop — Catalog → Cart → Checkout (Happy & Failure Paths)
+
+skinparam shadowing false
+skinparam ParticipantPadding 8
+skinparam BoxPadding 8
+skinparam sequence {
+  ArrowColor #4A90E2
+  LifeLineBorderColor #4A90E2
+  LifeLineBackgroundColor #EAF2FD
+  ParticipantBorderColor #4A90E2
+  ParticipantBackgroundColor #EAF2FD
+}
+
+autonumber
+
+actor Customer as C
+participant "Nginx\n(ingress)" as N
+participant "VeggieShop API\n(Spring Boot)" as API
+box "Contexts / Services" #D6EAF8
+  participant "CatalogController" as CatCtl
+  participant "CatalogService" as CatSvc
+  participant "PricingService" as PriceSvc
+  participant "InventoryService" as InvSvc
+  participant "CartController" as CartCtl
+  participant "OrderService" as OrderSvc
+  participant "CheckoutController" as ChkCtl
+  participant "CheckoutService" as ChkSvc
+  participant "NotificationService" as NotifSvc
+end box
+participant "Outbox\n(Transactional)" as Outbox
+participant "OutboxRelay\n(worker)" as Relay
+participant "Kafka\n(broker)" as Kafka
+participant "Payment Gateway" as Pay
+database "PostgreSQL" as PG
+
+== Browse & Search ==
+C -> N : GET /api/catalog/products?query=tomato
+N -> API : Route request
+API -> CatCtl : HTTP request
+CatCtl -> CatSvc : findProducts(query,paging)
+CatSvc -> PG : SELECT products + categories + tags
+PG --> CatSvc : result
+CatSvc --> CatCtl : ProductSummaryDTO[]
+CatCtl --> API : 200 OK (JSON)
+API --> N : response
+N --> C : product list
+
+== Add to Cart ==
+C -> N : POST /api/order/carts/{id}/items {sku,qty}
+N -> API
+API -> CartCtl : addItem(cartId, sku, qty)
+CartCtl -> InvSvc : checkAvailability(sku, qty)
+InvSvc -> PG : SELECT stock_batches WHERE sku=...
+PG --> InvSvc : available qty
+InvSvc --> CartCtl : OK
+CartCtl -> PriceSvc : quote(sku, qty, promotions?)
+PriceSvc -> PG : SELECT active price, tax, promo
+PG --> PriceSvc : result
+PriceSvc --> CartCtl : Money total
+CartCtl -> PG : UPSERT cart_item + totals
+PG --> CartCtl : saved
+CartCtl --> API : 200 OK (cart snapshot)
+API --> N : response
+N --> C : cart view
+
+== Start Checkout ==
+C -> N : POST /api/checkout/sessions {cartId, paymentMethod, deliverySlot}
+N -> API
+API -> ChkCtl : startSession(request)
+ChkCtl -> ChkSvc : validate&reserve(cartId, slot)
+ChkSvc -> InvSvc : reserveStock(cartId)
+InvSvc -> PG : INSERT stock_reservations ... (for each item)
+PG --> InvSvc : reserved
+InvSvc --> ChkSvc : reservationId
+ChkSvc -> OrderSvc : createOrder(cartId)
+OrderSvc -> PG : INSERT order, order_items
+PG --> OrderSvc : orderId
+OrderSvc -> Outbox : persist event OrderCreated{orderId}
+Outbox --> OrderSvc : PENDING
+
+== Payment Authorization ==
+ChkSvc -> Pay : authorize(orderId, amount, paymentMethod)
+Pay --> ChkSvc : authId (APPROVED)
+
+ChkSvc -> PG : UPDATE order(status='PENDING_PAYMENT', authId)
+PG --> ChkSvc : ok
+ChkSvc -> Outbox : persist event PaymentAuthorized{orderId, authId}
+Outbox --> ChkSvc : PENDING
+ChkCtl --> API : 201 Created (checkoutSession)
+
+== Relay Publishes Events ==
+Relay -> PG : SELECT outbox WHERE status=PENDING LIMIT n
+PG --> Relay : rows
+Relay -> Kafka : publish(OrderCreated), publish(PaymentAuthorized)
+Kafka --> Relay : acks
+Relay -> PG : UPDATE outbox SET status='SENT'
+
+== Payment Capture (async or on confirm) ==
+API -> ChkCtl : POST /api/checkout/confirm {sessionId}
+ChkCtl -> ChkSvc : capture(orderId)
+ChkSvc -> Pay : capture(authId, amount)
+Pay --> ChkSvc : CAPTURED (txnId)
+ChkSvc -> PG : UPDATE order(status='PAID', txnId)
+PG --> ChkSvc : ok
+ChkSvc -> Outbox : persist event OrderPaid{orderId, txnId}
+Outbox --> ChkSvc : PENDING
+ChkSvc -> NotifSvc : requestNotification(orderId, TEMPLATE=ORDER_CONFIRMED)
+NotifSvc -> Outbox : persist NotificationRequested{orderId}
+Outbox --> NotifSvc : PENDING
+ChkCtl --> API : 200 OK
+
+== Failure Paths ==
+alt Insufficient stock
+  InvSvc -> PG : SELECT available ...
+  PG --> InvSvc : qty insufficient
+  InvSvc --> ChkSvc : error(INSUFFICIENT_STOCK)
+  ChkCtl --> API : 422 Problem Details
+  API --> N : response
+  N --> C : error
+else Payment declined
+  ChkSvc -> Pay : authorize(...)
+  Pay --> ChkSvc : DECLINED
+  ChkSvc -> PG : UPDATE order(status='PAYMENT_DECLINED')
+  ChkSvc -> Outbox : NotificationRequested{paymentDeclined}
+  ChkCtl --> API : 402/422 Problem Details
+end
+
+@enduml

@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Semantic version tags, e.g., v1.2.3
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., v1.2.3). If empty, the pushed tag is used."
+        required: false
+
+permissions:
+  contents: write  # Needed to create a GitHub Release
+  actions: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Centralize artifact name prefix, adjust if needed
+  ARTIFACT_PREFIX: veggie-shop
+
+jobs:
+  build:
+    name: Build artifacts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin) with Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build (skip tests if already validated in CI)
+        run: mvn -s ci/maven-settings.xml -B -U -ntp -DskipTests clean package
+
+      - name: Generate SBOM (CycloneDX)
+        run: mvn -s ci/maven-settings.xml -B -ntp -DskipTests cyclonedx:makeAggregateBom
+
+      - name: Collect release artifacts
+        run: |
+          mkdir -p ../release-bundle
+          # Collect JARs
+          find . -type f -path "*/target/*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" -exec cp {} ../release-bundle/ \;
+          # Collect SBOMs (JSON/XML)
+          find . -type f -name "bom.*" -exec cp {} ../release-bundle/ \;
+        shell: bash
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-bundle
+          path: release-bundle
+
+  github_release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-bundle
+          path: release-bundle
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "value=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.value }}
+          name: ${{ steps.tag.outputs.value }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            release-bundle/*

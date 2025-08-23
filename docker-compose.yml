@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: vegetable-shop-db
+    environment:
+      POSTGRES_DB: vegetable_shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - shop-network
+
+  backend:
+    build: ./backend
+    container_name: vegetable-shop-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/vegetable_shop
+      DB_USER: postgres
+      DB_PASS: secret
+      ADMIN_USER: admin
+      ADMIN_PASS: admin123
+      JWT_SECRET: MySuperSecretKeyThatIsAtLeast32Characters!
+      JWT_EXPIRATION: 86400000
+      TZ: UTC
+    networks:
+      - shop-network
+
+  frontend:
+    build: ./frontend
+    container_name: vegetable-shop-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080/api
+      TZ: UTC
+    networks:
+      - shop-network
+
+volumes:
+  db_data:
+
+networks:
+  shop-network:

@@ -1,0 +1,51 @@
+{{! ------------------------------------------------------------------------- }}
+{{! request.mustache — Request payload DTO (Lombok + Jackson + Jakarta Validation) }}
+{{! Notes:                                                                      }}
+{{! - Use for create/update requests.                                           }}
+{{! - Adds jakarta.validation constraints and OpenAPI @Schema metadata.         }}
+{{!                                                                             }}
+{{! Expected context keys (example):                                            }}
+{{!   packageName: com.veggieshop.catalog.api.dto.request                       }}
+{{!   className: CreateProductRequest                                           }}
+{{!   description: "Payload to create a product"                                }}
+{{!   imports: ["java.math.BigDecimal"]                                         }}
+{{!   fields: [                                                                 }}
+{{!     { "type":"String","name":"name","description":"Display name",           }}
+{{!       "required":true,"validationAnnotations":["@NotBlank"],                }}
+{{!       "example":"Banana" },                                                 }}
+{{!     { "type":"BigDecimal","name":"price","description":"Unit price",        }}
+{{!       "required":true,"validationAnnotations":["@NotNull","@Positive"] }    }}
+{{!   ]                                                                          }}
+{{! ------------------------------------------------------------------------- }}
+package {{packageName}};
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Value;
+import jakarta.validation.constraints.*;
+{{#imports}}
+import {{.}};
+{{/imports}}
+
+@Value
+@Builder(toBuilder = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(name = "{{className}}", description = "{{description}}")
+public class {{className}} {
+
+{{#fields}}
+  /** {{description}} */
+  @Schema(description = "{{description}}"{{#example}}, example = "{{example}}"{{/example}}{{^required}}, nullable = true{{/required}})
+  @JsonProperty("{{jsonName}}{{^jsonName}}{{name}}{{/jsonName}}")
+  {{#validationAnnotations}}
+  {{.}}
+  {{/validationAnnotations}}
+  {{#annotations}}
+  {{.}}
+  {{/annotations}}
+  {{type}} {{name}};
+{{/fields}}
+
+}

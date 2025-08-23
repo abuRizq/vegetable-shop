@@ -1,0 +1,227 @@
+# values.yaml — Default values for veggie-shop Helm chart
+# All comments are in English for clarity and best-practices guidance.
+
+# --- Application replicas ---
+replicaCount: 2
+
+# --- Container image ---
+image:
+  repository: ghcr.io/your-org/vegetable-shop/veggieshop-service
+  tag: ""                 # Leave empty to use .Chart.AppVersion or pass via --set image.tag=...
+  pullPolicy: IfNotPresent
+imagePullSecrets: []      # e.g., [{ name: regcred }]
+
+nameOverride: ""
+fullnameOverride: ""
+
+# --- Service Account ---
+serviceAccount:
+  create: true
+  name: ""                # if empty, a name is generated
+  annotations: {}
+
+# --- Pod Annotations / Labels ---
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "8080"
+podLabels: {}
+
+# --- Pod Security Context (applies to the Pod) ---
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# --- Container Security Context (applies to the main container) ---
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: false    # Spring Boot may write to /tmp; set to true only if you mount tmp as emptyDir
+
+# --- Service ---
+service:
+  type: ClusterIP
+  port: 8080
+  annotations: {}
+  labels: {}
+
+containerPort: 8080
+
+# --- Ingress ---
+ingress:
+  enabled: false
+  className: "nginx"               # or your ingress class
+  annotations: {}
+  hosts:
+    - host: api.veggieshop.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []                           # example:
+  #  - secretName: veggieshop-tls
+  #    hosts:
+  #      - api.veggieshop.example
+
+# --- Resources ---
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+# --- Probes (tuned for Spring Boot 3 Actuator) ---
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 6
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 6
+
+startupProbe:
+  httpGet:
+    path: /actuator/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 30
+
+# --- HPA (KEDA optional in the future). Disabled by default. ---
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# --- Pod Disruption Budget ---
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# --- ServiceMonitor (Prometheus Operator) ---
+serviceMonitor:
+  enabled: false
+  namespace: ""
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+  annotations: {}
+  path: /actuator/prometheus
+  portName: http
+
+# --- Extra Kubernetes settings ---
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+priorityClassName: ""
+
+# --- Environment variables for the app (non-sensitive) ---
+env:
+  - name: SPRING_PROFILES_ACTIVE
+    value: "prod"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+    value: "health,info,prometheus"
+  # Database (normally provided via Secret; URL may be non-sensitive)
+  - name: SPRING_DATASOURCE_URL
+    value: ""   # e.g., jdbc:postgresql://postgresql:5432/veggieshop
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    value: ""   # e.g., redpanda:9092 or kafka:9092
+  - name: SPRING_REDIS_HOST
+    value: ""   # e.g., redis-master
+  - name: SPRING_REDIS_PORT
+    value: ""   # e.g., "6379"
+  - name: MINIO_ENDPOINT
+    value: ""   # e.g., http://minio:9000
+
+# --- Secret management ---
+# Option A: Internal K8s Secret managed by this chart (not recommended for prod)
+secret:
+  enabled: false
+  name: veggieshop-app-secrets
+  stringData:
+    SPRING_DATASOURCE_USERNAME: ""
+    SPRING_DATASOURCE_PASSWORD: ""
+    JWT_SECRET: ""
+    MINIO_ACCESS_KEY: ""
+    MINIO_SECRET_KEY: ""
+
+# Option B: External Secrets Operator (ESO) (recommended for prod)
+externalSecret:
+  enabled: false
+  name: veggieshop-app-secrets
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ""           # e.g., aws-secretsmanager, gcp-secretmanager, vault
+  target:
+    creationPolicy: Owner
+  data:
+    # Each item maps from your external secret to a key inside the generated K8s Secret
+    - secretKey: SPRING_DATASOURCE_USERNAME
+      remoteRef:
+        key: "veggieshop/db/username"
+    - secretKey: SPRING_DATASOURCE_PASSWORD
+      remoteRef:
+        key: "veggieshop/db/password"
+    - secretKey: JWT_SECRET
+      remoteRef:
+        key: "veggieshop/jwt/secret"
+    - secretKey: MINIO_ACCESS_KEY
+      remoteRef:
+        key: "veggieshop/minio/accessKey"
+    - secretKey: MINIO_SECRET_KEY
+      remoteRef:
+        key: "veggieshop/minio/secretKey"
+
+# --- Environment from Secret/ConfigMap ---
+envFrom:
+  secrets:
+    - name: veggieshop-app-secrets
+  configMaps: []
+
+# --- Volumes (if you set readOnlyRootFilesystem: true, mount /tmp as emptyDir) ---
+extraVolumes: []
+extraVolumeMounts: []
+# Example:
+# extraVolumes:
+#   - name: tmp
+#     emptyDir: {}
+# extraVolumeMounts:
+#   - name: tmp
+#     mountPath: /tmp
+
+# --- Subchart dependencies toggles (Bitnami & Redpanda) ---
+postgresql:
+  enabled: false
+  auth:
+    username: veggie
+    password: veggie
+    database: veggieshop
+
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    enabled: false
+
+redpanda:
+  enabled: false

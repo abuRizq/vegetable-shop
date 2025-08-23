@@ -1,0 +1,6 @@
+postgresql:
+  enabled: false
+redis:
+  enabled: false
+redpanda:
+  enabled: false

@@ -1,0 +1,77 @@
+# CODEOWNERS for Vegetable Shop Backend
+# -------------------------------------
+# Important:
+# - Pattern order matters. The LAST matching rule takes precedence.
+#   Keep the global fallback at the top and put more specific rules below.
+# - Teams or users listed here must have at least write access to the repo.
+# - Replace team slugs (veggieshop/...) with your actual org/team names if different.
+
+# Global fallback owner (applies to everything not matched by more specific rules)
+* @veggieshop/maintainers
+
+# --- GitHub / CI ---
+/.github/ @veggieshop/infra
+/.github/workflows/ @veggieshop/infra
+/ci/** @veggieshop/infra
+
+# --- Root & documentation ---
+/LICENSE @veggieshop/maintainers
+/CODE_OF_CONDUCT.md @veggieshop/maintainers
+/CONTRIBUTING.md @veggieshop/maintainers
+/README.md @veggieshop/maintainers @veggieshop/architecture
+/ARCHITECTURE-TREE.md @veggieshop/architecture
+/docs/** @veggieshop/architecture
+/adr/** @veggieshop/architecture
+/architecture/** @veggieshop/architecture
+/guides/** @veggieshop/architecture
+
+# --- Config & infrastructure ---
+/.editorconfig @veggieshop/infra
+/.gitattributes @veggieshop/infra
+/.gitignore @veggieshop/infra
+/.dockerignore @veggieshop/infra
+/.java-version @veggieshop/infra
+/.env.example @veggieshop/infra @veggieshop/platform
+/.sops.yaml @veggieshop/infra
+/Makefile @veggieshop/backend
+/scripts/** @veggieshop/backend
+/docker/** @veggieshop/infra @veggieshop/platform
+/config/helm/** @veggieshop/platform @veggieshop/infra
+/config/local/** @veggieshop/platform
+/secrets/** @veggieshop/infra @veggieshop/platform
+/tools/codegen/** @veggieshop/api
+/tools/db/** @veggieshop/db
+/tests/** @veggieshop/qa
+
+# --- Maven build ---
+/pom.xml @veggieshop/maintainers @veggieshop/platform
+/.mvn/** @veggieshop/infra
+
+# --- Shared modules ---
+/modules/domain-kernel/** @veggieshop/architecture
+/modules/platform/** @veggieshop/platform
+/modules/platform-autoconfigure/** @veggieshop/platform
+/modules/platform-starter/** @veggieshop/platform
+/modules/messaging/** @veggieshop/integration
+/modules/migrations/** @veggieshop/db
+/modules/contracts/events/** @veggieshop/api @veggieshop/integration
+/modules/contracts/http/** @veggieshop/api
+/modules/testing/** @veggieshop/qa
+/modules/system-tests/** @veggieshop/qa
+
+# --- Bounded contexts ---
+/modules/contexts/context-auth/** @veggieshop/auth
+/modules/contexts/context-catalog/** @veggieshop/catalog
+/modules/contexts/context-inventory/** @veggieshop/inventory
+/modules/contexts/context-pricing/** @veggieshop/pricing
+/modules/contexts/context-customer/** @veggieshop/customer
+/modules/contexts/context-order/** @veggieshop/order
+/modules/contexts/context-checkout/** @veggieshop/checkout
+/modules/contexts/context-vendor/** @veggieshop/vendor
+/modules/contexts/context-media/** @veggieshop/media
+/modules/contexts/context-review/** @veggieshop/review
+/modules/contexts/context-notification/** @veggieshop/notification
+/modules/contexts/context-audit/** @veggieshop/audit
+
+# --- Applications ---
+/apps/veggieshop-service/** @veggieshop/backend @veggieshop/platform

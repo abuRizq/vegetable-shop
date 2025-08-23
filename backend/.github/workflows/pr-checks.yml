@@ -1,0 +1,47 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened, ready_for_review ]
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.head.sha || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    name: Maven verify (PR)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin) with Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build & test (fail fast on quality gates)
+        run: mvn -s ci/maven-settings.xml -B -U -ntp clean verify
+
+      - name: Upload test reports (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-test-reports
+          if-no-files-found: ignore
+          path: |
+            backend/**/target/surefire-reports/*
+            backend/**/target/failsafe-reports/*

@@ -1,0 +1,126 @@
+# =========================================================
+# Vegetable Shop :: backend.sops.yaml
+# Purpose: SOPS config to encrypt secrets across the backend repo.
+# Docs: https://github.com/getsops/sops
+#
+# IMPORTANT
+# - Replace AGE recipients below with your real public keys.
+# - Store private keys on dev machines/CI as: $SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt
+# - Keep only sensitive values encrypted; keep metadata/plain config readable.
+# - For ..env files, you may need `--input-type dotenv --output-type dotenv` when editing.
+# =========================================================
+
+# ------------------------------
+# Recipients (placeholders)
+# ------------------------------
+# Example Age recipients (REPLACE with your keys):
+#   DEV  : age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#   CI   : age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#   PROD : age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# ------------------------------
+# Creation rules
+# ------------------------------
+creation_rules:
+
+  # --- Kubernetes Secrets (dev) ---
+  - path_regex: ^secrets/dev-app\.ya?ml$
+    key_groups:
+      - age:
+          - age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # Encrypt only data fields; leave metadata unencrypted
+    encrypted_regex: '^(data|stringData)$'
+    unencrypted_regex: '^(apiVersion|kind|metadata|type|name|namespace|labels|annotations)$'
+    mac_only_encrypted: true
+
+  # --- Kubernetes Secrets (staging) ---
+  - path_regex: ^secrets/staging-app\.ya?ml$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '^(data|stringData)$'
+    unencrypted_regex: '^(apiVersion|kind|metadata|type|name|namespace|labels|annotations)$'
+    mac_only_encrypted: true
+
+  # --- Kubernetes Secrets (prod) ---
+  - path_regex: ^secrets/prod-app\.ya?ml$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '^(data|stringData)$'
+    unencrypted_regex: '^(apiVersion|kind|metadata|type|name|namespace|labels|annotations)$'
+    mac_only_encrypted: true
+
+  # --- Generic secrets under /secrets (fallback) ---
+  - path_regex: ^secrets/.*\.(ya?ml|json|toml)$
+    key_groups:
+      - age:
+          - age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # Encrypt common secret-like keys even in generic config files
+    encrypted_regex: '(?i)(^|\.)(data|stringData|password|secret|token|api[-_]?key|client[-_]?secret|private[-_]?key|access[-_]?key|connectionString)$'
+    mac_only_encrypted: true
+
+  # --- Helm values (local) ---
+  # Encrypt only real secrets; leave non-sensitive configs intact.
+  - path_regex: ^config/helm/veggie-shop/values-local\.ya?ml$
+    key_groups:
+      - age:
+          - age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '(?i)(^|\.)(password|secret|token|api[-_]?key|client[-_]?secret|connectionString|credentials)$'
+    # Keep common, non-sensitive Helm keys unencrypted
+    unencrypted_regex: '^(name|namespace|replicaCount|image|image\.repository|image\.tag|imagePullSecrets|service|ingress|resources|nodeSelector|tolerations|affinity|autoscaling|hpa|pdb)$'
+    mac_only_encrypted: true
+
+  # --- Helm values (staging/prod) ---
+  - path_regex: ^config/helm/veggie-shop/values-(staging|prod)\.ya?ml$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '(?i)(^|\.)(password|secret|token|api[-_]?key|client[-_]?secret|connectionString|credentials)$'
+    unencrypted_regex: '^(name|namespace|replicaCount|image|image\.repository|image\.tag|imagePullSecrets|service|ingress|resources|nodeSelector|tolerations|affinity|autoscaling|hpa|pdb)$'
+    mac_only_encrypted: true
+
+  # --- Helm templates that embed literal Secret data (if any) ---
+  - path_regex: ^config/helm/veggie-shop/templates/(secrets|external-secret)\.ya?ml$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '^(data|stringData)$'
+    mac_only_encrypted: true
+
+  # --- ..env files (any environment) ---
+  # NOTE: Use: sops --input-type dotenv --output-type dotenv backend/..env.prod
+  - path_regex: ^(.*/)?\..env(\.local|\.staging|\.prod)?$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    # Encrypt every key/value line except comments
+    encrypted_regex: '^(?!\s*#).+'
+    mac_only_encrypted: true
+
+  # --- Docker .env files (migrator, etc.) ---
+  - path_regex: ^docker/.*/\..env$
+    key_groups:
+      - age:
+          - age1devxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '^(?!\s*#).+'
+    mac_only_encrypted: true
+
+  # --- Catch-all for any file named like *secret* or *credentials* ---
+  - path_regex: (?i).*(secret|secrets|credential|credentials)\.(ya?ml|json|toml|ini)$
+    key_groups:
+      - age:
+          - age1proxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - age1cixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    encrypted_regex: '(?i)(^|\.)(password|secret|token|api[-_]?key|client[-_]?secret|private[-_]?key|access[-_]?key|connectionString|credentials)$'
+    mac_only_encrypted: true

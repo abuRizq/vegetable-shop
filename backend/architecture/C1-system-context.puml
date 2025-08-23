@@ -1,0 +1,53 @@
+@startuml C1-system-context
+title VeggieShop — C1: System Context
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam rectangle {
+  RoundCorner 18
+  BackgroundColor #E8F3FF
+  BorderColor #4A90E2
+}
+skinparam note {
+  BackgroundColor #FFFBE6
+  BorderColor #D5B700
+}
+left to right direction
+
+' Actors
+actor "Customer\n(Shopper)" as Customer #99CC66
+actor "Admin / Support" as Admin #99CC66
+
+' System under design
+rectangle "VeggieShop Backend\n[System]" as Backend #D6EAF8
+
+' External systems
+rectangle "Payment Gateway\n(e.g., Stripe/Adyen)" as Pay #FFF2CC
+rectangle "OAuth Provider\n(Google OAuth2)" as OAuth #FFF2CC
+rectangle "Email/SMS Provider\n(SMTP/SMS API)" as Comm #FFF2CC
+rectangle "Media Storage / CDN\n(e.g., S3 + CDN)" as CDN #FFF2CC
+rectangle "Analytics / Monitoring\n(APM/Logs/Metrics)" as APM #FFF2CC
+
+' Interactions
+Customer --> Backend : Browse catalog\nAdd to cart / Checkout\nManage account
+Admin --> Backend : Catalog & inventory admin\nOrders & customers\nPromotions
+
+Backend --> Pay   : Charge / Refund / Capture
+Backend --> OAuth : Sign-in with / Link Account
+Backend --> Comm  : Email/SMS notifications
+Backend --> CDN   : Upload / Serve media
+Backend --> APM   : Metrics, traces, logs
+
+note bottom of Backend
+  Exposes REST APIs with JWT auth, Problem Details (RFC 7807), and OpenAPI.
+  Publishes domain events via outbox → Kafka to integrate bounded contexts.
+end note
+
+legend right
+  |= Element =|= Meaning |
+  | Green actor | External user/role |
+  | Blue box | System under design |
+  | Yellow box | External system |
+endlegend
+@enduml

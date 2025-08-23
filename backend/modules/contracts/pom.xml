@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vegetable Shop :: Contracts (event schemas + HTTP OpenAPI specifications) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Inherit versions, pluginManagement, and company-wide conventions -->
+  <parent>
+    <groupId>com.veggieshop</groupId>
+    <artifactId>backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>contracts</artifactId>
+  <name>Vegetable Shop :: Contracts</name>
+  <description>Canonical contracts: event JSON schemas and HTTP OpenAPI specifications</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- JPMS-friendly name; keeps the artifact consumable in modular projects -->
+    <automatic.module.name>com.veggieshop.contracts</automatic.module.name>
+    <!-- OpenAPI generator plugin version (used only in validation/codegen profiles) -->
+    <openapi.generator.version>7.7.0</openapi.generator.version>
+  </properties>
+
+  <!--
+    This module is resource-only by design.
+    It exposes:
+      - src/main/resources/events/schema/**      (event JSON Schemas)
+      - src/main/resources/http/openapi/**       (OpenAPI YAML files)
+    No runtime dependencies are required.
+  -->
+  <dependencies>
+    <!-- Keep it empty on purpose (contracts are consumed as classpath resources). -->
+
+    <!-- Test utilities if you add schema lint tests later -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <!-- Ship OpenAPI and event schemas as-is on the classpath -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>events/schema/**</include>
+          <include>http/openapi/**</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <!-- Add a stable Automatic-Module-Name to the JAR manifest -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Inherit compiler/test/coverage/formatting/static-analysis from the parent POM.
+           No Spring Boot repackage here: this is a library of contract resources. -->
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      contract-validate: validate all OpenAPI YAMLs using OpenAPI Generator.
+      - Not bound by default; activate explicitly:  mvn -Pcontract-validate validate
+      - Fails the build if any spec is invalid.
+    -->
+    <profile>
+      <id>contract-validate</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>${openapi.generator.version}</version>
+            <executions>
+              <!-- One validate execution per spec keeps logs readable.
+                   You can add/remove specs here as your catalog grows. -->
+              <execution>
+                <id>validate-auth</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/auth.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-catalog</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/catalog.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-inventory</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/inventory.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-order</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/order.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-pricing</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/pricing.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-customer</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/customer.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-checkout</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/checkout.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-vendor</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/vendor.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-media</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/media.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-review</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/review.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-notification</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/notification.yaml</inputSpec>
+                </configuration>
+              </execution>
+              <execution>
+                <id>validate-audit</id>
+                <phase>validate</phase>
+                <goals><goal>validate</goal></goals>
+                <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/http/openapi/audit.yaml</inputSpec>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      contract-codegen (optional): generate lightweight DTOs/clients from a chosen spec.
+      Usage example:
+        mvn -Pcontract-codegen org.openapitools:openapi-generator-maven-plugin:${openapi.generator.version}:generate \
+            -DinputSpec=src/main/resources/http/openapi/order.yaml \
+            -DgeneratorName=java \
+            -DapiPackage=com.veggieshop.contracts.order.api \
+            -DmodelPackage=com.veggieshop.contracts.order.model \
+            -Dlibrary=resttemplate \
+            -DgenerateApis=true -DgenerateModels=true -DgenerateModelTests=false -DgenerateApiTests=false
+      NOTE: No executions are bound to the lifecycle here; call the plugin directly with -D props.
+    -->
+    <profile>
+      <id>contract-codegen</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>${openapi.generator.version}</version>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
