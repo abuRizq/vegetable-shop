@@ -1,14 +1,12 @@
 "use client";
 
-import Header from "@/app/_Components/header/header";
-import Catagry from "@/app/_Components/main/catagry";
-import HeroSlider from "@/app/_Components/main/Hero";
 
 
-
+import { Catagry, HeroSlider } from "@/widgets/home-widgets/"
+import { Header } from "@/widgets/header/";
 
 // ----------- Main Page -----------
-export default function HomePage  ()  {
+export default function HomePage() {
   return (
     <div
       className="min-h-screen w-full content-transition"

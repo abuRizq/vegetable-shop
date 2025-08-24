@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { RegisterFormData, registerSchema } from "@/app/lib/schemas/register"
+import { RegisterFormData, registerSchema } from "@/shared/lib/schemas/register"
 import { useAuth } from "@/app/hooks/useAuth"
 
 export const RegisterForm = () => {

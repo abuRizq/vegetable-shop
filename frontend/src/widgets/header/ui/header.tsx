@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
-import ThemeToggle from "../cross-componets/theme-toggle"
+import ThemeToggle from "../../../app/_Components/cross-componets/theme-toggle"
 import { useAuth } from "@/app/hooks/useAuth"
 import { useRouter } from "next/navigation";
 import { useLogoutMution } from "@/app/hooks/auth";
@@ -13,7 +13,7 @@ function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  const {mutate: logout } = useLogoutMution({
+  const { mutate: logout } = useLogoutMution({
     onSuccess: (data) => {
       console.log("Data is here!!: ", data)
     },
@@ -286,4 +286,4 @@ function Header() {
   );
 }
 
-export default Header
+export { Header }

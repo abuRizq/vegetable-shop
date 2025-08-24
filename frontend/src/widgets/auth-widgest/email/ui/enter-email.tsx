@@ -21,7 +21,7 @@ function generateCode(len = 6) {
     return Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join("")
 }
 
-export default function EnterEmail({
+function EnterEmail({
     title = "Forgot your password?",
     subtitle = "Enter your email and we'll send you a 6‑digit code to verify it’s you.",
     buttonText = "Send verification code",
@@ -143,3 +143,6 @@ export default function EnterEmail({
     )
 }
 
+export {
+    EnterEmail
+}

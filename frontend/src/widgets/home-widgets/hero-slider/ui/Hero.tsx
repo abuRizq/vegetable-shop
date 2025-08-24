@@ -212,7 +212,7 @@ function ArrowButton({ dir, onClick }: { dir: "prev" | "next"; onClick: () => vo
 }
 
 // ---------- Main Slider ----------
-export default function HeroSlider({
+function HeroSlider({
   slides = defaultSlides,
   autoPlayMs = 5000,
   className = "",
@@ -353,7 +353,9 @@ export default function HeroSlider({
     </section>
   )
 }
-
+export {
+  HeroSlider
+}
 /*
 USAGE
 ------

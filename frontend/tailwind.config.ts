@@ -3,9 +3,10 @@ import type { Config } from 'tailwindcss'
 const config: Config = {
   darkMode: 'class',  // Enabling dark mode based on class, you can also use 'media'
   content: [
-    './src/app/**/*.{js,ts,jsx,tsx}',
-    './src/pages/**/*.{js,ts,jsx,tsx}',
-    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/**/*.{js,ts,jsx,tsx}',     // ✅ ADD THIS
+    './app/**/*.{js,ts,jsx,tsx}',     // ✅ Keep this
+    './pages/**/*.{js,ts,jsx,tsx}',   // ✅ If using pages
+    './widget/**/*.{js,ts,jsx,tsx}', // ✅ If you have components
   ],
   theme: {
     extend: {

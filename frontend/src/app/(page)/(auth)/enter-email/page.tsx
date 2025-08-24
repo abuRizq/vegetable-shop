@@ -1,6 +1,6 @@
 "use client"
 
-import EnterEmail from "@/app/_Components/Email/enter-email";
+import {EnterEmail} from "@/widgets/auth-widgest/";
 import { useParams, useRouter } from "next/navigation"
 
 export default function EnterEmailPage() {
