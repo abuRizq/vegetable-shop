@@ -3,14 +3,14 @@
 import { useState } from "react"
 
 import { User, Settings, Bell, Shield, Palette, Truck, CreditCard, Key, Leaf } from "lucide-react"
-import { AccountPreferences } from "@/app/_Components/Setting/account-preferences"
-import { DeliveryPreferences } from "@/app/_Components/Setting/delivery-preferences"
-import { NotificationSettings } from "@/app/_Components/Setting/notification-settings"
-import { PaymentMethods } from "@/app/_Components/Setting/payment-methods"
-import { PrivacyControls } from "@/app/_Components/Setting/privacy-controls"
-import { ProfileSettings } from "@/app/_Components/Setting/profile-settings"
-import { SecuritySettings } from "@/app/_Components/Setting/security-settings"
-import { ThemeAppearance } from "@/app/_Components/Setting/theme-appearance"
+import { AccountPreferences } from "@/widgets/Setting/account-preferences"
+import { DeliveryPreferences } from "@/widgets/Setting/delivery-preferences"
+import { NotificationSettings } from "@/widgets/Setting/notification-settings"
+import { PaymentMethods } from "@/widgets/Setting/payment-methods"
+import { PrivacyControls } from "@/widgets/Setting/privacy-controls"
+import { ProfileSettings } from "@/widgets/Setting/profile-settings"
+import { SecuritySettings } from "@/widgets/Setting/security-settings"
+import { ThemeAppearance } from "@/widgets/Setting/theme-appearance"
 
 const settingsTabs = [
     { id: "profile", label: "Profile", icon: User, component: ProfileSettings },

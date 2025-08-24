@@ -1,4 +1,4 @@
-import ReturntoHome from "@/app/_Components/cross-componets/returnto-home";
+import ReturntoHome from "@/shared/ui/returnto-home";
 
 
 

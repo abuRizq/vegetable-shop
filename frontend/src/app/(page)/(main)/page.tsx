@@ -1,8 +1,6 @@
 "use client";
 
-
-
-import { Catagry, HeroSlider } from "@/widgets/home-widgets/"
+import { HeroSlider, Category } from "@/widgets/home-widgets/"
 import { Header } from "@/widgets/header/";
 
 // ----------- Main Page -----------
@@ -15,7 +13,7 @@ export default function HomePage() {
       <main className="min-h-screen">
         <Header />
         <HeroSlider />
-        <Catagry />
+        <Category />
         {/* Seasonal & Freshly Arrived Sections */}
         {/* <SeasonalSection /> */}
         {/* <FreshlyArrived /> */}

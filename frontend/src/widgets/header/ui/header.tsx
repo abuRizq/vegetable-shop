@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
-import ThemeToggle from "../../../app/_Components/cross-componets/theme-toggle"
+import ThemeToggle from "../../../shared/ui/theme-toggle"
 import { useAuth } from "@/app/hooks/useAuth"
 import { useRouter } from "next/navigation";
 import { useLogoutMution } from "@/app/hooks/auth";
