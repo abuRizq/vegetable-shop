@@ -1,5 +1,5 @@
-import { baseURL } from '@/app/constants';
-import { User } from '@/app/types/auth';
+import { baseURL } from '@/shared/constants';
+import { User } from '@/shared/types/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 

@@ -1,7 +1,7 @@
 // import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { User } from "@/app/types/auth";
-import { baseURL } from "@/app/constants";
+import type { User } from "@/shared/types/auth";
+import { baseURL } from "@/shared/constants";
 import { NextResponse } from "next/server";
 
 const GET = async () => {

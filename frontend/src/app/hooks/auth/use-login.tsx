@@ -1,4 +1,4 @@
-import { LoginCredentials } from "@/app/types/auth";
+import { LoginCredentials } from "@/shared/types/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type TLoginMution = {
