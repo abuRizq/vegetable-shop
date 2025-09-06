@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+ 
 /* Light theme (default) */
 :root {
   /* Primary */

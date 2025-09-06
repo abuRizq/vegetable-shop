@@ -9,7 +9,7 @@ export default {
         './pages/**/*.{js,ts,jsx,tsx}',   // ✅ If using pages
         './components/**/*.{js,ts,jsx,tsx}', // ✅ If you have components
     ],
-     theme: {
+    theme: {
         extend: {
             colors: {
                 // Primary colors for both themes
