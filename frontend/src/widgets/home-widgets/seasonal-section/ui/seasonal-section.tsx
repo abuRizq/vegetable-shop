@@ -113,7 +113,7 @@ const getSeasonIcon = (season: string) => {
     }
 }
 
-const getFreshnessColor = (freshness: string) => {
+const getFreshnessColor = ( freshness: string) => {
     switch (freshness) {
         case "just-arrived":
             return "hsl(var(--accent))"

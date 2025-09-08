@@ -349,10 +349,10 @@ export const LoginForm = () => {
           </div>
           <div className="mt-3 text-center">
             <Link
-              href={"/EnterEmail"}
+              href={"/forget-password"}
               type="button"
               className="font-medium transition-colors duration-200 hover:underline text-red-500"
-            // style={{ color: "hsl(var(--primary))" }}
+              // style={{ color: "hsl(var(--primary))" }}
             >
               Forget Password ?
             </Link>
