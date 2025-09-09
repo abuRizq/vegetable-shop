@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Mail, Leaf, Loader2, Send } from "lucide-react"
-import { useAuth } from "@/app/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth"
 // import { ToastContainer, toast } from 'react-toastify';
 
 type EnterEmailProps = {

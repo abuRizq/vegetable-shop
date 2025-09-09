@@ -7,7 +7,7 @@ import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "luci
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { RegisterFormData, registerSchema } from "@/shared/lib/schemas/register"
-import { useAuth } from "@/app/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth"
 
 export const RegisterForm = () => {
     const { Register } = useAuth()

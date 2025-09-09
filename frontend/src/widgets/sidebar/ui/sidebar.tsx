@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
 import NavItem from "./nav-item"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/app/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)

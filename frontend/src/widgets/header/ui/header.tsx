@@ -5,9 +5,9 @@ import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
 import ThemeToggle from "../../../shared/ui/theme-toggle"
-import { useAuth } from "@/app/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation";
-import { useLogoutMution } from "@/app/hooks/auth";
+import { useLogoutMution } from "@/hooks/auth";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
