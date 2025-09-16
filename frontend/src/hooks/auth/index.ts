@@ -1,4 +1,4 @@
-export * from './use-logout';
-export * from './use-login';
+export * from '../../features/auth/logout/api/use-logout';
+export * from '../../features/auth/login/api/use-login';
 export * from './me';
-export * from './use-register';
+export * from '../../features/auth/register/api/use-register';

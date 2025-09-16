@@ -5,8 +5,10 @@ type TLoginMution = {
     onSuccess?: (data: void, variables: LoginCredentials, context: unknown) => unknown;
     onError?: (error: Error, variables: LoginCredentials, context: unknown) => unknown;
 }
+
 const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
     const queryClient = useQueryClient();
+    
     return useMutation({
         mutationFn: async (credentials: LoginCredentials) => {
                 const response = await fetch(`/api/auth/login`, {
@@ -38,6 +40,7 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
             };
         }
     });
+
 }
 
 export { useLoginMution };

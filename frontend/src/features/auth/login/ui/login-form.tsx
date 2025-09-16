@@ -5,14 +5,13 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
-import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart, Variable } from "lucide-react"
+import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart} from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMution } from '@/hooks/auth';
-import { LoginFormData, LoginSchema } from "@/shared/lib/schemas/login"
+import { LoginFormData, LoginSchema } from "@/features/auth/login/lib/validation"
 export const LoginForm = () => {
-
   const router = useRouter()
   const { isAuthenticated } = useAuth()
   const [showPassword, setShowPassword] = useState(false)

@@ -16,3 +16,4 @@ export const registerSchema = z.object({
         path: ["confirmPassword"], // 👈 error will be shown under confirmPassword
     })
 export type RegisterFormData = z.infer<typeof registerSchema>;
+    
