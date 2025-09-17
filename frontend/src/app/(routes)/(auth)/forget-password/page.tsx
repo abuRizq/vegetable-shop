@@ -1,6 +1,6 @@
 "use client"
 
-import {  OtpInput } from '@/widgets/auth-widgest/'
+import { OtpInput } from '@/features/auth/foreget-password'
 import React from 'react'
 
 function page() {

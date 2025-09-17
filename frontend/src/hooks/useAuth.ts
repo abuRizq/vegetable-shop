@@ -77,7 +77,7 @@ export const useAuth = () => {
             staleTime: 0, // Always fresh check
         });
     };
-    const isAuthenticated = !!(user && !isError);
+    const isAuthenticated = !!(user && !isError);   
     const isLoading = isCheckingAuth || LoginMution.isPending;
     return {
         user,

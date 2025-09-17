@@ -1,6 +1,5 @@
-import { RegisterCredentials } from "@/shared/types/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { unknown } from "zod";
+import { RegisterCredentials } from "../lib/type";
 
 
 type TregistrMution = {

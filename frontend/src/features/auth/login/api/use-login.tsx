@@ -1,5 +1,5 @@
-import { LoginCredentials } from "@/shared/types/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoginCredentials } from "../lib/type";
 
 type TLoginMution = {
     onSuccess?: (data: void, variables: LoginCredentials, context: unknown) => unknown;
@@ -8,20 +8,20 @@ type TLoginMution = {
 
 const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: async (credentials: LoginCredentials) => {
-                const response = await fetch(`/api/auth/login`, {
+            const response = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(credentials),
-            });            
+            });
             if (!response.ok) {
                 const errorData = await response
-                .json()
-                .catch(() => ({ error: 'Failed to parse error response' }));
+                    .json()
+                    .catch(() => ({ error: 'Failed to parse error response' }));
                 throw new Error(errorData.message || 'Failed to create user');
             }
             return response.json();
@@ -29,13 +29,13 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
         onSuccess: (data, variables, ctx) => {
             queryClient.invalidateQueries({ queryKey: ["user"] });
             queryClient.setQueryData(["user"], data.user);
-            if(!!onSuccess) {
+            if (!!onSuccess) {
                 onSuccess(data, variables, ctx)
             };
         },
         onError: (error, variables, ctx) => {
             console.error(error)
-            if(!!onError) {
+            if (!!onError) {
                 onError(error, variables, ctx)
             };
         }

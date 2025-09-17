@@ -1,6 +1,6 @@
 // src/app/lib/auth-server.ts (server-only)
 import { cookies } from "next/headers";
-import type { User } from "../types/auth";
+import type { User } from "../lib/auth";
 
 export async function getCurrentUser(): Promise<User | null> {
     const token = (await cookies()).get("at")?.value;

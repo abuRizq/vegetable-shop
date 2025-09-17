@@ -5,6 +5,7 @@ type MvirfyMution = {
     onSuccess?: (data: void, variables: unknown, context: unknown) => void;
     onError?: (error: Error, variables: unknown, context: unknown) => void;
 }
+
 const MeMution = ({ onError, onSuccess }: MvirfyMution) => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -20,12 +21,14 @@ const MeMution = ({ onError, onSuccess }: MvirfyMution) => {
             }
             return respons.data.josn();
         },
+
         onSuccess: (data, variables, ctx) => {
             queryClient.setQueryData(["user"], data.user);
             if (!!onSuccess) {
                 onSuccess(data, variables, ctx)
             };
         },
+
         onError: (error, variables, ctx) => {
             console.error(error)
             if (!!onError) {

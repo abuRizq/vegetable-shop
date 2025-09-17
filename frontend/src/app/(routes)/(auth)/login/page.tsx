@@ -1,6 +1,6 @@
 "use client"
 
-import { LoginForm } from '@/widgets/auth-widgest/'
+import { LoginForm } from '@/features/auth/login'
 import React from 'react'
 
 function page() {

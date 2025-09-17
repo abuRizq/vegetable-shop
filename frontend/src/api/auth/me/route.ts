@@ -1,6 +1,6 @@
 // import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { User } from "@/shared/types/auth";
+import type { User } from "@/shared/lib/auth";
 import { baseURL } from "@/shared/constants";
 import { NextResponse } from "next/server";
 

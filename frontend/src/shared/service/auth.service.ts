@@ -1,4 +1,4 @@
-import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../types/auth";
+import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../lib/auth";
 function setTokenToLoacalStorage(token: string): void {
     if (typeof window !== 'undefined') {
         localStorage.setItem('auth_token', token);
