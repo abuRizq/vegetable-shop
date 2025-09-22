@@ -14,7 +14,7 @@ const useAuthQuery = () => {
                 throw new Error(errorData.message || 'Failed to create user');
             }
             return await response.json()
-        },
+        },  
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         retry: (failureCount, error: any) => {
             if (error.massage.includes('Authentication expired') || error.massage.includes('No authentication token')) {

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { authService } from "../shared/service/auth.service";
-// import { USER_QK } from "../types/auth";
 
 const Authkey = {
     all: ['user'] as const,

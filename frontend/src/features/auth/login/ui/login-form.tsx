@@ -30,8 +30,6 @@ export const LoginForm = () => {
       console.log(ctx);
     }
   })
-
-  
   const {
     register,
     handleSubmit,

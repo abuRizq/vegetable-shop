@@ -16,15 +16,16 @@
     "@tanstack/react-query-devtools": "^5.84.1",
     "@tanstack/react-query-next-experimental": "^5.85.2",
     "lucide-react": "^0.526.0",
-    "next": "15.4.4",
-    "next-themes": "^0.4.6",  
+    "next": "^15.5.3",
+    "next-themes": "^0.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "react-toastify": "^11.0.5",
     "remixicon-react": "^1.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
