@@ -5,13 +5,13 @@ import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
 import ThemeToggle from "../../../shared/ui/theme-toggle"
-import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation";
-import { useLogoutMution } from "@/hooks/auth";
+import { useLogoutMution } from "@/features/auth/logout/api/use-logout";
+import { useAuthStore } from "@/entities/user/model/store";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const { mutate: logout } = useLogoutMution({
     onSuccess: (data) => {
@@ -21,7 +21,6 @@ function Header() {
       console.error(error.message)
     }
   })
-
   const onSubmit = async () => {
     setShowProfileMenu(false);
     logout()
@@ -45,7 +44,7 @@ function Header() {
       <div className="flex-1 max-w-2xl">
         <Searchbar />
       </div>
-
+      
       {/* Right Section - User Profile & Actions */}
       <div className="flex items-center space-x-4 ml-6 flex-shrink-0">
         {/* Notifications */}

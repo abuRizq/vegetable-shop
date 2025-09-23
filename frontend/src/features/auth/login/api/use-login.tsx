@@ -1,46 +1,61 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
+import { useAuthStore } from "@/entities/user/model/store";
 
 type TLoginMution = {
-    onSuccess?: (data: void, variables: LoginCredentials, context: unknown) => unknown;
-    onError?: (error: Error, variables: LoginCredentials, context: unknown) => unknown;
-}
-
+  onSuccess?: (
+    data: void,
+    variables: LoginCredentials,
+    context: unknown
+  ) => unknown;
+  onError?: (
+    error: Error,
+    variables: LoginCredentials,
+    context: unknown
+  ) => unknown;
+};
 const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (credentials: LoginCredentials) => {
-            const response = await fetch(`/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            });
-            if (!response.ok) {
-                const errorData = await response
-                    .json()
-                    .catch(() => ({ error: 'Failed to parse error response' }));
-                throw new Error(errorData.message || 'Failed to create user');
-            }
-            return response.json();
+  const queryClient = useQueryClient();
+  const { login, setError, clearError } = useAuthStore(); // Get store actions
+  return useMutation({
+    mutationFn: async (credentials: LoginCredentials) => {
+      const response = await fetch(`/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        onSuccess: (data, variables, ctx) => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
-            queryClient.setQueryData(["user"], data.user);
-            if (!!onSuccess) {
-                onSuccess(data, variables, ctx)
-            };
-        },
-        onError: (error, variables, ctx) => {
-            console.error(error)
-            if (!!onError) {
-                onError(error, variables, ctx)
-            };
-        }
-    });
-
-}
+        body: JSON.stringify(credentials),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to parse error response" }));
+        throw new Error(errorData.message || "Failed to create user");
+      }
+      return response.json();
+    },
+    onSuccess: (data, variables, ctx) => {
+      const user = data.data?.user || data.user;
+      if (user) {
+        login(data);
+        clearError();
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      }
+      queryClient.setQueryData(["user"], data.user);
+      if (onSuccess) {
+        onSuccess(data, variables, ctx);
+      }
+    },
+    onError: (error, variables, ctx) => {
+      console.error(error);
+      if (!!onError) {
+        onError(error, variables, ctx);
+        setError(error.message);
+      }
+    },
+  });
+};
 
 export { useLoginMution };

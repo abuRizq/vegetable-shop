@@ -17,7 +17,7 @@ export function QueryProviders({ children, dehydratedState }: any) {
                     },
                 },
             })
-    );
+        );      
     return (
         <QueryClientProvider client={queryClient}>
             {children}  

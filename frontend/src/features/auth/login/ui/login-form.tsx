@@ -1,19 +1,17 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
 import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart} from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMution } from '@/hooks/auth';
-import { LoginFormData, LoginSchema } from "@/features/auth/login/lib/validation"
+import { LoginFormData, LoginSchema } from "../lib/validation"
+import { useLoginMution } from "../api/use-login"
+import { useAuthStore } from "@/entities/user/model/store"
 export const LoginForm = () => {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)

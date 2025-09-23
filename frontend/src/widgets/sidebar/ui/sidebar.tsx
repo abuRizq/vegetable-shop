@@ -5,11 +5,11 @@ import { useState } from "react"
 import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
 import NavItem from "./nav-item"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuthStore } from "@/entities/user/model/store"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
-    const { user, } = useAuth();
+    const { user, } = useAuthStore();
     const route = useRouter();
     const onSubmit = async () => {
         if (user) {
@@ -26,7 +26,7 @@ function Sidebar() {
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed)
     }
-    const isLoggedIn = user != null;
+    // const isLoggedIn = user != null;
 
     return (
         <aside
@@ -35,7 +35,7 @@ function Sidebar() {
             border-r shadow-2xl
             transition-all duration-500 ease-in-out relative
             backdrop-blur-xl sidebar-transition
-            fixed left-0 top-0 z-10
+             left-0 top-0 z-10
             ${isCollapsed ? "w-[80px]" : "w-[280px]"}
         `}
             style={{

@@ -1,4 +1,10 @@
-import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../lib/auth";
+import { User } from "@/entities/user";
+import { VerifyResetTokenResponse, ResetPasswordRequest, ResetPasswordResponse } from "@/features/auth/foreget-password/lib/type";
+import { LoginCredentials, LoginResponse } from "@/features/auth/login/lib/type";
+import { RegisterCredentials } from "@/features/auth/register/lib/type";
+
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
+// import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../lib/auth";
 function setTokenToLoacalStorage(token: string): void {
     if (typeof window !== 'undefined') {
         localStorage.setItem('auth_token', token);
@@ -14,79 +20,7 @@ function removeTokenFromLocalStorage(): void {
     localStorage.removeItem('auth_token');
 }
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
-
 class AuthService {
-    async validateTokenAndGetUser(): Promise<User | null> {
-        try {
-            const response = await fetch(`http://localhost:8080/api/users/me`, {
-                method: 'GET',
-            });
-            if (!response.ok) {
-                return null
-            }
-            const data = await response.json();
-            const User = data.data;
-            console.log("form the vrfiy fun :" + data.token);
-            return User;
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    }
-    
-    async login(credentials: LoginCredentials): Promise<LoginResponse> {
-        try {
-            const response = await fetch(`/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            });
-            if (!response.ok) {
-                console.log("this is the response " + response);
-                const errorData = await (response).json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}: Login failed`);
-            }
-            const body = await response.json();
-            const data = body.data;
-            setTokenToLoacalStorage(data.token)
-            if (!data.token || !data.user) {
-                console.log("this is the response " + response.json());
-                throw new Error('Invalid response format from server');
-            }
-            return data;
-        } catch (error) {
-            console.error('Error during login:', error);
-            // removeTokenFromLocalStorage();
-            throw error;
-        }
-    }
-    async Register(credentials: RegisterCredentials): Promise<LoginResponse> {
-        try {
-            const response = await fetch(`${baseURL}/users/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(credentials),
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || `HTTP ${response.status}: Registration failed`);
-            }
-            const data: LoginResponse = await response.json();
-            if (!data.token || !data.user) {
-                throw new Error('Invalid response format from server');
-            }
-            // setTokenToLoacalStorage(data.token);
-            return data;
-        } catch (error) {
-            removeTokenFromLocalStorage();
-            throw error;
-        }
-    }
     async sendResetPasswordLink(eamil: string): Promise<void> {
         try {
             const response = await fetch(`${baseURL}/`, {

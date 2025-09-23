@@ -1,8 +1,8 @@
 // import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { User } from "@/shared/lib/auth";
 import { baseURL } from "@/shared/constants";
 import { NextResponse } from "next/server";
+import { User } from "@/entities/user";
 
 const GET = async () => {
     const token = (await cookies()).get("at")?.value;

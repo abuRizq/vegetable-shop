@@ -1,17 +1,28 @@
 "use client"
 
 import type React from "react"
-import { use, useState } from "react"
+import {  useState } from "react"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { RegisterFormData, registerSchema } from "@/features/auth/register/lib/register"
-import { useAuth } from "@/hooks/useAuth"
+import { useRegisterMution } from '../api/use-register'
 
 export const RegisterForm = () => {
-    const { Register } = useAuth()
-    const {
+    const { mutate: Register } = useRegisterMution({
+        onSuccess: (data , Variable,ctx ) => {
+          console.log(data);
+          console.log(Variable);
+          console.log(ctx);
+        },
+        onError: (error, Varibles, ctx) => {
+          console.error(error);
+          console.log(Varibles);
+          console.log(ctx);
+        }
+      })    
+      const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting }
@@ -41,15 +52,13 @@ export const RegisterForm = () => {
                 setRegisterError({ massage: "Registration failed. Please try again." })
                 return;
             }
-            await Register({
+             Register({
                 name: data.firstname + " " + data.lastname,
                 email: data.email,
                 password: data.password,
                 role: "ADMIN"
             });
 
-            // console.log("Registration successful:", data)
-            // router.push("/login?registered=true")
         } catch (error) {
             setRegisterError({ massage: "Registration failed. Please try again." })
         } finally {
