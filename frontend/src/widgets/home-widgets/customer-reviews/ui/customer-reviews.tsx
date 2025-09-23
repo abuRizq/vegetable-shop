@@ -356,7 +356,7 @@ export function CustomerReviews() {
                                     {currentReview.title}
                                 </h4>
                                 <p className="text-lg leading-relaxed" style={{ color: "hsl(var(--text-secondary))" }}>
-                                    "{currentReview.review}"
+                                    {/* "{currentReview.review}" */}
                                 </p>
                             </div>
 

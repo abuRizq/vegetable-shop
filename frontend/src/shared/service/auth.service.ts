@@ -1,15 +1,10 @@
-import { User } from "@/entities/user";
 import { VerifyResetTokenResponse, ResetPasswordRequest, ResetPasswordResponse } from "@/features/auth/foreget-password/lib/type";
-import { LoginCredentials, LoginResponse } from "@/features/auth/login/lib/type";
-import { RegisterCredentials } from "@/features/auth/register/lib/type";
+import { LoginResponse } from "@/features/auth/login/lib/type";
+// import { RegisterCredentials } from "@/features/auth/register/lib/type";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 // import { LoginCredentials, LoginResponse, RegisterCredentials, ResetPasswordRequest, ResetPasswordResponse, User, VerifyResetTokenResponse } from "../lib/auth";
-function setTokenToLoacalStorage(token: string): void {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', token);
-    }
-}
+
 function getTokenFromLocalStorage(): string | null {
     if (typeof window !== 'undefined') {
         return localStorage.getItem('auth_token');
@@ -19,7 +14,6 @@ function getTokenFromLocalStorage(): string | null {
 function removeTokenFromLocalStorage(): void {
     localStorage.removeItem('auth_token');
 }
-
 class AuthService {
     async sendResetPasswordLink(eamil: string): Promise<void> {
         try {

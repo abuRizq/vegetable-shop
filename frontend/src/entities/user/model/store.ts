@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { User } from "./type";
 
-
 interface AuthState {
   // State
   user: User | null;
@@ -89,11 +88,13 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => localStorage), // Uncomment this
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      // Add this to prevent hydration issues
+      skipHydration: true,
     }
   )
 );

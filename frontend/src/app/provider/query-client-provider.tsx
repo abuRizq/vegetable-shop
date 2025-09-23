@@ -7,7 +7,7 @@ import { useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function QueryProviders({ children, dehydratedState }: any) {
     // Create query client instance
-    const [queryClient] = useState(
+    const [queryClient] = useState( 
         () =>
             new QueryClient({
                 defaultOptions: {
