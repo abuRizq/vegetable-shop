@@ -8,20 +8,32 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-
+  token :string | null;
   // Actions
-  setUser: (user: User) => void;
+
+  setUser: (user: User , token:string) => void;
   clearUser: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
-  login: (user: User) => void;
   logout: () => void;
-
+  setAuthentctedUSer:(user:User , token:string) => void;
+  startLoading:()=>void;
+  stopLoading:()=>void;
   // Computed values
+
   isAdmin: () => boolean;
   getUserName: () => string;
   getUserInitials: () => string;
+}
+
+const InitialState={
+// Initial state
+user: null,
+isAuthenticated: false,
+isLoading: false,
+error: null,
+token: null,  // ← Add this line
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -32,13 +44,15 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      token :null,
 
       // Actions
-      setUser: (user) =>
+      setUser: (user, token) =>
         set({
           user,
           isAuthenticated: true,
           error: null,
+          token:token,
         }),
 
       clearUser: () =>
@@ -54,12 +68,13 @@ export const useAuthStore = create<AuthState>()(
 
       clearError: () => set({ error: null }),
 
-      login: (user) =>
+      setAuthentctedUSer: (user, token) =>
         set({
           user,
+          token,
           isAuthenticated: true,
           isLoading: false,
-          error: null,
+          error: null,  
         }),
 
       logout: () =>
@@ -69,6 +84,13 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
           error: null,
         }),
+        startLoading() {
+          set({ isLoading: true , error:null });  
+        },
+        stopLoading() {
+set({ isLoading: false  });  
+
+        },
 
       // Computed values
       isAdmin: () => get().user?.role === "ADMIN",

@@ -35,7 +35,7 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution) => {
     },
     onError: (error, variables, ctx) => {
       clearUser();
-      logout(); 
+      logout();
       if (!!onError) {
         onError(error, variables, ctx);
       }

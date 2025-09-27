@@ -7,10 +7,14 @@ import { User } from "@/entities/user";
 const GET = async () => {
     const token = (await cookies()).get("at")?.value;
     if (!token) {
-        return null
+        return new NextResponse(JSON.stringify({ error: 'No token' }), { status: 500 })
     }
     const res = await fetch(`${baseURL}/users/me`, {
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
     });
     if (!res.ok) {
         return new NextResponse(JSON.stringify({ error: 'No token' }), { status: 500 })
