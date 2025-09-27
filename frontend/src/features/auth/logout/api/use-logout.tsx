@@ -1,3 +1,5 @@
+"use client"
+
 import { useAuthStore } from "@/entities/user/model/store";
 import { useMutation } from "@tanstack/react-query";
 
@@ -7,18 +9,19 @@ type TLogoutMution = {
 };
 
 const useLogoutMution = ({ onSuccess, onError }: TLogoutMution) => {
-  const { logout, clearUser } = useAuthStore();
-
-  return useMutation({
-    mutationFn: async () => {
-      try {
-        const response = await fetch(`/api/auth/logout`, {
-          method: "POST",
-        });
-        if (!response.ok) {
-          const errordata = await response
-            .json()
-            .catch(() => ({ error: "Failed to parse error response" }));
+const { logout, startLoading, stopLoading } = useAuthStore();
+  
+return useMutation<void, Error>({
+  mutationFn: async () => {
+  startLoading(); // ← Add this
+    try {
+      const response = await fetch(`/api/auth/logout`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        const errordata = await response
+          .json()
+          .catch(() => ({ error: "Failed to parse error response" }));
           throw new Error(errordata.error || "try agian");
         }
         return response.json();
@@ -27,14 +30,14 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution) => {
       }
     },
     onSuccess: (data, variables, ctx) => {
-      clearUser();
+stopLoading();
       logout();
       if (!!onSuccess) {
         onSuccess(data, variables, ctx);
       }
     },
     onError: (error, variables, ctx) => {
-      clearUser();
+      stopLoading();
       logout();
       if (!!onError) {
         onError(error, variables, ctx);

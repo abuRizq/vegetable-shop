@@ -1,3 +1,5 @@
+"use client"
+
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { User } from "./type";
@@ -9,6 +11,7 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   token :string | null;
+  theme:"dark"|"light",
   // Actions
 
   setUser: (user: User , token:string) => void;
@@ -20,6 +23,7 @@ interface AuthState {
   setAuthentctedUSer:(user:User , token:string) => void;
   startLoading:()=>void;
   stopLoading:()=>void;
+  setTheme:(theme:"dark"|"light") => void;
   // Computed values
 
   isAdmin: () => boolean;
@@ -27,14 +31,15 @@ interface AuthState {
   getUserInitials: () => string;
 }
 
-const InitialState={
-// Initial state
-user: null,
-isAuthenticated: false,
-isLoading: false,
-error: null,
-token: null,  // ← Add this line
-}
+// const InitialState={
+// // Initial state
+// user: null,
+// isAuthenticated: false,
+// isLoading: false,
+// error: null,
+// token: null,  // ← Add this line
+// theme:"light"
+// }
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -45,25 +50,28 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
       token :null,
-
-      // Actions
+      theme:"light",
       setUser: (user, token) =>
         set({
           user,
+          token:token,
+          theme:get().theme,
           isAuthenticated: true,
           error: null,
-          token:token,
         }),
-
+      setTheme:()=>set({
+          theme:get().theme==="dark"?"light":"dark"
+        }),
       clearUser: () =>
         set({
           user: null,
+          token:null,
           isAuthenticated: false,
           error: null,
         }),
 
       setLoading: (isLoading) => set({ isLoading }),
-
+     
       setError: (error) => set({ error }),
 
       clearError: () => set({ error: null }),
@@ -73,13 +81,14 @@ export const useAuthStore = create<AuthState>()(
           user,
           token,
           isAuthenticated: true,
-          isLoading: false,
+             isLoading: false,
           error: null,  
         }),
 
       logout: () =>
         set({
           user: null,
+            token:null,
           isAuthenticated: false,
           isLoading: false,
           error: null,
@@ -89,7 +98,6 @@ export const useAuthStore = create<AuthState>()(
         },
         stopLoading() {
 set({ isLoading: false  });  
-
         },
 
       // Computed values
@@ -110,9 +118,11 @@ set({ isLoading: false  });
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => localStorage), // Uncomment this
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
+        token:state.token,
+        theme:state.theme,
         isAuthenticated: state.isAuthenticated,
       }),
       // Add this to prevent hydration issues
