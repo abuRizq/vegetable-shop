@@ -1,7 +1,17 @@
 package com.veggieshop.config;
 
-import com.veggieshop.entity.*;
-import com.veggieshop.repository.*;
+import com.veggieshop.category.Category;
+import com.veggieshop.category.CategoryRepository;
+import com.veggieshop.offer.Offer;
+import com.veggieshop.offer.OfferRepository;
+import com.veggieshop.order.Order;
+import com.veggieshop.order.OrderItem;
+import com.veggieshop.order.OrderItemRepository;
+import com.veggieshop.order.OrderRepository;
+import com.veggieshop.product.Product;
+import com.veggieshop.product.ProductRepository;
+import com.veggieshop.user.User;
+import com.veggieshop.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +19,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
@@ -27,149 +39,135 @@ public class DataInitializer {
             OrderItemRepository orderItemRepository
     ) {
         return args -> {
-            // لا تضف البيانات إلا إذا كانت الجداول فارغة
-            if (userRepository.count() > 0
-                    || categoryRepository.count() > 0
-                    || productRepository.count() > 0
-                    || offerRepository.count() > 0
-                    || orderRepository.count() > 0
-                    || orderItemRepository.count() > 0) {
-                return;
-            }
 
-            // 🟢 Users
-            User admin = User.builder()
-                    .name("Admin User")
-                    .email("admin@example.com")
-                    .password(passwordEncoder.encode("admin123"))
-                    .role(User.Role.ADMIN)
-                    .build();
-            User user1 = User.builder()
+            // === USERS ===
+            User user1 = userRepository.save(User.builder()
                     .name("John Doe")
                     .email("john@example.com")
-                    .password(passwordEncoder.encode("john123"))
+                    .password(passwordEncoder.encode("password"))
                     .role(User.Role.USER)
-                    .build();
-            User user2 = User.builder()
+                    .enabled(true)
+                    .createdAt(Instant.now())
+                    .build());
+
+            User user2 = userRepository.save(User.builder()
                     .name("Jane Smith")
                     .email("jane@example.com")
-                    .password(passwordEncoder.encode("jane123"))
+                    .password(passwordEncoder.encode("password"))
+                    .role(User.Role.ADMIN)
+                    .enabled(true)
+                    .createdAt(Instant.now())
+                    .build());
+            User user3 = userRepository.save(User.builder()
+                    .name("Alice Brown")
+                    .email("alice@example.com")
+                    .password(passwordEncoder.encode("password"))
                     .role(User.Role.USER)
-                    .build();
+                    .enabled(true)
+                    .createdAt(Instant.now())
+                    .build());
 
-            userRepository.saveAll(List.of(admin, user1, user2));
+            // === CATEGORIES ===
+            Category cat1 = categoryRepository.save(Category.builder().name("Vegetables").description("Fresh vegetables").build());
+            Category cat2 = categoryRepository.save(Category.builder().name("Fruits").description("Seasonal fruits").build());
+            Category cat3 = categoryRepository.save(Category.builder().name("Herbs").description("Aromatic herbs").build());
 
-            // 🟢 Categories
-            Category vegetables = Category.builder()
-                    .name("Vegetables")
-                    .description("Fresh and organic vegetables.")
-                    .build();
-            Category fruits = Category.builder()
-                    .name("Fruits")
-                    .description("Seasonal and imported fruits.")
-                    .build();
-            Category herbs = Category.builder()
-                    .name("Herbs")
-                    .description("Aromatic and culinary herbs.")
-                    .build();
-
-            categoryRepository.saveAll(List.of(vegetables, fruits, herbs));
-
-            // 🟢 Products
-            Product tomato = Product.builder()
+            // === PRODUCTS ===
+            Product prod1 = productRepository.save(Product.builder()
                     .name("Tomato")
-                    .description("Fresh red tomatoes")
-                    .price(BigDecimal.valueOf(2.5))
+                    .description("Red juicy tomatoes")
+                    .price(new BigDecimal("1.25"))
                     .discount(BigDecimal.ZERO)
                     .featured(true)
-                    .soldCount(150L)
-                    .imageUrl("https://example.com/tomato.jpg")
-                    .category(vegetables)
-                    .build();
+                    .soldCount(20L)
+                    .imageUrl("https://img.com/tomato.jpg")
+                    .active(true)
+                    .category(cat1)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build());
 
-            Product apple = Product.builder()
+            Product prod2 = productRepository.save(Product.builder()
                     .name("Apple")
-                    .description("Crispy green apples")
-                    .price(BigDecimal.valueOf(3))
-                    .discount(BigDecimal.valueOf(0.5))
+                    .description("Sweet red apples")
+                    .price(new BigDecimal("2.30"))
+                    .discount(new BigDecimal("0.20"))
                     .featured(false)
-                    .soldCount(90L)
-                    .imageUrl("https://example.com/apple.jpg")
-                    .category(fruits)
-                    .build();
+                    .soldCount(10L)
+                    .imageUrl("https://img.com/apple.jpg")
+                    .active(true)
+                    .category(cat2)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build());
 
-            Product basil = Product.builder()
+            Product prod3 = productRepository.save(Product.builder()
                     .name("Basil")
-                    .description("Organic basil leaves")
-                    .price(BigDecimal.valueOf(1.5))
+                    .description("Fresh green basil")
+                    .price(new BigDecimal("0.99"))
                     .discount(BigDecimal.ZERO)
-                    .featured(true)
-                    .soldCount(40L)
-                    .imageUrl("https://example.com/basil.jpg")
-                    .category(herbs)
-                    .build();
+                    .featured(false)
+                    .soldCount(5L)
+                    .imageUrl("https://img.com/basil.jpg")
+                    .active(true)
+                    .category(cat3)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build());
 
-            productRepository.saveAll(List.of(tomato, apple, basil));
+            // === OFFERS ===
+            Offer offer1 = offerRepository.save(Offer.builder()
+                    .product(prod1)
+                    .discount(new BigDecimal("0.20"))
+                    .startDate(LocalDate.now().minusDays(2))
+                    .endDate(LocalDate.now().plusDays(3))
+                    .build());
 
-            // 🟢 Offers
-            Offer offer1 = Offer.builder()
-                    .product(apple)
-                    .discount(BigDecimal.valueOf(0.5))
-                    .startDate(LocalDate.now().minusDays(3))
-                    .endDate(LocalDate.now().plusDays(7))
-                    .build();
-
-            Offer offer2 = Offer.builder()
-                    .product(tomato)
-                    .discount(BigDecimal.valueOf(0.2))
+            Offer offer2 = offerRepository.save(Offer.builder()
+                    .product(prod2)
+                    .discount(new BigDecimal("0.40"))
                     .startDate(LocalDate.now())
-                    .endDate(LocalDate.now().plusDays(10))
-                    .build();
+                    .endDate(LocalDate.now().plusDays(5))
+                    .build());
 
-            offerRepository.saveAll(List.of(offer1, offer2));
+            Offer offer3 = offerRepository.save(Offer.builder()
+                    .product(prod3)
+                    .discount(new BigDecimal("0.10"))
+                    .startDate(LocalDate.now().minusDays(1))
+                    .endDate(LocalDate.now().plusDays(7))
+                    .build());
 
-            // 🟢 Orders
+            // === ORDERS + ORDER ITEMS ===
             Order order1 = Order.builder()
                     .user(user1)
-                    .totalPrice(BigDecimal.valueOf(10))
+                    .totalPrice(new BigDecimal("5.15"))
                     .status(Order.Status.PAID)
-                    .orderItems(null)
+                    .createdAt(LocalDateTime.now().minusDays(1))
                     .build();
+            order1 = orderRepository.save(order1);
 
             Order order2 = Order.builder()
                     .user(user2)
-                    .totalPrice(BigDecimal.valueOf(4.5))
+                    .totalPrice(new BigDecimal("3.20"))
+                    .status(Order.Status.SHIPPED)
+                    .createdAt(LocalDateTime.now().minusDays(2))
+                    .build();
+            order2 = orderRepository.save(order2);
+
+            Order order3 = Order.builder()
+                    .user(user3)
+                    .totalPrice(new BigDecimal("7.50"))
                     .status(Order.Status.PENDING)
-                    .orderItems(null)
+                    .createdAt(LocalDateTime.now())
                     .build();
+            order3 = orderRepository.save(order3);
 
-            orderRepository.saveAll(List.of(order1, order2));
-
-            // 🟢 OrderItems
-            OrderItem item1 = OrderItem.builder()
-                    .order(order1)
-                    .product(tomato)
-                    .quantity(2)
-                    .price(tomato.getPrice())
-                    .build();
-
-            OrderItem item2 = OrderItem.builder()
-                    .order(order1)
-                    .product(apple)
-                    .quantity(3)
-                    .price(apple.getPrice())
-                    .build();
-
-            OrderItem item3 = OrderItem.builder()
-                    .order(order2)
-                    .product(basil)
-                    .quantity(1)
-                    .price(basil.getPrice())
-                    .build();
-
-            orderItemRepository.saveAll(List.of(item1, item2, item3));
-
-            System.out.println("✅ Database initialized with test data!");
+            orderItemRepository.saveAll(List.of(
+                    OrderItem.builder().order(order1).product(prod1).quantity(2).price(prod1.getPrice()).build(),
+                    OrderItem.builder().order(order1).product(prod2).quantity(1).price(prod2.getPrice()).build(),
+                    OrderItem.builder().order(order2).product(prod2).quantity(2).price(prod2.getPrice()).build(),
+                    OrderItem.builder().order(order3).product(prod3).quantity(5).price(prod3.getPrice()).build()
+            ));
         };
     }
 }
