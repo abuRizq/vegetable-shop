@@ -12,12 +12,14 @@ export const userQueryKeys = {
   // profile: () => [...userQueryKeys.all, "profile"] as const,
   me: () => [...userQueryKeys.all, "me"] as const,
   // resetToken: (token: string) =>
-  //   [...userQueryKeys.all, "resetToken", token] as const,
+  //   [..  .userQueryKeys.all, "resetToken", token] as const,
 };
+
 // Main user validation query (from your original useAuth)
 export const useUserProfile = () => {
   // method to manage the user ans set and delete the user
-  const { setUser, clearUser, setLoading, setError } = useAuthStore();
+  const { setAuthentctedUser, clearUser, startLoading, stopLoading, setError } =
+    useAuthStore();
   //to control in the query form the cleint
   const queryClient = useQueryClient();
   // define the query
@@ -25,7 +27,7 @@ export const useUserProfile = () => {
     queryKey: userQueryKeys.me(),
     queryFn: async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/users/me`, {
+        const response = await fetch(`/api/auth/me`, {
           method: "GET",
           credentials: "include",
         });
@@ -39,8 +41,9 @@ export const useUserProfile = () => {
           throw new Error("Authentication failed");
         }
         const data = await response.json();
-        const User = data.data;
-        console.log("form the vrfiy fun :" + data.token);
+        const User = data.user || data.data.user || data;
+        const token = data.token || data.data.token;
+        console.log("form the vrfiy fun :" + User.name + "\n" + token);
         return User;
       } catch (error) {
         console.error(error);
@@ -64,14 +67,17 @@ export const useUserProfile = () => {
   // Integrate with Zustand store (React Query v5: use side effects instead of callbacks)
   useEffect(() => {
     if (query.isSuccess) {
-      setUser(query.data as User);
-      setError(null);
+      setAuthentctedUser(query.data as User, ""); // Token is in HTTP-only cookies, not needed here      setError(null);
+      setError(null)
+      stopLoading();
     }
-  }, [query.isSuccess, query.data, setUser, setError]);
+  }, [query.isSuccess, query.data, setAuthentctedUser, setError]);
+
   useEffect(() => {
     if (query.isError) {
       const err: any = query.error as any;
       clearUser();
+      stopLoading();
       setError(err?.message || "Authentication failed");
       const msg = err?.message || "";
       if (
@@ -84,8 +90,8 @@ export const useUserProfile = () => {
   }, [query.isError, query.error, clearUser, setError, queryClient]);
 
   useEffect(() => {
-    setLoading(query.isLoading);
-  }, [query.isLoading, setLoading]);
+    startLoading();
+  }, [query.isLoading]);
 
   return query;
 };

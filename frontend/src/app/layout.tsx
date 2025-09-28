@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import './styles/globals.css'
+import "./styles/globals.css";
 import { QueryProviders } from "./provider/query-client-provider";
+import { AuthProvider } from "./provider/auth-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +16,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-        <QueryProviders >
-          {children}
+        <QueryProviders>
+          <AuthProvider>{children}</AuthProvider>
         </QueryProviders>
       </body>
     </html>

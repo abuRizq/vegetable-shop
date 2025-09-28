@@ -10,6 +10,7 @@ const POST = async (req: NextRequest) => {
             headers: { "Content-type": "application/json" },
             body: JSON.stringify(body),
             cache: 'no-store',
+            credentials: 'include',
         });
         
         const data = await res.json();

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
@@ -18,10 +18,16 @@ type TLoginMution = {
 };
 const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
   const queryClient = useQueryClient();
-  const { setAuthentctedUSer, setError, clearError,setLoading,stopLoading } = useAuthStore(); // Get store actions
+  const {
+    setAuthentctedUser,
+    setError,
+    clearError,
+    startLoading,
+    stopLoading,
+  } = useAuthStore(); // Get store actions
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      setLoading(true);
+      startLoading();
       const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers: {
@@ -29,6 +35,7 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
           Accept: "application/json",
         },
         body: JSON.stringify(credentials),
+        credentials: "include",
       });
       if (!response.ok) {
         const errorData = await response
@@ -41,14 +48,16 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
     onSuccess: (data, variables, ctx) => {
       const user = data.data?.user || data.user;
       if (user) {
-        setAuthentctedUSer(user, data.token);
+        setAuthentctedUser(user, data.token);
         clearError();
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
       queryClient.setQueryData(["user"], data.user);
       if (!!onSuccess) {
-        stopLoading();
         onSuccess(data, variables, ctx);
+        setAuthentctedUser(user, data.token);
+
+        stopLoading();
       }
     },
     onError: (error, variables, ctx) => {
@@ -57,7 +66,7 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
       if (!!onError) {
         onError(error, variables, ctx);
         setError(error.message);
-      } 
+      }
     },
   });
 };
