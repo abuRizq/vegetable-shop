@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormData, LoginSchema } from "../lib/validation"
-import { useLoginMutation } from "../api/use-login-v2"
+import { useLoginMutation } from "../api/use-login"
 import { useIsAuthenticated } from "@/entities/user"
 
 export const LoginForm = () => {
@@ -18,8 +18,11 @@ export const LoginForm = () => {
   const [loginError, setLoginError] = useState<string | null>(null)
 
   const { mutate: login, isPending } = useLoginMutation({
-    onSuccess: () => {
+    
+    onSuccess: (data) => {
       console.log("Login successful");
+      console.log(data);
+      
       router.push("/");
     },
     onError: (error) => {

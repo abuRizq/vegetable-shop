@@ -4,24 +4,25 @@
  * All auth state is now managed by React Query's cache.
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User } from "../model/type";
+import { useQuery,  useQueryClient } from "@tanstack/react-query";
 
 // ============================================================================
 // QUERY KEYS - Centralized key management
 // ============================================================================
 
-export const userQueryKeys = {
-  all: ["user"] as const,
-  me: () => [...userQueryKeys.all, "me"] as const,
-} as const;
+
+export const userQueryKeys ={
+  all:['user'] as const,
+  me : ()=>[...userQueryKeys.all , "me"] as const 
+}
+
 
 // ============================================================================
 // API FUNCTIONS - Pure functions for API calls
 // ============================================================================
 
 
-async function fetchUserProfile(): Promise<User | null> {
+async function fetchUserProfile() {
   try {
     const response = await fetch("/api/auth/me", {
       method: "GET",
@@ -32,13 +33,19 @@ async function fetchUserProfile(): Promise<User | null> {
     if (response.status === 401) {
       return null;
     }
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || "Failed to fetch user profile");
+      throw new Error(errorData.error || "your session is end , need to login again");
     }
+    console.log(response);
+    
     const data = await response.json();
-    return data.user || data.data?.user || null;
-  } catch (error) {
+    console.log(data +"from the ts");
+    
+    return data.user ;
+  }
+  catch (error) {
     console.error("User profile fetch error:", error);
     // Network errors should return null instead of throwing
     if (error instanceof TypeError) {
@@ -48,27 +55,9 @@ async function fetchUserProfile(): Promise<User | null> {
   }
 }
 
-
-async function logoutUser(): Promise<void> {
-  const response = await fetch("/api/auth/logout", {
-    method: "POST",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || "Logout failed");
-  }
-}
-
 // ============================================================================
 // MAIN HOOKS - Public API
 // ============================================================================
-
-/**
- * Main hook to get current user
- * This is the primary hook that replaces useAuthStore()
- */
 
 export const useUser = () => {
   return useQuery({
@@ -96,13 +85,6 @@ export const useUser = () => {
 // COMPUTED VALUE HOOKS - Derived state from user query
 // ============================================================================
 
-/**
- * Check if user is authenticated
- * @example
- * const isAuthenticated = useIsAuthenticated();
- * if (!isAuthenticated) return <LoginPrompt />;
- */
-
 export const useIsAuthenticated = (): boolean => {
   const { data: user, isLoading } = useUser();
   // While loading, we don't know auth status yet
@@ -111,27 +93,16 @@ export const useIsAuthenticated = (): boolean => {
   return !!user;
 };
 
-/**
- * Check if user is admin
- * @example
- * const isAdmin = useIsAdmin();
- * if (isAdmin) return <AdminPanel />;
- */
-export const useIsAdmin = (): boolean => {
-  const { data: user } = useUser();
-  return user?.role === "ADMIN";
-};
 
-/**
- * Get user's display name
- * @example
- * const userName = useUserName();
- * return <div>Welcome, {userName}</div>;
- */
-export const useUserName = (): string => {
-  const { data: user } = useUser();
-  return user?.name || "Guest";
-};
+// export const useIsAdmin = (): boolean => {
+//   const { data: user } = useUser();
+//   return user?.role === "ADMIN";
+// };
+
+// export const useUserName = (): string => {
+//   const { data: user } = useUser();
+//   return user?.name || "Guest";
+// };
 
 /**
  * Get user's initials for avatar
@@ -151,36 +122,6 @@ export const useUserInitials = (): string => {
     .slice(0, 2);
 };
 
-// ============================================================================
-// MUTATION HOOKS - Actions that modify auth state
-// ============================================================================
-
-/**
- * Logout mutation
- * Clears user from cache and calls logout endpoint
- * 
- * @example
- * const logout = useLogout();
- * <button onClick={() => logout.mutate()}>Logout</button>
- */
-export const useLogout = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: logoutUser,
-    onSuccess: () => {
-      // Clear user from cache
-      queryClient.setQueryData(userQueryKeys.me(), null);
-      // Invalidate all user-related queries
-      queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
-    },
-    onError: (error) => {
-      console.error("Logout error:", error);
-      // Even if logout fails, clear local cache
-      queryClient.setQueryData(userQueryKeys.me(), null);
-    },
-  });
-};
 
 // ============================================================================
 // UTILITY HOOKS - Helper functions

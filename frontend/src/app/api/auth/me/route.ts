@@ -43,10 +43,11 @@ const GET = async () => {
 
             return response;
         }
-
         // Scenario 3: Valid token
         const data = await res.json();
+        console.log('Backend response:', JSON.stringify(data, null, 2));
         const user = data.data?.user || data.user || data;
+        // console.log('Extracted user:', JSON.stringify(user, null, 2));
 
         return NextResponse.json({
             user,

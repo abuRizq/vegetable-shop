@@ -1,24 +1,23 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
 import ThemeToggle from "../../../shared/ui/theme-toggle"
 import { useRouter } from "next/navigation";
-import { useLogoutMutation } from "@/features/auth/logout/api/use-logout-v2";
-import { useUser, useIsAuthenticated } from "@/entities/user";
+import { useLogoutMutation } from "@/features/auth/logout/api/use-logout";
+import { useUser } from "@/entities/user";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { data: user } = useUser();
-  const isAuthenticated = useIsAuthenticated();
+  const { data, isLoading } = useUser();
   const router = useRouter();
-
-  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation({
+  const user = data?.data
+  const { mutate: logout} = useLogoutMutation({
     onSuccess: () => {
       console.log("Logged out successfully");
-      router.push("/login");
+      router.push("/");
     },
     onError: (error) => {
       console.error("Logout error:", error.message);
@@ -29,12 +28,6 @@ function Header() {
     setShowProfileMenu(false);
     logout();
   };
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router])
 
   return (
     <header
@@ -87,7 +80,9 @@ function Header() {
         {/* Profile Section */}
 
         <div className="relative">
-          {user != undefined ? (
+          {isLoading ? (
+            <div className="w-10 h-10 rounded-full animate-pulse" style={{ backgroundColor: "hsl(var(--elevated))" }}></div>
+          ) : user ? (
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center space-x-3 p-2 rounded-xl transition-all duration-200 hover:scale-105 group"

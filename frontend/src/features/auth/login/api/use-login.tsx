@@ -3,27 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
 import { userQueryKeys } from "@/entities/user/api/auth-hooks";
+import { User } from "@/entities/user";
 
-type TLoginMution = {
-  onSuccess?: (
-    data: void,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
-  onError?: (
-    error: Error,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
+type LoginMutationOptions = {
+  onSuccess?: (data: unknown, variables: LoginCredentials, context: unknown) => void;
+  onError?: (error: Error, variables: LoginCredentials, context: unknown) => void;
 };
 
-/**
- * @deprecated Use useLoginMutation from use-login-v2.tsx instead
- * This version is kept for backward compatibility during migration
- */
-const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
+export const useLoginMutation = ({ onSuccess, onError }: LoginMutationOptions = {}) => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
       const response = await fetch(`/api/auth/login`, {
@@ -44,25 +32,26 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
-      const user = data.data?.user || data.user;
+      // Extract user from response
+      const user = data.data.user;
       if (user) {
-        // Update React Query cache with user data
         queryClient.setQueryData(userQueryKeys.me(), user);
       }
+
       // Invalidate to trigger refetch (ensures fresh data)
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
-
-      if (!!onSuccess) {
-        onSuccess(data, variables, ctx);
+      // Call custom success handler
+      if (onSuccess) {
+        onSuccess(data.data, variables, ctx);
       }
     },
     onError: (error, variables, ctx) => {
       console.error("Login error:", error);
-      if (!!onError) {
+      // Call custom error handler
+      if (onError) {
         onError(error, variables, ctx);
       }
     },
   });
 };
 
-export { useLoginMution };

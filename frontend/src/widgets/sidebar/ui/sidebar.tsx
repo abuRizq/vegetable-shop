@@ -6,7 +6,7 @@ import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRig
 import NavItem from "./nav-item"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/entities/user"
-import { useLogoutMutation } from "@/features/auth/logout/api/use-logout-v2"
+import { useLogoutMutation } from "@/features/auth/logout/api/use-logout"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)

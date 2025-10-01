@@ -5,10 +5,8 @@ export * from './model/type'
 export {
   useUser,
   useIsAuthenticated,
-  useIsAdmin,
-  useUserName,
   useUserInitials,
-  useLogout,
+  // useLogout, 
   useRefetchUser,
   useAuthLoading,
   useAuthError,
@@ -17,4 +15,4 @@ export {
 
 // Legacy exports (for backward compatibility during migration)
 // TODO: Remove after migration is complete
-export { useUserProfile } from './api/queries'
+// export { useUserProfile } from './api/auth-hooks'
