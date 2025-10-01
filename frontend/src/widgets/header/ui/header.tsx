@@ -6,26 +6,30 @@ import Searchbar from "./search-bar";
 import Link from "next/link"
 import ThemeToggle from "../../../shared/ui/theme-toggle"
 import { useRouter } from "next/navigation";
-import { useLogoutMution } from "@/features/auth/logout/api/use-logout";
-import { useAuthStore } from "@/entities/user/model/store";
+import { useLogoutMutation } from "@/features/auth/logout/api/use-logout-v2";
+import { useUser, useIsAuthenticated } from "@/entities/user";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: user } = useUser();
+  const isAuthenticated = useIsAuthenticated();
   const router = useRouter();
-  const { mutate: logout } = useLogoutMution({
-    onSuccess: (data) => {
-      console.log("Data is here!!: ", data)
+
+  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation({
+    onSuccess: () => {
+      console.log("Logged out successfully");
+      router.push("/login");
     },
     onError: (error) => {
-      console.error(error.message)
+      console.error("Logout error:", error.message);
     }
-  })
-  const onSubmit = async () => {
+  });
+
+  const onSubmit = () => {
     setShowProfileMenu(false);
-    logout()
-    window.location.reload()
-  }
+    logout();
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/");

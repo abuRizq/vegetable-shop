@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userQueryKeys } from "@/entities/user/api/auth-hooks";
 
-type TLogoutMution = {
-  onSuccess?: (data: void, variables: void, context: unknown) => unknown;
-  onError?: (error: Error, variables: void, context: unknown) => unknown;
+type LogoutMutationOptions = {
+  onSuccess?: (data: void, variables: void, context: unknown) => void;
+  onError?: (error: Error, variables: void, context: unknown) => void;
 };
 
 /**
- * @deprecated Use useLogoutMutation from use-logout-v2.tsx instead
- * This version is kept for backward compatibility during migration
+ * Logout mutation hook - React Query only version
+ * No Zustand dependency - all state managed by React Query
  */
-const useLogoutMution = ({ onSuccess, onError }: TLogoutMution = {}) => {
+export const useLogoutMutation = ({ onSuccess, onError }: LogoutMutationOptions = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, void>({
@@ -23,21 +23,23 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution = {}) => {
       });
 
       if (!response.ok) {
-        const errordata = await response
+        const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to parse error response" }));
-        throw new Error(errordata.error || "Logout failed");
+        throw new Error(errorData.error || "Logout failed");
       }
+
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
       // Clear user from React Query cache
       queryClient.setQueryData(userQueryKeys.me(), null);
-
+      
       // Invalidate all user queries to ensure clean state
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
 
-      if (!!onSuccess) {
+      // Call custom success handler
+      if (onSuccess) {
         onSuccess(data, variables, ctx);
       }
     },
@@ -47,11 +49,11 @@ const useLogoutMution = ({ onSuccess, onError }: TLogoutMution = {}) => {
       // Even on error, clear the cache (user intended to logout)
       queryClient.setQueryData(userQueryKeys.me(), null);
 
-      if (!!onError) {
+      // Call custom error handler
+      if (onError) {
         onError(error, variables, ctx);
       }
     },
   });
 };
 
-export { useLogoutMution };

@@ -4,24 +4,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
 import { userQueryKeys } from "@/entities/user/api/auth-hooks";
 
-type TLoginMution = {
-  onSuccess?: (
-    data: void,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
-  onError?: (
-    error: Error,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
+type LoginMutationOptions = {
+  onSuccess?: (data: unknown, variables: LoginCredentials, context: unknown) => void;
+  onError?: (error: Error, variables: LoginCredentials, context: unknown) => void;
 };
 
 /**
- * @deprecated Use useLoginMutation from use-login-v2.tsx instead
- * This version is kept for backward compatibility during migration
+ * Login mutation hook - React Query only version
+ * No Zustand dependency - all state managed by React Query
  */
-const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
+export const useLoginMutation = ({ onSuccess, onError }: LoginMutationOptions = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -35,34 +27,41 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
         body: JSON.stringify(credentials),
         credentials: "include",
       });
+
       if (!response.ok) {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to parse error response" }));
         throw new Error(errorData.message || errorData.error || "Login failed");
       }
+
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
+      // Extract user from response
       const user = data.data?.user || data.user;
+
       if (user) {
         // Update React Query cache with user data
         queryClient.setQueryData(userQueryKeys.me(), user);
       }
+
       // Invalidate to trigger refetch (ensures fresh data)
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
 
-      if (!!onSuccess) {
+      // Call custom success handler
+      if (onSuccess) {
         onSuccess(data, variables, ctx);
       }
     },
     onError: (error, variables, ctx) => {
       console.error("Login error:", error);
-      if (!!onError) {
+
+      // Call custom error handler
+      if (onError) {
         onError(error, variables, ctx);
       }
     },
   });
 };
 
-export { useLoginMution };

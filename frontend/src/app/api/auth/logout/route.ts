@@ -6,7 +6,7 @@ const POST = async () => {
     (await cookies()).set(
         {
             name: 'at', value: '', httpOnly: true,
-            secure: process.env.NODE_ENV === 'development',
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax', path: '/', maxAge: 0
         })
     return NextResponse.json({ success: true })

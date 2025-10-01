@@ -11,7 +11,7 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   token: string | null;
-  theme: "dark" | "light";
+  // theme: "dark" | "light";
   // Actions
 
   setUser: (user: User, token: string) => void;
@@ -20,7 +20,7 @@ interface AuthState {
   setError: (error: string | null) => void;
   clearError: () => void;
   logout: () => void;
-  setAuthentctedUser: (user: User, token: string) => void;
+  // setAuthenticatedUser: (user: User, token: string) => void;
   startLoading: () => void;
   stopLoading: () => void;
   setTheme: (theme: "dark" | "light") => void;
@@ -45,13 +45,13 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           token: token,
-          theme: get().theme,
+          // theme: get().theme,
           isAuthenticated: true,
           error: null,
         }),
       setTheme: () =>
         set({
-          theme: get().theme === "dark" ? "light" : "dark",
+          // theme: get().theme === "dark" ? "light" : "dark",
         }),
       clearUser: () =>
         set({
@@ -66,16 +66,7 @@ export const useAuthStore = create<AuthState>()(
       setError: (error) => set({ error }),
 
       clearError: () => set({ error: null }),
-          
-      setAuthentctedUser: (user, token) =>
-        set({
-          user,
-          token,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        }),
-
+   
       logout: () =>
         set({
           user: null,
@@ -92,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // Computed values
-      isAdmin: () => get().user?.role === "ADMIN" || get().user?.role === "USER",
+      isAdmin: () => get().user?.role === "ADMIN" ,
 
       getUserName: () => get().user?.name || "Guest",
 
@@ -113,11 +104,11 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
-        theme: state.theme,
+        // theme: state.theme,
         isAuthenticated: state.isAuthenticated,
       }),
       // Add this to prevent hydration issues
-      skipHydration: true,
+      skipHydration: false,
     }
   )
 );
