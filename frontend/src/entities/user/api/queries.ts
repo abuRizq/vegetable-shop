@@ -1,52 +1,73 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useAuthStore } from "../model/store";
+/**
+ * @deprecated This file is deprecated. Use auth-hooks.ts instead.
+ *
+ * Migration guide:
+ * - Replace useUserProfile() with useUser() from auth-hooks.ts
+ * - Replace userQueryKeys with userQueryKeys from auth-hooks.ts
+ *
+ * This file is kept for backward compatibility during migration.
+ */
+import { useQuery } from "@tanstack/react-query";
 import { User } from "../model/type";
-// import { validateTokenAndGetUser } from "../lib/get-user";
+import { userQueryKeys as newUserQueryKeys } from "./auth-hooks";
 
-// Edit the valadtion procsess
 
+/**
+ * @deprecated Use userQueryKeys from auth-hooks.ts instead
+ */
 export const userQueryKeys = {
   all: ["user"] as const,
-  // profile: () => [...userQueryKeys.all, "profile"] as const,
+  // Key for current user profile query
+  // Spread operator creates ['user', 'me']
+  // Function allows dynamic generation if needed in future
   me: () => [...userQueryKeys.all, "me"] as const,
-  // resetToken: (token: string) =>
-  //   [..  .userQueryKeys.all, "resetToken", token] as const,
-};
+} as const;
 
-// Main user validation query (from your original useAuth)
+/**
+ * @deprecated Use useUser() from auth-hooks.ts instead
+ * This version syncs with Zustand which is being phased out
+ */
 export const useUserProfile = () => {
-  // method to manage the user ans set and delete the user
-  const { setAuthentctedUser, clearUser, startLoading, stopLoading, setError } =
-    useAuthStore();
-  //to control in the query form the cleint
-  const queryClient = useQueryClient();
   // define the query
   const query = useQuery({
-    queryKey: userQueryKeys.me(),
-    queryFn: async () => {
+    queryKey: newUserQueryKeys.me(),
+    queryFn: async function fetchUserProfile(): Promise<User | null> {
       try {
-        const response = await fetch(`/api/auth/me`, {
+        // Call Next.js API route (which proxies to backend)
+        const response = await fetch('/api/auth/me', {
           method: "GET",
+          // CRITICAL: Include credentials to send HTTP-only cookie
           credentials: "include",
         });
+
+        // If not OK, handle different error scenarios
         if (!response.ok) {
+          // 401 = Not authenticated (normal case, not an error)
           if (response.status === 401) {
-            throw new Error("No authentication token");
+            return null; // Return null instead of throwing
           }
-          if (response.status === 403) {
-            throw new Error("Authentication expired");
-          }
-          throw new Error("Authentication failed");
+          // Other errors: try to parse error message
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to fetch user profile");
         }
+        // Parse successful response
         const data = await response.json();
-        const User = data.user || data.data.user || data;
-        const token = data.token || data.data.token;
-        console.log("form the vrfiy fun :" + User.name + "\n" + token);
-        return User;
+
+        // Return user object
+        return data.data?.user || data.user || null;
+
       } catch (error) {
-        console.error(error);
+        // Log for debugging
+        console.error("User profile fetch error:", error);
+
+        // Handle network errors gracefully
+        if (error instanceof TypeError) {
+          // Network error - return null instead of throwing
+          return null;
+        }
+
+        // Re-throw to let React Query handle retry logic
         throw error;
       }
     },
@@ -60,39 +81,13 @@ export const useUserProfile = () => {
       return failureCount < 2;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchInterval: 15 * 60 * 1000, // 15 minutes
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
-  // Integrate with Zustand store (React Query v5: use side effects instead of callbacks)
-  useEffect(() => {
-    if (query.isSuccess) {
-      setAuthentctedUser(query.data as User, ""); // Token is in HTTP-only cookies, not needed here      setError(null);
-      setError(null)
-      stopLoading();
-    }
-  }, [query.isSuccess, query.data, setAuthentctedUser, setError]);
 
-  useEffect(() => {
-    if (query.isError) {
-      const err: any = query.error as any;
-      clearUser();
-      stopLoading();
-      setError(err?.message || "Authentication failed");
-      const msg = err?.message || "";
-      if (
-        msg.includes("Authentication expired") ||
-        msg.includes("No authentication token")
-      ) {
-        queryClient.removeQueries({ queryKey: userQueryKeys.all });
-      }
-    }
-  }, [query.isError, query.error, clearUser, setError, queryClient]);
-
-  useEffect(() => {
-    startLoading();
-  }, [query.isLoading]);
-
+  // No more Zustand integration - React Query is the single source of truth
   return query;
 };
 // export const useVerifyResetToken = (token: string) => {
