@@ -2,32 +2,18 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
-import { useAuthStore } from "@/entities/user/model/store";
+import { userQueryKeys } from "@/entities/user/api/auth-hooks";
+import { User } from "@/entities/user";
 
-type TLoginMution = {
-  onSuccess?: (
-    data: void,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
-  onError?: (
-    error: Error,
-    variables: LoginCredentials,
-    context: unknown
-  ) => unknown;
+type LoginMutationOptions = {
+  onSuccess?: (data: unknown, variables: LoginCredentials, context: unknown) => void;
+  onError?: (error: Error, variables: LoginCredentials, context: unknown) => void;
 };
-const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
+
+export const useLoginMutation = ({ onSuccess, onError }: LoginMutationOptions = {}) => {
   const queryClient = useQueryClient();
-  const {
-    setAuthentctedUser,
-    setError,
-    clearError,
-    startLoading,
-    stopLoading,
-  } = useAuthStore(); // Get store actions
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      startLoading();
       const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers: {
@@ -41,34 +27,31 @@ const useLoginMution = ({ onSuccess, onError }: TLoginMution) => {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to parse error response" }));
-        throw new Error(errorData.message || "Failed to create user");
+        throw new Error(errorData.message || errorData.error || "Login failed");
       }
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
-      const user = data.data?.user || data.user;
+      // Extract user from response
+      const user = data.data.user;
       if (user) {
-        setAuthentctedUser(user, data.token);
-        clearError();
-        queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.setQueryData(userQueryKeys.me(), user);
       }
-      queryClient.setQueryData(["user"], data.user);
-      if (!!onSuccess) {
-        onSuccess(data, variables, ctx);
-        setAuthentctedUser(user, data.token);
 
-        stopLoading();
+      // Invalidate to trigger refetch (ensures fresh data)
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
+      // Call custom success handler
+      if (onSuccess) {
+        onSuccess(data.data, variables, ctx);
       }
     },
     onError: (error, variables, ctx) => {
-      console.error(error);
-      stopLoading();
-      if (!!onError) {
+      console.error("Login error:", error);
+      // Call custom error handler
+      if (onError) {
         onError(error, variables, ctx);
-        setError(error.message);
       }
     },
   });
 };
 
-export { useLoginMution };

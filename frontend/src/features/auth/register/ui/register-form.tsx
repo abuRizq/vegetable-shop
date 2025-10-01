@@ -7,10 +7,10 @@ import { Eye, EyeOff, Mail, Loader2, Leaf, User, Check, AlertCircle } from "luci
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { RegisterFormData, registerSchema } from "@/features/auth/register/lib/register"
-import { useRegisterMution } from '../api/use-register'
+import { useRegisterMutation } from "../api/use-register"
 
 export const RegisterForm = () => {
-    const { mutate: Register } = useRegisterMution({
+    const { mutate: Register } = useRegisterMutation({
         onSuccess: (data , Variable,ctx ) => {
           console.log(data);
           console.log(Variable);
