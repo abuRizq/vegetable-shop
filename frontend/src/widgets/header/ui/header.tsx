@@ -11,9 +11,15 @@ import { useUser } from "@/entities/user";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { data, isLoading } = useUser();
+  // const test = useUser()
+  // // console.log((test) , "test");
+  
+  const { data:user, isLoading } = useUser();
   const router = useRouter();
-  const user = data?.data
+//  const user = data?.data;
+  // console.log(JSON.stringify(test) , "frrr");
+  
+  // const user = data?.data
   const { mutate: logout} = useLogoutMutation({
     onSuccess: () => {
       console.log("Logged out successfully");

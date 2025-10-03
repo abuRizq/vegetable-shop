@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./styles/globals.css";
 import { QueryProviders } from "./provider/query-client-provider";
-// import { AuthProvider } from "./provider/auth-provider";
+import { getServerUser } from "@/shared/lib/server-auth";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { userQueryKeys } from "@/entities/user/api/auth-hooks";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,10 +15,23 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Create a new QueryClient instance for this request
+  const queryClient = new QueryClient();
+
+  // Prefetch user data on the server
+  await queryClient.prefetchQuery({
+    queryKey: userQueryKeys.me(),
+    queryFn: getServerUser,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Dehydrate the state to pass to client
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-        <QueryProviders>
+        <QueryProviders dehydratedState={dehydratedState}>
           {children}
         </QueryProviders>
       </body>

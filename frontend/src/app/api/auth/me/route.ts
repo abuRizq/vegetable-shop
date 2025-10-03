@@ -13,7 +13,6 @@ const GET = async () => {
                 code: 'NO_TOKEN'
             }, { status: 401 });
         }
-
         const res = await fetch(`http://localhost:8080/api/users/me`, {
             method: "GET",
             headers: {
@@ -29,7 +28,7 @@ const GET = async () => {
                 error: res.status === 401 ? 'Authentication expired' : 'Authentication failed',
                 code: res.status === 401 ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID'
             }, { status: 401 });
-
+            
             // Remove the invalid cookie
             response.cookies.set({
                 name: 'at',

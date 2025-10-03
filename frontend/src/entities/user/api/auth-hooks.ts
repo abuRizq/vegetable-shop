@@ -39,11 +39,9 @@ async function fetchUserProfile() {
       throw new Error(errorData.error || "your session is end , need to login again");
     }
     console.log(response);
-    
     const data = await response.json();
-    console.log(data +"from the ts");
-    
-    return data.user ;
+    console.log(data.user.data ,"from the ts");
+    return data.user.data ;
   }
   catch (error) {
     console.error("User profile fetch error:", error);
@@ -87,22 +85,19 @@ export const useUser = () => {
 
 export const useIsAuthenticated = (): boolean => {
   const { data: user, isLoading } = useUser();
-  // While loading, we don't know auth status yet
-  // Return false to be safe (components can check isLoading separately)
   if (isLoading) return false;
   return !!user;
 };
 
 
-// export const useIsAdmin = (): boolean => {
-//   const { data: user } = useUser();
-//   return user?.role === "ADMIN";
-// };
-
-// export const useUserName = (): string => {
-//   const { data: user } = useUser();
-//   return user?.name || "Guest";
-// };
+export const useIsAdmin = (): boolean => {
+  const { data: user } = useUser();
+  return user?.role === "ADMIN";
+};
+export const useUserName = (): string => {
+  const { data: user } = useUser();
+  return user?.name || "Guest";
+};
 
 /**
  * Get user's initials for avatar
@@ -110,17 +105,17 @@ export const useIsAuthenticated = (): boolean => {
  * const initials = useUserInitials();
  * return <Avatar>{initials}</Avatar>;
  */
-export const useUserInitials = (): string => {
-  const { data: user } = useUser();
-  if (!user) return "G";
+// export const useUserInitials = (): string => {
+//   const { data: user } = useUser();
+//   if (!user) return "G";
   
-  return user.name
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-};
+//   return user.name
+//     .split(" ")
+//     .map((word) => word[0])
+//     .join("")
+//     .toUpperCase()
+//     .slice(0, 2);
+// };
 
 
 // ============================================================================

@@ -5,7 +5,7 @@ export * from './model/type'
 export {
   useUser,
   useIsAuthenticated,
-  useUserInitials,
+  // useUserInitials,
   // useLogout, 
   useRefetchUser,
   useAuthLoading,

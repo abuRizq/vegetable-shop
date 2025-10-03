@@ -9,10 +9,6 @@ type RegisterMutationOptions = {
   onError?: (error: Error, variables: RegisterCredentials, context: unknown) => void;
 };
 
-/**
- * Register mutation hook - React Query only version
- * No Zustand dependency - all state managed by React Query
- */
 export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOptions = {}) => {
   const queryClient = useQueryClient();
 
@@ -37,17 +33,14 @@ export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOpti
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
-      // Extract user from response
-      const user = data.data?.user || data.user;
 
+      const user = data.data?.user || data.user;
       if (user) {
-        // Update React Query cache with user data
         queryClient.setQueryData(userQueryKeys.me(), user);
       }
 
       // Invalidate to trigger refetch (ensures fresh data)
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
-
       // Call custom success handler
       if (onSuccess) {
         onSuccess(data, variables, ctx);
