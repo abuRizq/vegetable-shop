@@ -24,7 +24,6 @@ const POST = async (req: NextRequest) => {
         if (!token) {
             return NextResponse.json({ error: 'No token received' }, { status: 500 });
         }
-        
         (await cookies()).set({
             name: 'at',
             value: token,

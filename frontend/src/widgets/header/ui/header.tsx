@@ -1,36 +1,39 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Bell, Settings, ChevronDown, User, ShoppingCart } from "lucide-react"
 import Searchbar from "./search-bar";
 import Link from "next/link"
 import ThemeToggle from "../../../shared/ui/theme-toggle"
 import { useRouter } from "next/navigation";
-import { useLogoutMution } from "@/features/auth/logout/api/use-logout";
-import { useAuthStore } from "@/entities/user/model/store";
+import { useLogoutMutation } from "@/features/auth/logout/api/use-logout";
+import { useUser } from "@/entities/user";
 
 function Header() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const { user, isAuthenticated } = useAuthStore();
+  // const test = useUser()
+  // // console.log((test) , "test");
+  
+  const { data:user, isLoading } = useUser();
   const router = useRouter();
-  const { mutate: logout } = useLogoutMution({
-    onSuccess: (data) => {
-      console.log("Data is here!!: ", data)
+//  const user = data?.data;
+  // console.log(JSON.stringify(test) , "frrr");
+  
+  // const user = data?.data
+  const { mutate: logout} = useLogoutMutation({
+    onSuccess: () => {
+      console.log("Logged out successfully");
+      router.push("/");
     },
     onError: (error) => {
-      console.error(error.message)
+      console.error("Logout error:", error.message);
     }
-  })
-  const onSubmit = async () => {
+  });
+
+  const onSubmit = () => {
     setShowProfileMenu(false);
-    logout()
-    window.location.reload()
-  }
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router])
+    logout();
+  };
 
   return (
     <header
@@ -83,7 +86,9 @@ function Header() {
         {/* Profile Section */}
 
         <div className="relative">
-          {user != undefined ? (
+          {isLoading ? (
+            <div className="w-10 h-10 rounded-full animate-pulse" style={{ backgroundColor: "hsl(var(--elevated))" }}></div>
+          ) : user ? (
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center space-x-3 p-2 rounded-xl transition-all duration-200 hover:scale-105 group"

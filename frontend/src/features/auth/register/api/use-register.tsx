@@ -1,39 +1,59 @@
+"use client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RegisterCredentials } from "../lib/type";
+import { userQueryKeys } from "@/entities/user/api/auth-hooks";
 
+type RegisterMutationOptions = {
+  onSuccess?: (data: unknown, variables: RegisterCredentials, context: unknown) => void;
+  onError?: (error: Error, variables: RegisterCredentials, context: unknown) => void;
+};
 
-type TregistrMution = {
-    onSuccess: (data: void, variables: RegisterCredentials, ctx: unknown) => unknown,
-    onError: (data: Error, variables: unknown, ctx: unknown) => unknown
-}
+export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOptions = {}) => {
+  const queryClient = useQueryClient();
 
-const useRegisterMution = ({ onSuccess, onError }: TregistrMution) => {
-    const queryClinet = useQueryClient();
-    return useMutation({
-        mutationFn: async (creditels: RegisterCredentials) => {
-            const res = await fetch("api/auth/register", {
-                method: 'POST',
-                body: JSON.stringify(creditels)
-            })
-            if (!res.ok) {
-                const error = await res.json().catch(() => ({ error: 'Failed to parse error response' }))
-                throw new Error(error.message || 'Failed to create user');
-            }
-            return res.json();
+  return useMutation({
+    mutationFn: async (credentials: RegisterCredentials) => {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        onSuccess: (data, variables, ctx) => {
-            queryClinet.invalidateQueries({ queryKey: ['user'] });
-            queryClinet.setQueryData(['user'], data.user)
-            if (!!onSuccess) {
-                onSuccess(data, variables, ctx)
-            };
-        },
-        onError: (data, variables, ctx) => {
-            if (!!onError) {
-                onError(data, variables, ctx)
-            }
-        }
-    })
-}
+        body: JSON.stringify(credentials),
+        credentials: "include",
+      });
 
-export { useRegisterMution };
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Failed to parse error response" }));
+        throw new Error(errorData.message || errorData.error || "Registration failed");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables, ctx) => {
+
+      const user = data.data?.user || data.user;
+      if (user) {
+        queryClient.setQueryData(userQueryKeys.me(), user);
+      }
+
+      // Invalidate to trigger refetch (ensures fresh data)
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
+      // Call custom success handler
+      if (onSuccess) {
+        onSuccess(data, variables, ctx);
+      }
+    },
+    onError: (error, variables, ctx) => {
+      console.error("Registration error:", error);
+
+      // Call custom error handler
+      if (onError) {
+        onError(error, variables, ctx);
+      }
+    },
+  });
+};
+

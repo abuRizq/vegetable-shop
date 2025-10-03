@@ -1,5 +1,5 @@
+import { User } from '@/entities/user';
 import { baseURL } from '@/shared/constants';
-import { User } from '@/shared/lib/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -23,13 +23,13 @@ const POST = async (NextRequest: NextRequest) => {
         name: 'at',
         value: token,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'development',
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 15, // 15 min
     })
     const user: User = data.user;
-    return user;
+    return NextResponse.json({ success: true , data:user });
 };
 export { POST }
 
