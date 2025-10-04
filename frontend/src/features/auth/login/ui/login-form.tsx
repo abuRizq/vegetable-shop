@@ -7,56 +7,48 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormData, LoginSchema } from "../lib/validation"
-import { useLoginMution } from "../api/use-login"
-import { useAuthStore } from "@/entities/user/model/store"
+import { useLoginMutation } from "../api/use-login"
+import { useIsAuthenticated } from "@/entities/user"
+
 export const LoginForm = () => {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const isAuthenticated = useIsAuthenticated()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
-  
-  const { mutate: login } = useLoginMution({
-    onSuccess: (data , Variable,ctx ) => {
+
+  const { mutate: login, isPending } = useLoginMutation({
+    
+    onSuccess: (data) => {
+      console.log("Login successful");
       console.log(data);
-      console.log(Variable);
-      console.log(ctx);
+      
+      router.push("/");
     },
-    onError: (error, Varibles, ctx) => {
-      console.error(error);
-      console.log(Varibles);
-      console.log(ctx);
+    onError: (error) => {
+      console.error("Login error:", error);
+      setLoginError(error.message);
     }
   })
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
   })
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      login(data)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setLoginError(error.message)
-    }
+  const onSubmit = (data: LoginFormData) => {
+    setLoginError(null);
+    login(data);
   }
+
+  // Use isPending instead of isSubmitting for loading state
+  const isSubmitting = isPending;
+
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/")
-      /***
-       * what the bnifet form this code 
-       */
-      // queryClient.setQueryData(["user", "user"], (prevUser) => {
-      //   if (!prevUser) return prevUser;
-      //   return {
-      //     ...prevUser,
-      //     isNew: true, // 👈 custom update
-      //   };
-      // });
     }
   }, [isAuthenticated, router])
 

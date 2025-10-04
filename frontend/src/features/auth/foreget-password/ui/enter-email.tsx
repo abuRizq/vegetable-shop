@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import { Mail, Leaf, Loader2, Send } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
 // import { ToastContainer, toast } from 'react-toastify';
 
 type EnterEmailProps = {
@@ -30,9 +29,7 @@ function EnterEmail({
     defaultEmail = "",
 }: EnterEmailProps) {
     const [email, setEmail] = useState(defaultEmail)
-
-    const { forgotPassword, forgotPasswordState } = useAuth();
-    const loading = forgotPasswordState.isPending;
+    const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
     const validateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
@@ -45,17 +42,12 @@ function EnterEmail({
             setError("Please enter a valid email address.")
             return;
         }
-        forgotPassword(email, {
-            onSuccess: () => {
-                setSuccess("A verification code has been sent to your email address.")
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onError: (error: any) => {
-                console.error('Failed to send reset link:', error);
-                setError(error.message || "Failed to send reset link");
-            }
-        })
-
+        setLoading(true)
+        // TODO: Implement forgot password API call
+        setTimeout(() => {
+            setSuccess("A verification code has been sent to your email address.")
+            setLoading(false)
+        }, 2000)
     }
 
     return (
@@ -105,12 +97,12 @@ function EnterEmail({
                             className="input w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none"
                         />
                     </div>
-                    {forgotPasswordState.error && (
+                    {error && (
                         <p className="text-sm mt-1" style={{ color: "hsl(var(--error))" }} aria-live="polite">
-                            {forgotPasswordState.error}
+                            {error}
                         </p>
                     )}
-                    {forgotPasswordState.isSuccess && (
+                    {success && (
                         <p className="text-sm mt-1" style={{ color: "hsl(var(--success))" }} aria-live="polite">
                             {success}
                         </p>

@@ -1,28 +1,40 @@
 'use client';
 
-import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, HydrationBoundary, type DehydratedState } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function QueryProviders({ children, dehydratedState }: any) {
-    // Create query client instance
-    const [queryClient] = useState( 
+interface QueryProvidersProps {
+  children: ReactNode;
+  dehydratedState?: DehydratedState;
+}
+
+export function QueryProviders({ children, dehydratedState }: QueryProvidersProps) {
+    // Create query client instance with improved defaults
+    const [queryClient] = useState(
         () =>
             new QueryClient({
                 defaultOptions: {
                     queries: {
                         staleTime: 5 * 60 * 1000,    // 5 minutes
-                        gcTime: 10 * 60 * 1000,      // 10 minutes
+                        gcTime: 10 * 60 * 1000,      // 10 minutes (formerly cacheTime)
+                        refetchOnWindowFocus: true,   // Refetch when window regains focus
+                        refetchOnReconnect: true,     // Refetch when reconnecting
+                        retry: 1,                     // Retry failed requests once
+                    },
+                    mutations: {
+                        retry: 0,                     // Don't retry mutations by default
                     },
                 },
             })
-        );      
+        );
+
     return (
         <QueryClientProvider client={queryClient}>
-            {children}  
-            {/* <HydrationBoundary state={dehydratedState}></HydrationBoundary> */}
-            <ReactQueryDevtools initialIsOpen={false} />
+            <HydrationBoundary state={dehydratedState}>
+                {children}
+            </HydrationBoundary>
+            <ReactQueryDevtools initialIsOpen={true} />
         </QueryClientProvider>
     );
 }
