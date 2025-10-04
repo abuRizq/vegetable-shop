@@ -24,7 +24,7 @@ export default async function RootLayout({
     queryFn: getServerUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-
+  
   // Dehydrate the state to pass to client
   const dehydratedState = dehydrate(queryClient);
 

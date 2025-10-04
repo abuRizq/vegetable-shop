@@ -23,15 +23,14 @@ import { useRegisterMutation } from "../api/use-register";
 
 export const RegisterForm = () => {
   const { mutate: Register } = useRegisterMutation({
-    onSuccess: (data, Variables, ctx) => {
+    onSuccess: (data, Variables) => {
       console.log(data);
       console.log(Variables);
-      console.log(ctx);
+      router.push("/")
     },
-    onError: (error, Variables, ctx) => {
+    onError: (error, Variables) => {
       console.error(error);
       console.log(Variables);
-      console.log(ctx);
     },
   });
   const {
@@ -47,20 +46,16 @@ export const RegisterForm = () => {
   const [registerError, setRegisterError] = useState({ massage: "" });
   
   const router = useRouter();
-  // Handle form submission
 
   const onSubmit = async (data: RegisterFormData) => {
-    // if (!validateForm()) return
     try {
       Register({
-        name: data.firstname + " " + data.lastname,
-        email: data.email,
-        password: data.password,
+        name:data.firstname,
+        email:data.email,
+        password:data.password
       });
     } catch (error) {
       setRegisterError({ massage: "Registration failed. Please try again." });
-    } finally {
-      // setIsSubmitting(false)
     }
   };
 
@@ -180,9 +175,9 @@ export const RegisterForm = () => {
                     style={{ color: "hsl(var(--text-disabled))" }}
                   />
                   <input
-                    id="firstName"
+                    id="firstname"
                     {...register("firstname")}
-                    name="firstName"
+                    name="firstname"
                     type="text"
                     required
                     disabled={isSubmitting}
@@ -212,9 +207,9 @@ export const RegisterForm = () => {
                   />
                   <input
                     id="lastName"
-                    // name="lastName"
                     type="text"
                     {...register("lastname")}
+                    name="lastName"
                     required
                     disabled={isSubmitting}
                     placeholder="Enter last name"

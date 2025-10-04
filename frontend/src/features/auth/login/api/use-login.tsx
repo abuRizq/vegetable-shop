@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginCredentials } from "../lib/type";
 import { userQueryKeys } from "@/entities/user/api/auth-hooks";
-import { User } from "@/entities/user";
 
 type LoginMutationOptions = {
   onSuccess?: (data: unknown, variables: LoginCredentials, context: unknown) => void;
@@ -37,7 +36,6 @@ export const useLoginMutation = ({ onSuccess, onError }: LoginMutationOptions = 
       if (user) {
         queryClient.setQueryData(userQueryKeys.me(), user);
       }
-
       // Invalidate to trigger refetch (ensures fresh data)
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
       // Call custom success handler

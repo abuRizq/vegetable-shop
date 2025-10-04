@@ -13,6 +13,7 @@ export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOpti
   const queryClient = useQueryClient();
 
   return useMutation({
+    
     mutationFn: async (credentials: RegisterCredentials) => {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -22,14 +23,12 @@ export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOpti
         body: JSON.stringify(credentials),
         credentials: "include",
       });
-
       if (!response.ok) {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to parse error response" }));
         throw new Error(errorData.message || errorData.error || "Registration failed");
       }
-
       return response.json();
     },
     onSuccess: (data, variables, ctx) => {
@@ -38,10 +37,7 @@ export const useRegisterMutation = ({ onSuccess, onError }: RegisterMutationOpti
       if (user) {
         queryClient.setQueryData(userQueryKeys.me(), user);
       }
-
-      // Invalidate to trigger refetch (ensures fresh data)
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
-      // Call custom success handler
       if (onSuccess) {
         onSuccess(data, variables, ctx);
       }
