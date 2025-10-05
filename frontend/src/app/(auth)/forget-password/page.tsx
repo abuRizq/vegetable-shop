@@ -1,12 +1,12 @@
 "use client";
 
-import { OtpInput } from "@/features/auth/foreget-password";
+import { EnterEmail } from "@/features/auth/foreget-password/ui/enter-email";
 import React from "react";
 
 function page() {
   return (
-    <div className="h-screen w-full">
-      <OtpInput />
+    <div className="h-screen w-full flex justify-center items-center">
+      <EnterEmail />
     </div>
   );
 }

@@ -37,7 +37,6 @@ export const LoginForm = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
   })
-
   const onSubmit = (data: LoginFormData) => {
     setLoginError(null);
     login(data);
