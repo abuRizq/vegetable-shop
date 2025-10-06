@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { NextResponse } from "next/server";
 
 type Tforgetpass = {
   onSuccess?: (
