@@ -9,7 +9,8 @@ function ResetForm() {
   const parm = useSearchParams();
   const router = useRouter();
   const token = parm.get("token");
-
+  console.log(token);
+  
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string>();
@@ -54,9 +55,8 @@ function ResetForm() {
       setError("Password must be at least 8 characters");
       return;
     }
-
     setLoading(true);
-    restPassword({ token: token, newPassWord: newPassword });
+    restPassword({ token: token, newPassword: newPassword });
   };
 
   return (

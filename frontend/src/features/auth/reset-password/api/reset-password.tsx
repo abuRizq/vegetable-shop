@@ -9,16 +9,17 @@ type TestPassword = {
 const useRestPassword = ({ onSuccess, onError }: TestPassword ={}) => {
   return useMutation({
     mutationFn: async (credentials: resetPassword) => {
-      const res = await fetch("api/auth/reset-password", {
+      const res = await fetch("http://localhost:8080/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify(credentials),
       });
-      const data = await res.json();
+      console.log(res);
+      // const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to reset password");
+        throw new Error(res.status + "Failed to reset password");
       }
-      return data;
+      // return data;
     },
     onSuccess: (data, variables, ctx) => {
       if (onSuccess) {

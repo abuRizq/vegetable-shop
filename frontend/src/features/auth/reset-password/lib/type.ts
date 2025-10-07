@@ -1,4 +1,4 @@
 export type resetPassword={
-    token:string, 
-    newPassWord:string
+    token:string,
+    newPassword:string
 }
