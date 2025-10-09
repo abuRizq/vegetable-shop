@@ -4,13 +4,14 @@ import { useSearchParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Lock, Leaf, Loader2, KeyRound } from "lucide-react";
 import { useRestPassword } from "../api/reset-password";
+import { Toast } from "@/shared/ui/toast";
 
 function ResetForm() {
   const parm = useSearchParams();
   const router = useRouter();
   const token = parm.get("token");
   console.log(token);
-  
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string>();
@@ -21,14 +22,16 @@ function ResetForm() {
     onSuccess: (data) => {
       console.log("Password reset successful", data);
       setSuccess("Password reset successfully! Redirecting to login...");
-      setLoading(false);
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      Toast.success("please login again ", {
+        position: "top-right",
+      });
+      router.push("/login");
     },
     onError: (error) => {
       console.error("Reset password error:", error);
-      setError(error.message);
+      Toast.error(error.message, {
+        position: "top-center",
+      });
       setLoading(false);
     },
   });

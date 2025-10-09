@@ -4,29 +4,26 @@
  * All auth state is now managed by React Query's cache.
  */
 
-import { useQuery,  useQueryClient } from "@tanstack/react-query";
+import { api } from "@/shared/lib/api-client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // ============================================================================
 // QUERY KEYS - Centralized key management
 // ============================================================================
 
-
-export const userQueryKeys ={
-  all:['user'] as const,
-  me : ()=>[...userQueryKeys.all , "me"] as const 
-}
-
+export const userQueryKeys = {
+  all: ["user"] as const,
+  me: () => [...userQueryKeys.all, "me"] as const,
+};
 
 // ============================================================================
 // API FUNCTIONS - Pure functions for API calls
 // ============================================================================
 
-
 async function fetchUserProfile() {
   try {
-    const response = await fetch("/api/auth/me", {
-      method: "GET",
-      credentials: "include", // Send HTTP-only cookie
+    const response = await api.get(`/auth/me`, {
+      requiresAuth: true,
     });
 
     // 401 = Not authenticated (normal case, not an error)
@@ -36,14 +33,15 @@ async function fetchUserProfile() {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || "your session is end , need to login again");
+      throw new Error(
+        errorData.error || "your session is end , need to login again"
+      );
     }
     console.log(response);
     const data = await response.json();
-    console.log(data.user.data ,"from the ts");
-    return data.user.data ;
-  }
-  catch (error) {
+    console.log(data.user.data, "from the ts");
+    return data.user.data;
+  } catch (error) {
     console.error("User profile fetch error:", error);
     // Network errors should return null instead of throwing
     if (error instanceof TypeError) {
@@ -89,7 +87,6 @@ export const useIsAuthenticated = (): boolean => {
   return !!user;
 };
 
-
 export const useIsAdmin = (): boolean => {
   const { data: user } = useUser();
   return user?.role === "ADMIN";
@@ -108,7 +105,7 @@ export const useUserName = (): string => {
 // export const useUserInitials = (): string => {
 //   const { data: user } = useUser();
 //   if (!user) return "G";
-  
+
 //   return user.name
 //     .split(" ")
 //     .map((word) => word[0])
@@ -117,7 +114,6 @@ export const useUserName = (): string => {
 //     .slice(0, 2);
 // };
 
-
 // ============================================================================
 // UTILITY HOOKS - Helper functions
 // ============================================================================
@@ -125,7 +121,7 @@ export const useUserName = (): string => {
 /**
  * Manually refetch user profile
  * Useful after login or when you need to force refresh
- * 
+ *
  * @example
  * const refetchUser = useRefetchUser();
  * await refetchUser();
@@ -140,7 +136,7 @@ export const useRefetchUser = () => {
 /**
  * Get loading state for auth
  * Useful for showing loading spinners during initial auth check
- * 
+ *
  * @example
  * const isAuthLoading = useAuthLoading();
  * if (isAuthLoading) return <Spinner />;
@@ -160,4 +156,3 @@ export const useAuthError = (): Error | null => {
   const { error } = useUser();
   return error;
 };
-

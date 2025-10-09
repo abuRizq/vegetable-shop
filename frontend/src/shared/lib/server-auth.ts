@@ -7,14 +7,12 @@ import { cookies } from "next/headers";
 export async function getServerUser() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("at")?.value;
-
+    const token = cookieStore.get("auth_token")?.value;
     // No token = not authenticated
     if (!token) {
       return null;
     }
-
-    const res = await fetch(`http://localhost:8080/api/users/me`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",

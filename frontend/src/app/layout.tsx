@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./styles/globals.css";
 import { QueryProviders } from "./provider/query-client-provider";
+import { ToastProvider } from "./provider/toast-provider";
 import { getServerUser } from "@/shared/lib/server-auth";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { userQueryKeys } from "@/entities/user/api/auth-hooks";
@@ -17,7 +18,7 @@ export default async function RootLayout({
 }>) {
   // Create a new QueryClient instance for this request
   const queryClient = new QueryClient();
-
+  
   // Prefetch user data on the server
   await queryClient.prefetchQuery({
     queryKey: userQueryKeys.me(),
@@ -33,6 +34,7 @@ export default async function RootLayout({
       <body className="flex min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
         <QueryProviders dehydratedState={dehydratedState}>
           {children}
+          <ToastProvider />
         </QueryProviders>
       </body>
     </html>

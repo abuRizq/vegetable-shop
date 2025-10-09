@@ -1,55 +1,70 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Loader2, AlertCircle, Leaf, ShoppingCart} from "lucide-react"
-import Link from "next/link"
-import { useForm } from "react-hook-form"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Loader2,
+  AlertCircle,
+  Leaf,
+  ShoppingCart,
+} from "lucide-react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginFormData, LoginSchema } from "../lib/validation"
-import { useLoginMutation } from "../api/use-login"
-import { useIsAuthenticated } from "@/entities/user"
+import { LoginFormData, LoginSchema } from "../lib/validation";
+import { useLoginMutation } from "../api/use-login";
+import { useIsAuthenticated } from "@/entities/user";
+import { Toast } from "@/shared/ui/toast";
 
 export const LoginForm = () => {
-  const router = useRouter()
-  const isAuthenticated = useIsAuthenticated()
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [loginError, setLoginError] = useState<string | null>(null)
+  const router = useRouter();
+  const isAuthenticated = useIsAuthenticated();
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const { mutate: login, isPending } = useLoginMutation({
-    
     onSuccess: (data) => {
-      console.log("Login successful");
+      Toast.success(`Login successful! Welcome back !`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
       console.log(data);
-      
       router.push("/");
+      // window.location.reload();
     },
     onError: (error) => {
       console.error("Login error:", error);
       setLoginError(error.message);
-    }
-  })
+      Toast.error(error.message || "Login failed. Please try again.", {
+        position: "top-center",
+        autoClose: 4000,
+      });
+    },
+  });
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
-  })
+  });
   const onSubmit = (data: LoginFormData) => {
     setLoginError(null);
-    login(data);
-  }
+    login({ ...data, rememberMe });
+  };
 
   // Use isPending instead of isSubmitting for loading state
   const isSubmitting = isPending;
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/")
+      router.push("/");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   // Show loading while checking existing auth
   if (isAuthenticated) {
@@ -59,13 +74,19 @@ export const LoginForm = () => {
         style={{ backgroundColor: "hsl(var(--background))" }}
       >
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: "hsl(var(--primary))" }} />
-          <p className="text-lg" style={{ color: "hsl(var(--text-secondary))" }}>
+          <Loader2
+            className="w-8 h-8 animate-spin mx-auto mb-4"
+            style={{ color: "hsl(var(--primary))" }}
+          />
+          <p
+            className="text-lg"
+            style={{ color: "hsl(var(--text-secondary))" }}
+          >
             Checking authentication...
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -360,4 +381,4 @@ export const LoginForm = () => {
       </div>
     </div>
   );
-}
+};

@@ -1,30 +1,16 @@
+import { api } from "@/shared/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
 
 type Tforgetpass = {
-  onSuccess?: (
-    data: unknown,
-    variables: string,
-    ctx: unknown
-  ) => void;
-  onError?: (
-    error: Error,
-    variables: string,
-    ctx: unknown
-  ) => void;
+  onSuccess?: (data: unknown, variables: string, ctx: unknown) => void;
+  onError?: (error: Error, variables: string, ctx: unknown) => void;
 };
-const useSendRestPasswordEmail = ({ onError, onSuccess }: Tforgetpass={}) => {
+const useSendRestPasswordEmail = ({ onError, onSuccess }: Tforgetpass = {}) => {
   return useMutation({
     mutationFn: async (credentials: string) => {
-      const response = await fetch("api/auth/sendEmail", {
-        method:"POST",
-        body:JSON.stringify({ email: credentials }),
-        headers: { "Content-type": "application/json" },
+      return await api.post("/auth/forgot-password", {email:credentials}, {
+        requiresAuth: false
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to send reset email");
-      }
-      return data;
     },
     onSuccess,
     onError: (error, variables, ctx) => {

@@ -20,16 +20,17 @@ import {
   registerSchema,
 } from "@/features/auth/register/lib/register";
 import { useRegisterMutation } from "../api/use-register";
+import { Toast } from "@/shared/ui/toast";
 
 export const RegisterForm = () => {
   const { mutate: Register } = useRegisterMutation({
     onSuccess: (data, Variables) => {
       console.log(data);
       console.log(Variables);
-      router.push("/")
+      router.push("/");
     },
     onError: (error, Variables) => {
-      console.error(error);
+      Toast.error(error.message);
       console.log(Variables);
     },
   });
@@ -44,15 +45,15 @@ export const RegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
   const [registerError, setRegisterError] = useState({ massage: "" });
-  
+
   const router = useRouter();
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
       Register({
-        name:data.firstname,
-        email:data.email,
-        password:data.password
+        name: data.firstname,
+        email: data.email,
+        password: data.password,
       });
     } catch (error) {
       setRegisterError({ massage: "Registration failed. Please try again." });
