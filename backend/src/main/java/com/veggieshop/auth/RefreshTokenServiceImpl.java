@@ -47,9 +47,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token not found"));
 
-        if (refreshToken.isRevoked() || refreshToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new IllegalArgumentException("Refresh token is expired or revoked");
+        if (refreshToken.isRevoked()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token revoked");
         }
+        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token expired");
+        }
+
         return refreshToken;
     }
 

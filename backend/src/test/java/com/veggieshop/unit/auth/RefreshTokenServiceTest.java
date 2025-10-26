@@ -6,6 +6,9 @@ import com.veggieshop.auth.RefreshTokenServiceImpl;
 import com.veggieshop.user.User;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.time.Instant;
 import java.util.*;
 
@@ -78,7 +81,12 @@ class RefreshTokenServiceTest {
     @Test
     void validateToken_shouldThrow_whenNotFound() {
         when(refreshTokenRepository.findByToken("notfound")).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> refreshTokenService.validateToken("notfound"));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> refreshTokenService.validateToken("notfound"));
+
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(ex.getReason()).isEqualTo("Refresh token not found");
     }
 
     @Test
@@ -91,7 +99,12 @@ class RefreshTokenServiceTest {
                 .expiryDate(Instant.now().plusSeconds(1000))
                 .build();
         when(refreshTokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(token));
-        assertThrows(IllegalArgumentException.class, () -> refreshTokenService.validateToken(tokenValue));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> refreshTokenService.validateToken(tokenValue));
+
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        // assertThat(ex.getReason()).containsIgnoringCase("revoked");
     }
 
     @Test
@@ -104,7 +117,12 @@ class RefreshTokenServiceTest {
                 .expiryDate(Instant.now().minusSeconds(10))
                 .build();
         when(refreshTokenRepository.findByToken(tokenValue)).thenReturn(Optional.of(token));
-        assertThrows(IllegalArgumentException.class, () -> refreshTokenService.validateToken(tokenValue));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> refreshTokenService.validateToken(tokenValue));
+
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        // assertThat(ex.getReason()).containsIgnoringCase("expired");
     }
 
     @Test
