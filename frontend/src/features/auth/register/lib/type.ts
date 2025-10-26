@@ -4,9 +4,9 @@ export interface RegisterCredentials {
     name: string
     email: string
     password: string
-    confirmPassword: string
+    // confirmPassword: boolean
     role?: UserRole
-    acceptTerms: boolean
+    // acceptTerms: boolean
 }
 
 export interface RegisterRequest {

@@ -266,6 +266,9 @@ class ProductServiceTest {
     @Test
     void findByCategory_shouldReturnPagedProducts() {
         Pageable pageable = PageRequest.of(0, 1);
+
+        when(categoryRepository.existsById(1L)).thenReturn(true);
+
         Product p1 = Product.builder().id(1L).name("Cucumber").category(vegetables).build();
         Page<Product> page = new PageImpl<>(List.of(p1), pageable, 1);
 
@@ -274,7 +277,9 @@ class ProductServiceTest {
 
         Page<ProductDto.ProductResponse> result = productService.findByCategory(1L, pageable);
         assertThat(result.getContent()).hasSize(1);
+        verify(categoryRepository).existsById(1L);
     }
+
 
     @Test
     void findFeatured_shouldReturnPagedFeaturedProducts() {

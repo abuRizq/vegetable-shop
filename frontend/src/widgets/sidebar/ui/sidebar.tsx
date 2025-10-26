@@ -5,21 +5,24 @@ import { useState } from "react"
 import { Home, Heart, Clock, ShoppingCart, LogOut, Star, ChevronLeft, ChevronRight, Leaf } from "lucide-react"
 import NavItem from "./nav-item"
 import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/entities/user/model/store"
+import { useUser } from "@/entities/user"
+import { useLogoutMutation } from "@/features/auth/logout/api/use-logout"
 
 function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false)
-    const { user, } = useAuthStore();
-    const route = useRouter();
-    const onSubmit = async () => {
+    const { data: user } = useUser();
+    const router = useRouter();
+    const { mutate: logout } = useLogoutMutation({
+        onSuccess: () => {
+            router.push('/login');
+        }
+    });
+
+    const onSubmit = () => {
         if (user) {
-            // await logout();
-            /***
-             * Add refrech page here
-             * 
-             */
+            logout();
         } else {
-            route.push('/login')
+            router.push('/login');
         }
     }
 
