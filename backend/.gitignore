@@ -1,4 +1,85 @@
-# Spring Boot application config
-src/main/resources/application*.properties
-src/main/resources/application*.yml
-!src/main/resources/application.yml
+# ======================= Maven / Build =======================
+target/
+**/target/
+.mvn/wrapper/maven-wrapper.jar
+**/.flattened-pom.xml
+**/dependency-reduced-pom.xml
+**/surefire-reports/
+**/failsafe-reports/
+**/jacoco.exec
+**/jacoco/*.exec
+**/site/
+
+# ======================= Spring / Config & Secrets =======================
+# Never commit real config files
+src/main/resources/application.yml
+src/main/resources/application.properties
+src/main/resources/application-*.yml
+src/main/resources/application-*.properties
+
+# Allow example templates
+!src/main/resources/application.yml.example
+!src/main/resources/application.properties.example
+
+# ======================= IDEs & Editors =======================
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+.nb-gradle/
+nbproject/
+.fleet/
+**/.ijwb/
+
+# ======================= Logs & runtime =======================
+logs/
+*.log
+*.hprof
+*.jfr
+spring.log
+nohup.out
+*.pid
+*.seed
+
+# ======================= Temp & caches =======================
+tmp/
+temp/
+**/.cache/
+.cache/
+dist/
+build/
+bin/
+.gen/
+.generated/
+generated/
+**/generated-sources/
+
+# ======================= Certificates / Keys =======================
+*.keystore
+*.p12
+*.jks
+*.pem
+*.crt
+*.key
+
+# ======================= Testing & Quality =======================
+coverage/
+**/coverage/
+**/test-output/
+**/test-results/
+**/reports/
+.checkstyle/
+checkstyle-result.xml
+pmd.xml
+findbugs.xml
+spotbugsXml.xml
+
+# ======================= OS junk =======================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+*.swp
+*.swo
