@@ -25,8 +25,8 @@ RUN adduser --system --group spring
 USER spring:spring
 
 WORKDIR /app
-# Copy the fat jar (Spring Boot repackage result)
-COPY --from=build /workspace/target/*.jar /app/app.jar
+# Copy ONLY the Spring Boot fat jar (repackaged) to avoid "no main manifest" error
+COPY --from=build /workspace/target/*-exec.jar /app/app.jar
 
 # Render injects PORT, and your app reads it (server.port=${PORT:8080})
 EXPOSE 8080
