@@ -1,5 +1,3 @@
-"use client"
-
 import { RegisterForm } from '@/features/auth/register'
 import React from 'react'
 

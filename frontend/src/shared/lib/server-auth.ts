@@ -1,9 +1,5 @@
 import { cookies } from "next/headers";
 
-/**
- * Server-side user fetching utility
- * This runs on the server and provides initial user data before hydration
- */
 export async function getServerUser() {
   try {
     const cookieStore = await cookies();

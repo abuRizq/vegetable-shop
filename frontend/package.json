@@ -17,6 +17,7 @@
     "@tanstack/react-query-devtools": "^5.84.1",
     "@tanstack/react-query-next-experimental": "^5.85.2",
     "@tanstack/react-query-persist-client": "^5.90.2",
+    "axios": "^1.12.2",
     "lucide-react": "^0.526.0",
     "next": "^15.5.3",
     "next-auth": "^4.24.11",

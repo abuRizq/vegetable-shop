@@ -21,8 +21,8 @@ function ThemeToggle() {
                  shadow-md hover:shadow-lg
                  border border-gray-200/50 dark:border-gray-600/50
                  hover:scale-105 active:scale-95
-                 group"
-    >
+                 group">
+      
       <div className="transition-transform duration-300 group-hover:rotate-12">
         {isDark ? (
           <Sun className="w-5 h-5 text-yellow-500 dark:text-yellow-400 drop-shadow-sm" />

@@ -1,4 +1,4 @@
-import ReturntoHome from "@/shared/ui/returnto-home";
+import ReturnHome from "@/shared/ui/return-home";
 
 
 export default function RootLayout({
@@ -8,7 +8,7 @@ export default function RootLayout({
 }>) {
     return (
         <div className="flex w-full min-h-screen bg-gray-50 dark:bg-gray-900 content-transition">
-            <ReturntoHome />
+            <ReturnHome />
             {children}
         </div>
     );

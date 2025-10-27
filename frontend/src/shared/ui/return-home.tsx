@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { ArrowLeft, Home } from "lucide-react"
 
-export default function ReturnToHome() {
+export default function ReturnHome() {
   return (
     <Link
       href="/"

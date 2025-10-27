@@ -1,24 +1,14 @@
-/**
- * React Query Auth Hooks - Single Source of Truth for Authentication
- * This file replaces Zustand store for auth state management.
- * All auth state is now managed by React Query's cache.
- */
+
 
 import { api } from "@/shared/lib/api-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-// ============================================================================
-// QUERY KEYS - Centralized key management
-// ============================================================================
 
 export const userQueryKeys = {
   all: ["user"] as const,
   me: () => [...userQueryKeys.all, "me"] as const,
 };
 
-// ============================================================================
-// API FUNCTIONS - Pure functions for API calls
-// ============================================================================
 
 async function fetchUserProfile() {
   try {
@@ -43,17 +33,12 @@ async function fetchUserProfile() {
     return data.user.data;
   } catch (error) {
     console.error("User profile fetch error:", error);
-    // Network errors should return null instead of throwing
     if (error instanceof TypeError) {
       return null;
     }
     throw error;
   }
 }
-
-// ============================================================================
-// MAIN HOOKS - Public API
-// ============================================================================
 
 export const useUser = () => {
   return useQuery({

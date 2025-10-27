@@ -67,11 +67,6 @@ export const api = {
     return response.json();
   
   },
-
-  /**
-   * POST request
-   */
-
   post: async (
     endpoint: string,
     data?: any,

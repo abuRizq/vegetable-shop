@@ -1,4 +1,4 @@
-import ReturntoHome from "@/shared/ui/returnto-home";
+import ReturntoHome from "@/shared/ui/return-home";
 
 function AuthLayout({
     children,

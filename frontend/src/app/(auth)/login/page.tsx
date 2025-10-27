@@ -1,5 +1,3 @@
-"use client";
-
 import { LoginForm } from "@/features/auth/login";
 import React from "react";
 
