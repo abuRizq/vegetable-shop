@@ -148,8 +148,20 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.veggieshop.VegetableShopApp</mainClass>
+                    <classifier>exec</classifier>
+                    <layers enabled="true"/>
+                </configuration>
             </plugin>
-            <!-- Maven Compiler Plugin for Java 17 and annotation processors -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -157,9 +169,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
+                    <compilerArgs><arg>-parameters</arg></compilerArgs>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.mapstruct</groupId>
@@ -181,4 +191,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
