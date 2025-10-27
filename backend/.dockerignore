@@ -1,0 +1,7 @@
+# Keep the image lean
+target
+.git
+.gitignore
+.idea
+.vscode
+**/*.log

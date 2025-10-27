@@ -1,53 +1,95 @@
+version: "3.9"
+
 services:
-  postgres:
-    image: postgres:15
-    container_name: vegetable-shop-db
+  # ===== Backend connected to Neon (default) =====
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veg-backend
+    restart: unless-stopped
+    environment:
+      PORT: ${PORT:-8080}
+
+      # ---- Neon Postgres (from .env)
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
+      # ---- Safer defaults for dev
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+
+      # ---- App settings
+      APP_RESET_LINK_BASE: ${APP_RESET_LINK_BASE:-http://localhost:3000/reset-password?token=}
+      APP_SECURITY_COOKIE_SECURE: ${APP_SECURITY_COOKIE_SECURE:-false}
+      JWT_SECRET: ${JWT_SECRET}
+
+      # ---- Optional mail config
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+    ports:
+      - "8080:8080"
+    networks:
+      - veggienet
+
+  # ===== Local Postgres (optional) =====
+  db:
+    profiles: ["local-db"]
+    image: postgres:16-alpine
+    container_name: veg-postgres
     environment:
       POSTGRES_DB: vegetable_shop
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      TZ: UTC
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - shop-network
+      - veggienet
 
-  backend:
-    build: ./backend
-    container_name: vegetable-shop-backend
+  # ===== Backend against local Postgres (optional) =====
+  app-local:
+    profiles: ["local-db"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veg-backend-local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      DB_URL: jdbc:postgresql://db:5432/vegetable_shop
+      DB_USER: postgres
+      DB_PASS: postgres
+      JPA_DDL_AUTO: update
+      SQL_INIT_MODE: never
+      SPRING_PROFILES_ACTIVE: dev
+      APP_RESET_LINK_BASE: http://localhost:3000/reset-password?token=
+      APP_SECURITY_COOKIE_SECURE: "false"
+      JWT_SECRET: ${JWT_SECRET}
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres
-    environment:
-      DB_URL: jdbc:postgresql://postgres:5432/vegetable_shop
-      DB_USER: postgres
-      DB_PASS: secret
-      ADMIN_USER: admin
-      ADMIN_PASS: admin123
-      JWT_SECRET: MySuperSecretKeyThatIsAtLeast32Characters!
-      JWT_EXPIRATION: 86400000
-      TZ: UTC
     networks:
-      - shop-network
-
-  frontend:
-    build: ./frontend
-    container_name: vegetable-shop-frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    environment:
-      NEXT_PUBLIC_API_URL: http://backend:8080/api
-      TZ: UTC
-    networks:
-      - shop-network
-
-volumes:
-  db_data:
+      - veggienet
 
 networks:
-  shop-network:
+  veggienet:
+
+volumes:
+  pgdata:
