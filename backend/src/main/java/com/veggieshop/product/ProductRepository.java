@@ -4,6 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // All products, paginated and sorted (admin)
@@ -28,10 +31,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name, Pageable pageable);
 
     // Filter by price range (active products)
-    Page<Product> findByPriceBetweenAndActiveTrue(java.math.BigDecimal min, java.math.BigDecimal max, Pageable pageable);
+    Page<Product> findByPriceBetweenAndActiveTrue(BigDecimal min, BigDecimal max, Pageable pageable);
 
     // Prevent duplicate product names
     boolean existsByName(String name);
 
     boolean existsByCategoryId(Long categoryId);
+
+    // Exact match (used by the seeder)
+    Optional<Product> findByName(String name);
 }
