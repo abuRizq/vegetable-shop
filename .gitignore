@@ -63,12 +63,12 @@ yarn-error.log*
 **/site/
 
 # Spring config (real files) — allow examples
-backend/src/main/resources/application.yml
-backend/src/main/resources/application.properties
-backend/src/main/resources/application-*.yml
-backend/src/main/resources/application-*.properties
-!backend/src/main/resources/application.yml.example
-!backend/src/main/resources/application.properties.example
+#backend/src/main/resources/application.yml
+#backend/src/main/resources/application.properties
+#backend/src/main/resources/application-*.yml
+#backend/src/main/resources/application-*.properties
+#!backend/src/main/resources/application.yml.example
+#!backend/src/main/resources/application.properties.example
 
 # certificates / keys
 *.keystore

@@ -12,14 +12,14 @@ target/
 
 # ======================= Spring / Config & Secrets =======================
 # Never commit real config files
-src/main/resources/application.yml
-src/main/resources/application.properties
-src/main/resources/application-*.yml
-src/main/resources/application-*.properties
+#src/main/resources/application.yml
+#src/main/resources/application.properties
+#src/main/resources/application-*.yml
+#src/main/resources/application-*.properties
 
 # Allow example templates
-!src/main/resources/application.yml.example
-!src/main/resources/application.properties.example
+#!src/main/resources/application.yml.example
+#!src/main/resources/application.properties.example
 
 # ======================= IDEs & Editors =======================
 .idea/
