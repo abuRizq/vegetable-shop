@@ -121,12 +121,15 @@ function Sidebar() {
                     )}
                     <nav className="space-y-1">
                         <NavItem
+                            href=""
+
                             icon={<Home size={20} />}
                             text="Home"
                             active
                             collapsed={isCollapsed}
                         />
                         <NavItem
+                            href=""
                             icon={<Clock size={20} />}
                             text="Fresh Today"
                             collapsed={isCollapsed}
@@ -146,16 +149,20 @@ function Sidebar() {
                     )}
                     <nav className="space-y-1">
                         <NavItem
+                            href="/car"
                             icon={<Heart size={20} />}
                             text="Offers & Discounts"
                             collapsed={isCollapsed}
                         />
                         <NavItem
+                            href=""
                             icon={<Star size={20} />}
                             text="Best Sellers"
                             collapsed={isCollapsed}
                         />
                         <NavItem
+                            href=""
+
                             icon={<ShoppingCart size={20} />}
                             text="Orders"
                             collapsed={isCollapsed}
@@ -176,6 +183,7 @@ function Sidebar() {
                     )}
                     <nav className="space-y-1">
                         <NavItem
+                            href="/products"
                             icon={<Heart size={20} />}
                             text="shopping list"
                             collapsed={isCollapsed}

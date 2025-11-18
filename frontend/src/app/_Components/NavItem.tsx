@@ -1,18 +1,20 @@
+import Link from "next/link";
 import type React from "react"
 
 export interface NavItemProps {
-    icon: React.ReactNode
-    text: string
-    active?: boolean
-    className?: string
-    collapsed?: boolean
+    icon: React.ReactNode;
+    text: string;
+    active?: boolean;
+    className?: string;
+    collapsed?: boolean;
+    href: string;
 }
 
-function NavItem({ icon, text, active = false, className = "", collapsed = false }: NavItemProps) {
+function NavItem({ href, icon, text, active = false, className = "", collapsed = false }: NavItemProps) {
     return (
         <div className="relative group">
-            <a
-                href="#"
+            <Link
+                href={href}
                 className={`
              flex items-center rounded-xl
                     nav-item-transition
@@ -45,7 +47,7 @@ function NavItem({ icon, text, active = false, className = "", collapsed = false
                         <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-sm"></div>
                     </div>
                 )}
-            </a>
+            </Link>
 
             {/* Enhanced Tooltip for collapsed state */}
             {collapsed && (
